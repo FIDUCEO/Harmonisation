@@ -10,10 +10,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       158,          7]
-NotebookDataLength[     11853,        383]
-NotebookOptionsPosition[     10348,        323]
-NotebookOutlinePosition[     10707,        339]
-CellTagsIndexPosition[     10664,        336]
+NotebookDataLength[     12307,        393]
+NotebookOptionsPosition[     10765,        332]
+NotebookOutlinePosition[     11124,        348]
+CellTagsIndexPosition[     11081,        345]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -22,6 +22,15 @@ Notebook[{
 Cell[CellGroupData[{
 Cell["Measurement Equations", "Title",
  CellChangeTimes->{{3.7034930072903957`*^9, 3.703493012525505*^9}}],
+
+Cell["\<\
+This work was undertaken within the project \[OpenCurlyDoubleQuote]Fidelity \
+and Uncertainty in Climate data records from Earth Observation\
+\[CloseCurlyDoubleQuote] (FIDUCEO). FIDUCEO has received funding from the \
+European Union\[CloseCurlyQuote]s H2020 Research and Innovation programme, \
+under Grant Agreement 638822.\
+\>", "Text",
+ CellChangeTimes->{3.7034868718845987`*^9, 3.703495372228732*^9}],
 
 Cell[CellGroupData[{
 
@@ -340,50 +349,51 @@ CellTagsIndex->{}
 Notebook[{
 Cell[CellGroupData[{
 Cell[580, 22, 106, 1, 92, "Title"],
+Cell[689, 25, 414, 7, 68, "Text"],
 Cell[CellGroupData[{
-Cell[711, 27, 282, 4, 64, "Section"],
+Cell[1128, 36, 282, 4, 64, "Section"],
 Cell[CellGroupData[{
-Cell[1018, 35, 681, 21, 32, "Input"],
-Cell[1702, 58, 675, 21, 46, "Output"]
+Cell[1435, 44, 681, 21, 32, "Input"],
+Cell[2119, 67, 675, 21, 46, "Output"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[2414, 84, 182, 3, 32, "Input"],
-Cell[2599, 89, 267, 6, 43, "Output"]
+Cell[2831, 93, 182, 3, 32, "Input"],
+Cell[3016, 98, 267, 6, 43, "Output"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[2903, 100, 131, 2, 32, "Input"],
-Cell[3037, 104, 247, 6, 43, "Output"]
+Cell[3320, 109, 131, 2, 32, "Input"],
+Cell[3454, 113, 247, 6, 43, "Output"]
 }, Open  ]]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[3333, 116, 229, 3, 64, "Section"],
+Cell[3750, 125, 229, 3, 64, "Section"],
 Cell[CellGroupData[{
-Cell[3587, 123, 573, 14, 32, "Input"],
-Cell[4163, 139, 531, 11, 32, "Output"]
-}, Open  ]],
-Cell[CellGroupData[{
-Cell[4731, 155, 571, 15, 32, "Input"],
-Cell[5305, 172, 710, 19, 50, "Output"]
+Cell[4004, 132, 573, 14, 32, "Input"],
+Cell[4580, 148, 531, 11, 32, "Output"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[6052, 196, 327, 9, 32, "Input"],
-Cell[6382, 207, 735, 20, 46, "Output"]
+Cell[5148, 164, 571, 15, 32, "Input"],
+Cell[5722, 181, 710, 19, 50, "Output"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[7154, 232, 577, 12, 32, "Input"],
-Cell[7734, 246, 896, 25, 67, "Output"]
+Cell[6469, 205, 327, 9, 32, "Input"],
+Cell[6799, 216, 735, 20, 46, "Output"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[8667, 276, 184, 3, 32, "Input"],
-Cell[8854, 281, 449, 9, 61, "Output"]
+Cell[7571, 241, 577, 12, 32, "Input"],
+Cell[8151, 255, 896, 25, 67, "Output"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[9340, 295, 131, 2, 32, "Input"],
-Cell[9474, 299, 257, 5, 61, "Output"]
+Cell[9084, 285, 184, 3, 32, "Input"],
+Cell[9271, 290, 449, 9, 61, "Output"]
 }, Open  ]],
-Cell[9746, 307, 285, 6, 32, "Input"]
+Cell[CellGroupData[{
+Cell[9757, 304, 131, 2, 32, "Input"],
+Cell[9891, 308, 257, 5, 61, "Output"]
 }, Open  ]],
-Cell[10046, 316, 286, 4, 64, "Section"]
+Cell[10163, 316, 285, 6, 32, "Input"]
+}, Open  ]],
+Cell[10463, 325, 286, 4, 64, "Section"]
 }, Open  ]]
 }
 ]
