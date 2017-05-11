@@ -1,5 +1,9 @@
 (* ::Package:: *)
 
+(* ::Title:: *)
+(*A Wolfram Language Package to Create Harmonisation Plots with Mathematica*)
+
+
 (* ::Section:: *)
 (*Plot functions*)
 
