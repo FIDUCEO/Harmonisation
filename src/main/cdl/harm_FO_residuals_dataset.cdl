@@ -1,0 +1,40 @@
+netcdf harm_FO_residuals_dataset {
+dimensions:
+	m = 16848699 ;
+variables:
+	double t(m) ;
+		t:description = "The time of measurement for sensor i" ;
+		t:units = "seconds since 1970-1-1 0:0:0" ;
+	float measurand_i(m) ;
+		measurand_i:description = "The measurand (e.g. radiance) of sensor i" ;
+	float measurand_j(m) ;
+		measurand_j:description = "The measurand (e.g. radiance) of sensor j" ;
+	float measurand_i_uncertainty_q(m) ;
+		measurand_i_uncertainty_q:description = "The uncertainty of the measurand of sensor i due to the uncertainty of sensor state variables" ;
+	float measurand_j_uncertainty_q(m) ;
+		measurand_j_uncertainty_q:description = "The uncertainty of the measurand of sensor j due to the uncertainty of sensor state variables" ;
+	float measurand_i_uncertainty_x(m) ;
+		measurand_i_uncertainty_x:description = "The uncertainty of the measurand of sensor i due to the uncertainty of calibration parameters" ;
+	float measurand_j_uncertainty_x(m) ;
+		measurand_j_uncertainty_x:description = "The uncertainty of the measurand of sensor j due to the uncertainty of calibration parameters" ;
+	float k_res(m) ;
+		k_res:description = "The harmonisation residual" ;
+	float k_res_uncertainty_l(m) ;
+		k_res_uncertainty_l:description = "The uncertainty of the harmonisation residual due to the uncertainty of the measurand difference" ;
+	float k_res_uncertainty_h(m) ;
+		k_res_uncertainty_h:description = "The uncertainty of the harmonisation residual due to the uncertainty of the measurand adjustment" ;
+	float k_res_normalised(m) ;
+		k_res_normalised:description = "k_res_normalised" ;
+
+// global attributes:
+		:matchup_dataset = "AVHRR_RSIM_4_RSA_____" ;
+		:matchup_dataset_begin = "19830524" ;
+		:matchup_dataset_end = "20151231" ;
+		:sensor_i = "m02" ;
+		:sensor_j = "n17" ;
+		:software = "FO" ;
+		:software_version = "2.0" ;
+		:software_tag = "e998838" ;
+		:job = "jobs/job_sim_v2.nml" ;
+		:job_id = "02" ;
+}
