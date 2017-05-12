@@ -13,11 +13,15 @@
 
 
 (* ::Input::Initialization:: *)
-plotCorrelationMatrix[data_,OptionsPattern[{ColorFunction->"TemperatureMap",Frame->True,FrameLabel->{"Sensor","Sensor"},ParameterGrouping->1,PlotTheme->"Detailed"}]]:=Module[{labels,matrix,parameterGrouping,frameTicks},matrix=data[[1]];labels=data[[2]];parameterGrouping=OptionValue[ParameterGrouping];frameTicks=Table[{(parameterGrouping+1)/2+i-1,Rotate[(StringReplace[StringJoin[labels[[i]]],RegularExpression[" {1,}"]->""]),45 Degree]},{i,1,Length[labels],parameterGrouping}];MatrixPlot[matrix,Mesh->{Length[matrix]/parameterGrouping-1,Length[matrix]/parameterGrouping-1},ColorFunction->OptionValue[ColorFunction],Frame->OptionValue[Frame],FrameLabel->OptionValue[FrameLabel],FrameTicks->{frameTicks,frameTicks},PlotTheme->OptionValue[PlotTheme]]];
+plotCorrelationMatrix[data_,OptionsPattern[{ColorFunction->"TemperatureMap",Frame->True,FrameLabel->{"Sensor","Sensor"},FrameTicks->None,Mesh->None,ParameterGrouping->0,PlotTheme->"Detailed"}]]:=Module[{labels,matrix,frameTicks,mesh,parameterGrouping},matrix=data[[1]];labels=data[[2]];
+parameterGrouping=OptionValue[ParameterGrouping];frameTicks=If[parameterGrouping>0,Table[Table[{(parameterGrouping+1)/2+i-1,Rotate[(StringReplace[StringJoin[labels[[i]]],RegularExpression[" {1,}"]->""]),45 Degree]},{i,1,Length[labels],parameterGrouping}],2],OptionValue[FrameTicks]];
+mesh=If[parameterGrouping>0,{Length[matrix]/parameterGrouping-1,Length[matrix]/parameterGrouping-1},OptionValue[Mesh]];MatrixPlot[matrix,Mesh->mesh,ColorFunction->OptionValue[ColorFunction],Frame->OptionValue[Frame],FrameLabel->OptionValue[FrameLabel],FrameTicks->frameTicks,PlotTheme->OptionValue[PlotTheme]]];
 
 
 (* ::Input::Initialization:: *)
-plotCovarianceMatrix[data_,OptionsPattern[{ColorFunction->"TemperatureMap",Frame->True,FrameLabel->{"Sensor","Sensor"},ParameterGrouping->1,PlotTheme->"Detailed"}]]:=Module[{labels,matrix,parameterGrouping,frameTicks},matrix=data[[1]];labels=data[[2]];parameterGrouping=OptionValue[ParameterGrouping];frameTicks=Table[{(parameterGrouping+1)/2+i-1,Rotate[(StringReplace[StringJoin[labels[[i]]],RegularExpression[" {1,}"]->""]),45 Degree]},{i,1,Length[labels],parameterGrouping}];MatrixPlot[matrix,Mesh->{Length[matrix]/parameterGrouping-1,Length[matrix]/parameterGrouping-1},ColorFunction->OptionValue[ColorFunction],Frame->OptionValue[Frame],FrameLabel->OptionValue[FrameLabel],FrameTicks->{frameTicks,frameTicks},PlotTheme->OptionValue[PlotTheme]]];
+plotCovarianceMatrix[data_,OptionsPattern[{ColorFunction->"TemperatureMap",Frame->True,FrameLabel->{"Sensor","Sensor"},FrameTicks->None,Mesh->None,ParameterGrouping->0,PlotTheme->"Detailed"}]]:=Module[{labels,matrix,frameTicks,mesh,parameterGrouping},matrix=data[[1]];labels=data[[2]];
+parameterGrouping=OptionValue[ParameterGrouping];frameTicks=If[parameterGrouping>0,Table[Table[{(parameterGrouping+1)/2+i-1,Rotate[(StringReplace[StringJoin[labels[[i]]],RegularExpression[" {1,}"]->""]),45 Degree]},{i,1,Length[labels],parameterGrouping}],2],OptionValue[FrameTicks]];
+mesh=If[parameterGrouping>0,{Length[matrix]/parameterGrouping-1,Length[matrix]/parameterGrouping-1},OptionValue[Mesh]];MatrixPlot[matrix,Mesh->mesh,ColorFunction->OptionValue[ColorFunction],Frame->OptionValue[Frame],FrameLabel->OptionValue[FrameLabel],FrameTicks->frameTicks,PlotTheme->OptionValue[PlotTheme]]];
 
 
 (* ::Input::Initialization:: *)
