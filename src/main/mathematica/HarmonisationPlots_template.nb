@@ -10,10 +10,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       158,          7]
-NotebookDataLength[     29857,        725]
-NotebookOptionsPosition[     27813,        654]
-NotebookOutlinePosition[     28226,        672]
-CellTagsIndexPosition[     28183,        669]
+NotebookDataLength[     30913,        747]
+NotebookOptionsPosition[     28748,        672]
+NotebookOutlinePosition[     29162,        690]
+CellTagsIndexPosition[     29119,        687]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -77,24 +77,42 @@ Cell[BoxData[
   3.703489719457919*^9, 3.7034897211510363`*^9}}],
 
 Cell["\<\
-Edit the cell below to set the harmonization data directory. Then evaluate \
-this notebook.\
+Edit the cell below to set the path to the directory where your harmonization \
+output data data reside. The directory must contain the parameter and \
+residuals datasets from a single harmonisation job.\
 \>", "ItemNumbered",
  CellChangeTimes->{{3.7034832116285353`*^9, 3.703483244371187*^9}, {
   3.703483492409885*^9, 3.703483505140524*^9}, {3.7034852068627663`*^9, 
-  3.703485217281692*^9}}],
+  3.703485217281692*^9}, {3.703590042267261*^9, 3.703590148008461*^9}, {
+  3.703590414805244*^9, 3.7035905094904613`*^9}}],
 
 Cell[BoxData[
  RowBox[{
   RowBox[{
   "SetDirectory", "[", 
-   "\"\</path/to/the/harmonisation/output/data/directory\>\"", "]"}], 
+   "\"\</path/to/the/harmonisation/job/output/data/directory\>\"", "]"}], 
   ";"}]], "Input",
  CellChangeTimes->{{3.702282413442349*^9, 3.7022824240200787`*^9}, {
    3.7029633676426573`*^9, 3.702963395946211*^9}, 3.7033179198233423`*^9, 
    3.703319621328933*^9, {3.7034837880637093`*^9, 3.703483823998508*^9}, {
    3.703583699790305*^9, 3.703583713830944*^9}, {3.703585835546171*^9, 
-   3.703585850746058*^9}, {3.703586264468678*^9, 3.703586266694193*^9}}],
+   3.703585850746058*^9}, {3.703586264468678*^9, 3.703586266694193*^9}, {
+   3.7035905368236647`*^9, 3.70359053756038*^9}}],
+
+Cell["Evaluate this notebook.", "ItemNumbered",
+ CellChangeTimes->{{3.703590169477845*^9, 3.703590176302195*^9}, {
+  3.703590263146962*^9, 3.703590342270567*^9}}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Preparation", "Section",
+ CellChangeTimes->{{3.703243100598578*^9, 3.703243104215357*^9}, {
+   3.7033196830067377`*^9, 3.703319700045059*^9}, 3.703319730776149*^9, {
+   3.703482625880747*^9, 3.7034826268831673`*^9}, {3.70348513796059*^9, 
+   3.703485138168635*^9}, {3.703489590508238*^9, 3.7034895927197227`*^9}, {
+   3.703489628493743*^9, 3.703489634980667*^9}, {3.703590191739871*^9, 
+   3.7035902017385674`*^9}, {3.7035902520857563`*^9, 3.703590254672139*^9}}],
 
 Cell[BoxData[
  RowBox[{"parameterDatasetName", "=", 
@@ -653,7 +671,7 @@ Cell[BoxData[
 }, Open  ]]
 },
 WindowSize->{808, 755},
-WindowMargins->{{76, Automatic}, {Automatic, 38}},
+WindowMargins->{{Automatic, 243}, {Automatic, 15}},
 PrintingCopies->1,
 PrintingPageRange->{1, Automatic},
 FrontEndVersion->"11.0 for Mac OS X x86 (32-bit, 64-bit Kernel) (September \
@@ -680,51 +698,55 @@ Cell[1629, 48, 325, 8, 30, "ItemNumbered"],
 Cell[1957, 58, 229, 4, 32, "Input"],
 Cell[2189, 64, 327, 6, 30, "ItemNumbered"],
 Cell[2519, 72, 204, 4, 32, "Input"],
-Cell[2726, 78, 291, 6, 30, "ItemNumbered"],
-Cell[3020, 86, 512, 10, 32, "Input"],
-Cell[3535, 98, 811, 15, 54, "Input"],
-Cell[4349, 115, 506, 10, 54, "Input"],
-Cell[4858, 127, 1135, 26, 138, "Input"]
+Cell[2726, 78, 500, 8, 49, "ItemNumbered"],
+Cell[3229, 88, 567, 11, 32, "Input"],
+Cell[3799, 101, 162, 2, 30, "ItemNumbered"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[6030, 158, 105, 1, 64, "Section"],
-Cell[6138, 161, 789, 17, 54, "Input"],
-Cell[6930, 180, 1821, 27, 32, "Input"]
+Cell[3998, 108, 469, 6, 64, "Section"],
+Cell[4470, 116, 811, 15, 54, "Input"],
+Cell[5284, 133, 506, 10, 54, "Input"],
+Cell[5793, 145, 1135, 26, 138, "Input"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[8788, 212, 106, 1, 64, "Section"],
-Cell[8897, 215, 737, 17, 54, "Input"],
-Cell[9637, 234, 1550, 23, 32, "Input"]
+Cell[6965, 176, 105, 1, 64, "Section"],
+Cell[7073, 179, 789, 17, 54, "Input"],
+Cell[7865, 198, 1821, 27, 32, "Input"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[11224, 262, 522, 7, 64, "Section"],
-Cell[11749, 271, 895, 19, 54, "Input"],
-Cell[12647, 292, 924, 16, 32, "Input"]
+Cell[9723, 230, 106, 1, 64, "Section"],
+Cell[9832, 233, 737, 17, 54, "Input"],
+Cell[10572, 252, 1550, 23, 32, "Input"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[13608, 313, 279, 4, 64, "Section"],
-Cell[13890, 319, 549, 16, 54, "Input"],
-Cell[14442, 337, 1530, 34, 54, "Input"]
+Cell[12159, 280, 522, 7, 64, "Section"],
+Cell[12684, 289, 895, 19, 54, "Input"],
+Cell[13582, 310, 924, 16, 32, "Input"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[16009, 376, 497, 7, 64, "Section"],
-Cell[16509, 385, 574, 16, 32, "Input"],
-Cell[17086, 403, 1757, 38, 54, "Input"]
+Cell[14543, 331, 279, 4, 64, "Section"],
+Cell[14825, 337, 549, 16, 54, "Input"],
+Cell[15377, 355, 1530, 34, 54, "Input"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[18880, 446, 556, 7, 64, "Section"],
-Cell[19439, 455, 642, 17, 32, "Input"],
-Cell[20084, 474, 1736, 37, 54, "Input"]
+Cell[16944, 394, 497, 7, 64, "Section"],
+Cell[17444, 403, 574, 16, 32, "Input"],
+Cell[18021, 421, 1757, 38, 54, "Input"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[21857, 516, 533, 7, 64, "Section"],
-Cell[22393, 525, 603, 16, 32, "Input"],
-Cell[22999, 543, 1687, 36, 54, "Input"]
+Cell[19815, 464, 556, 7, 64, "Section"],
+Cell[20374, 473, 642, 17, 32, "Input"],
+Cell[21019, 492, 1736, 37, 54, "Input"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[24723, 584, 594, 8, 64, "Section"],
-Cell[25320, 594, 664, 16, 32, "Input"],
-Cell[25987, 612, 1798, 38, 75, "Input"]
+Cell[22792, 534, 533, 7, 64, "Section"],
+Cell[23328, 543, 603, 16, 32, "Input"],
+Cell[23934, 561, 1687, 36, 54, "Input"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[25658, 602, 594, 8, 64, "Section"],
+Cell[26255, 612, 664, 16, 32, "Input"],
+Cell[26922, 630, 1798, 38, 75, "Input"]
 }, Open  ]]
 }, Open  ]]
 }
