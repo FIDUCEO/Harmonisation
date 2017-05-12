@@ -10,10 +10,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       158,          7]
-NotebookDataLength[     13657,        425]
-NotebookOptionsPosition[     11963,        359]
-NotebookOutlinePosition[     12322,        375]
-CellTagsIndexPosition[     12279,        372]
+NotebookDataLength[     14353,        443]
+NotebookOptionsPosition[     12654,        377]
+NotebookOutlinePosition[     13013,        393]
+CellTagsIndexPosition[     12970,        390]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -24,13 +24,31 @@ Cell["Measurement Equations", "Title",
  CellChangeTimes->{{3.7034930072903957`*^9, 3.703493012525505*^9}}],
 
 Cell["\<\
-This work was undertaken within the project \[OpenCurlyDoubleQuote]Fidelity \
-and Uncertainty in Climate data records from Earth Observation\
-\[CloseCurlyDoubleQuote] (FIDUCEO). FIDUCEO has received funding from the \
-European Union\[CloseCurlyQuote]s H2020 Research and Innovation programme, \
-under Grant Agreement 638822.\
+Copyright (C) 2017 Ralf Quast
+
+This code was developed for the EC project \[OpenCurlyDoubleQuote]Fidelity \
+and Uncertainty in
+Climate Data Records from Earth Observations (FIDUCEO)\[CloseCurlyDoubleQuote].
+Grant Agreement: 638822
+<Version> Reviewed and approved by <name, instituton>, <date>
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the Free
+Software Foundation; either version 3 of the License, or (at your option)
+any later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+more details.
+
+A copy of the GNU General Public License should have been supplied along
+with this program; if not, see http://www.gnu.org/licenses/\
 \>", "Text",
- CellChangeTimes->{3.7034868718845987`*^9, 3.703495372228732*^9}],
+ CellChangeTimes->{{3.703613898672303*^9, 3.70361406057141*^9}, {
+  3.703614098346682*^9, 3.703614109338667*^9}, {3.703614202235271*^9, 
+  3.7036142049506693`*^9}},
+ FontSize->12],
 
 Cell[CellGroupData[{
 
@@ -376,56 +394,56 @@ CellTagsIndex->{}
 Notebook[{
 Cell[CellGroupData[{
 Cell[580, 22, 106, 1, 92, "Title"],
-Cell[689, 25, 414, 7, 68, "Text"],
+Cell[689, 25, 1105, 25, 334, "Text"],
 Cell[CellGroupData[{
-Cell[1128, 36, 282, 4, 64, "Section"],
+Cell[1819, 54, 282, 4, 64, "Section"],
 Cell[CellGroupData[{
-Cell[1435, 44, 268, 4, 32, "Input"],
-Cell[1706, 50, 167, 3, 32, "Output"]
+Cell[2126, 62, 268, 4, 32, "Input"],
+Cell[2397, 68, 167, 3, 32, "Output"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[1910, 58, 930, 27, 96, "Input"],
-Cell[2843, 87, 741, 19, 46, "Output"]
+Cell[2601, 76, 930, 27, 96, "Input"],
+Cell[3534, 105, 741, 19, 46, "Output"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[3621, 111, 182, 3, 32, "Input"],
-Cell[3806, 116, 398, 8, 43, "Output"]
+Cell[4312, 129, 182, 3, 32, "Input"],
+Cell[4497, 134, 398, 8, 32, "Output"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[4241, 129, 131, 2, 32, "Input"],
-Cell[4375, 133, 376, 8, 43, "Output"]
+Cell[4932, 147, 131, 2, 32, "Input"],
+Cell[5066, 151, 376, 8, 32, "Output"]
 }, Open  ]],
-Cell[4766, 144, 145, 3, 32, "Input"]
-}, Open  ]],
-Cell[CellGroupData[{
-Cell[4948, 152, 229, 3, 64, "Section"],
-Cell[CellGroupData[{
-Cell[5202, 159, 573, 14, 32, "Input"],
-Cell[5778, 175, 531, 11, 32, "Output"]
+Cell[5457, 162, 145, 3, 32, "Input"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[6346, 191, 571, 15, 32, "Input"],
-Cell[6920, 208, 710, 19, 50, "Output"]
+Cell[5639, 170, 229, 3, 64, "Section"],
+Cell[CellGroupData[{
+Cell[5893, 177, 573, 14, 32, "Input"],
+Cell[6469, 193, 531, 11, 32, "Output"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[7667, 232, 327, 9, 32, "Input"],
-Cell[7997, 243, 735, 20, 46, "Output"]
+Cell[7037, 209, 571, 15, 32, "Input"],
+Cell[7611, 226, 710, 19, 50, "Output"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[8769, 268, 577, 12, 32, "Input"],
-Cell[9349, 282, 896, 25, 67, "Output"]
+Cell[8358, 250, 327, 9, 32, "Input"],
+Cell[8688, 261, 735, 20, 46, "Output"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[10282, 312, 184, 3, 32, "Input"],
-Cell[10469, 317, 449, 9, 61, "Output"]
+Cell[9460, 286, 577, 12, 32, "Input"],
+Cell[10040, 300, 896, 25, 67, "Output"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[10955, 331, 131, 2, 32, "Input"],
-Cell[11089, 335, 257, 5, 61, "Output"]
+Cell[10973, 330, 184, 3, 32, "Input"],
+Cell[11160, 335, 449, 9, 50, "Output"]
 }, Open  ]],
-Cell[11361, 343, 285, 6, 32, "Input"]
+Cell[CellGroupData[{
+Cell[11646, 349, 131, 2, 32, "Input"],
+Cell[11780, 353, 257, 5, 50, "Output"]
 }, Open  ]],
-Cell[11661, 352, 286, 4, 64, "Section"]
+Cell[12052, 361, 285, 6, 32, "Input"]
+}, Open  ]],
+Cell[12352, 370, 286, 4, 64, "Section"]
 }, Open  ]]
 }
 ]

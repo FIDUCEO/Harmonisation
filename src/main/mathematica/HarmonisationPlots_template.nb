@@ -10,10 +10,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       158,          7]
-NotebookDataLength[     31090,        750]
-NotebookOptionsPosition[     28925,        675]
-NotebookOutlinePosition[     29339,        693]
-CellTagsIndexPosition[     29296,        690]
+NotebookDataLength[     31787,        768]
+NotebookOptionsPosition[     29616,        693]
+NotebookOutlinePosition[     30030,        711]
+CellTagsIndexPosition[     29987,        708]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -29,13 +29,31 @@ Cell[TextData[{
    3.7034851237872143`*^9}],
 
 Cell["\<\
-This work was undertaken within the project \[OpenCurlyDoubleQuote]Fidelity \
-and Uncertainty in Climate data records from Earth Observation\
-\[CloseCurlyDoubleQuote] (FIDUCEO). FIDUCEO has received funding from the \
-European Union\[CloseCurlyQuote]s H2020 Research and Innovation programme, \
-under Grant Agreement 638822.\
+Copyright (C) 2017 Ralf Quast
+
+This code was developed for the EC project \[OpenCurlyDoubleQuote]Fidelity \
+and Uncertainty in
+Climate Data Records from Earth Observations (FIDUCEO)\[CloseCurlyDoubleQuote].
+Grant Agreement: 638822
+<Version> Reviewed and approved by <name, instituton>, <date>
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the Free
+Software Foundation; either version 3 of the License, or (at your option)
+any later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+more details.
+
+A copy of the GNU General Public License should have been supplied along
+with this program; if not, see http://www.gnu.org/licenses/\
 \>", "Text",
- CellChangeTimes->{3.7034868718845987`*^9, 3.703495415008472*^9}],
+ CellChangeTimes->{{3.703613898672303*^9, 3.70361406057141*^9}, {
+  3.703614098346682*^9, 3.703614109338667*^9}, {3.703614202235271*^9, 
+  3.7036142049506693`*^9}},
+ FontSize->12],
 
 Cell[CellGroupData[{
 
@@ -694,62 +712,62 @@ CellTagsIndex->{}
 Notebook[{
 Cell[CellGroupData[{
 Cell[580, 22, 221, 6, 148, "Title"],
-Cell[804, 30, 414, 7, 68, "Text"],
+Cell[804, 30, 1105, 25, 334, "Text"],
 Cell[CellGroupData[{
-Cell[1243, 41, 383, 5, 64, "Section"],
-Cell[1629, 48, 325, 8, 30, "ItemNumbered"],
-Cell[1957, 58, 229, 4, 32, "Input"],
-Cell[2189, 64, 327, 6, 30, "ItemNumbered"],
-Cell[2519, 72, 204, 4, 32, "Input"],
-Cell[2726, 78, 500, 8, 49, "ItemNumbered"],
-Cell[3229, 88, 567, 11, 32, "Input"],
-Cell[3799, 101, 211, 3, 30, "ItemNumbered"]
+Cell[1934, 59, 383, 5, 64, "Section"],
+Cell[2320, 66, 325, 8, 30, "ItemNumbered"],
+Cell[2648, 76, 229, 4, 32, "Input"],
+Cell[2880, 82, 327, 6, 30, "ItemNumbered"],
+Cell[3210, 90, 204, 4, 32, "Input"],
+Cell[3417, 96, 500, 8, 49, "ItemNumbered"],
+Cell[3920, 106, 567, 11, 32, "Input"],
+Cell[4490, 119, 211, 3, 30, "ItemNumbered"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[4047, 109, 469, 6, 64, "Section"],
-Cell[4519, 117, 811, 15, 54, "Input"],
-Cell[5333, 134, 506, 10, 54, "Input"],
-Cell[5842, 146, 1160, 26, 138, "Input"]
+Cell[4738, 127, 469, 6, 64, "Section"],
+Cell[5210, 135, 811, 15, 54, "Input"],
+Cell[6024, 152, 506, 10, 54, "Input"],
+Cell[6533, 164, 1160, 26, 138, "Input"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[7039, 177, 105, 1, 64, "Section"],
-Cell[7147, 180, 789, 17, 54, "Input"],
-Cell[7939, 199, 1821, 27, 32, "Input"]
+Cell[7730, 195, 105, 1, 64, "Section"],
+Cell[7838, 198, 789, 17, 54, "Input"],
+Cell[8630, 217, 1821, 27, 32, "Input"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[9797, 231, 106, 1, 64, "Section"],
-Cell[9906, 234, 737, 17, 54, "Input"],
-Cell[10646, 253, 1550, 23, 32, "Input"]
+Cell[10488, 249, 106, 1, 64, "Section"],
+Cell[10597, 252, 737, 17, 54, "Input"],
+Cell[11337, 271, 1550, 23, 32, "Input"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[12233, 281, 522, 7, 64, "Section"],
-Cell[12758, 290, 895, 19, 54, "Input"],
-Cell[13656, 311, 975, 17, 32, "Input"]
+Cell[12924, 299, 522, 7, 64, "Section"],
+Cell[13449, 308, 895, 19, 54, "Input"],
+Cell[14347, 329, 975, 17, 32, "Input"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[14668, 333, 279, 4, 64, "Section"],
-Cell[14950, 339, 549, 16, 54, "Input"],
-Cell[15502, 357, 1530, 34, 54, "Input"]
+Cell[15359, 351, 279, 4, 64, "Section"],
+Cell[15641, 357, 549, 16, 54, "Input"],
+Cell[16193, 375, 1530, 34, 54, "Input"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[17069, 396, 497, 7, 64, "Section"],
-Cell[17569, 405, 574, 16, 32, "Input"],
-Cell[18146, 423, 1757, 38, 54, "Input"]
+Cell[17760, 414, 497, 7, 64, "Section"],
+Cell[18260, 423, 574, 16, 32, "Input"],
+Cell[18837, 441, 1757, 38, 54, "Input"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[19940, 466, 556, 7, 64, "Section"],
-Cell[20499, 475, 642, 17, 32, "Input"],
-Cell[21144, 494, 1788, 38, 75, "Input"]
+Cell[20631, 484, 556, 7, 64, "Section"],
+Cell[21190, 493, 642, 17, 32, "Input"],
+Cell[21835, 512, 1788, 38, 75, "Input"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[22969, 537, 533, 7, 64, "Section"],
-Cell[23505, 546, 603, 16, 32, "Input"],
-Cell[24111, 564, 1687, 36, 54, "Input"]
+Cell[23660, 555, 533, 7, 64, "Section"],
+Cell[24196, 564, 603, 16, 32, "Input"],
+Cell[24802, 582, 1687, 36, 54, "Input"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[25835, 605, 594, 8, 64, "Section"],
-Cell[26432, 615, 664, 16, 32, "Input"],
-Cell[27099, 633, 1798, 38, 75, "Input"]
+Cell[26526, 623, 594, 8, 64, "Section"],
+Cell[27123, 633, 664, 16, 32, "Input"],
+Cell[27790, 651, 1798, 38, 75, "Input"]
 }, Open  ]]
 }, Open  ]]
 }
