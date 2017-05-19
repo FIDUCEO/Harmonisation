@@ -4,6 +4,10 @@
 (*A Wolfram Language Package to Create Harmonisation Plots with Mathematica*)
 
 
+(* ::Section::Closed:: *)
+(*License*)
+
+
 (* ::Text:: *)
 (*Copyright (C) 2017 Ralf Quast*)
 (**)
@@ -52,11 +56,23 @@ plotRadianceVsRadiance[data_,OptionsPattern[{BinSize->{1.0},PlotRange->{{5,155},
 
 
 (* ::Input::Initialization:: *)
+plotRadianceVsRadianceRandom[data_,OptionsPattern[{Seed->27183,PointNumber->10000,PlotRange->{{5,155},{5,155}},PlotTheme->{"Detailed","VibrantColor"},Title->None}]]:=Module[{},RandomSeed[OptionValue[Seed]];ListPlot[RandomChoice[Transpose[data],OptionValue[PointNumber]],FrameLabel->{"Radiance ([radiance])","Radiance ([radiance])"},PlotLabel->OptionValue[Title],PlotRange->OptionValue[PlotRange],PlotTheme->OptionValue[PlotTheme]]];
+
+
+(* ::Input::Initialization:: *)
 plotResidualsVsTime[data_,OptionsPattern[{BinSizes->{{1/4},{0.1}},PlotRange->{All,{-5,5}},PlotTheme->"Detailed",Title->None}]]:=DensityHistogram[Transpose[{data[[1]]/86400/365.25+1970,data[[2]]}],OptionValue[BinSizes],{"Log","PDF"},FrameLabel->{"Time (calendar year)","K residual ([radiance])"},ColorFunction->"TemperatureMap",PlotLabel->OptionValue[Title],PlotRange->OptionValue[PlotRange],PlotRangePadding->None,PlotTheme->OptionValue[PlotTheme]];
 
 
 (* ::Input::Initialization:: *)
+plotResidualsVsTimeRandom[data_,OptionsPattern[{Seed->27183,PointNumber->10000,PlotRange->{All,{-5,5}},PlotTheme->{"Detailed","VibrantColor"},Title->None}]]:=Module[{},RandomSeed[OptionValue[Seed]];ListPlot[RandomChoice[Transpose[{data[[1]]/86400/365.25+1970,data[[2]]}],OptionValue[PointNumber]],FrameLabel->{"Time (calendar year)","K residual ([radiance])"},PlotLabel->OptionValue[Title],PlotRange->OptionValue[PlotRange],PlotTheme->OptionValue[PlotTheme]]];
+
+
+(* ::Input::Initialization:: *)
 plotNormalizedResidualsVsTime[data_,OptionsPattern[{BinSizes->{{1/4},{0.1}},PlotRange->{All,{-7,7}},PlotTheme->"Detailed",Title->None}]]:=DensityHistogram[Transpose[{data[[1]]/86400/365.25+1970,data[[2]]}],OptionValue[BinSizes],{"Log","PDF"},FrameLabel->{"Time (calendar year)","Normalised K residual"},ColorFunction->"TemperatureMap",PlotLabel->OptionValue[Title],PlotRange->OptionValue[PlotRange],PlotRangePadding->None,PlotTheme->OptionValue[PlotTheme]];
+
+
+(* ::Input::Initialization:: *)
+plotNormalizedResidualsVsTimeRandom[data_,OptionsPattern[{Seed->27183,PointNumber->10000,PlotRange->{All,{-5,5}},PlotTheme->{"Detailed","VibrantColor"},Title->None}]]:=Module[{},RandomSeed[OptionValue[Seed]];ListPlot[RandomChoice[Transpose[{data[[1]]/86400/365.25+1970,data[[2]]}],OptionValue[PointNumber]],FrameLabel->{"Time (calendar year)","Normalised K residual"},PlotLabel->OptionValue[Title],PlotRange->OptionValue[PlotRange],PlotTheme->OptionValue[PlotTheme]]];
 
 
 (* ::Input::Initialization:: *)
