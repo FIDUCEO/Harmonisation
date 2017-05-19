@@ -10,10 +10,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       158,          7]
-NotebookDataLength[     22806,        645]
-NotebookOptionsPosition[     20384,        555]
-NotebookOutlinePosition[     20743,        571]
-CellTagsIndexPosition[     20700,        568]
+NotebookDataLength[     23313,        655]
+NotebookOptionsPosition[     20853,        564]
+NotebookOutlinePosition[     21212,        580]
+CellTagsIndexPosition[     21169,        577]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -543,7 +543,16 @@ Cell[BoxData[
  RowBox[{"100000", " ", "speedOfLight"}]], "Output",
  CellChangeTimes->{3.70416917251964*^9, 3.704169338856594*^9, 
   3.704174372558134*^9}]
-}, Open  ]]
+}, Open  ]],
+
+Cell["\<\
+The  measurement equation for HIRS has the same form as that for AVHRR, where \
+the coefficient a4 for HIRS corresponds to the coefficient a0 for AVHRR.\
+\>", "Text",
+ CellChangeTimes->{{3.7041681216766987`*^9, 3.7041682133004704`*^9}, {
+   3.704168263408086*^9, 3.704168284932734*^9}, {3.704168841228365*^9, 
+   3.704168864592929*^9}, {3.704168975121915*^9, 3.704168981885584*^9}, 
+   3.704169152411152*^9, {3.7041750018899307`*^9, 3.704175111140719*^9}}]
 }, Open  ]],
 
 Cell["Microwave - fully simplified", "Section",
@@ -643,9 +652,10 @@ Cell[18658, 494, 1065, 38, 51, "Text"],
 Cell[CellGroupData[{
 Cell[19748, 536, 150, 3, 32, "Input"],
 Cell[19901, 541, 154, 3, 32, "Output"]
-}, Open  ]]
 }, Open  ]],
-Cell[20082, 548, 286, 4, 64, "Section"]
+Cell[20070, 547, 466, 7, 49, "Text"]
+}, Open  ]],
+Cell[20551, 557, 286, 4, 64, "Section"]
 }, Open  ]]
 }
 ]
