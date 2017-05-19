@@ -56,7 +56,7 @@ plotRadianceVsRadiance[data_,OptionsPattern[{BinSize->{1.0},PlotRange->{{5,155},
 
 
 (* ::Input::Initialization:: *)
-plotRadianceVsRadianceRandom[data_,OptionsPattern[{Seed->27183,PointNumber->10000,PlotRange->{{5,155},{5,155}},PlotTheme->{"Detailed","VibrantColor"},Title->None}]]:=Module[{},RandomSeed[OptionValue[Seed]];ListPlot[RandomChoice[Transpose[data],OptionValue[PointNumber]],FrameLabel->{"Radiance ([radiance])","Radiance ([radiance])"},PlotLabel->OptionValue[Title],PlotRange->OptionValue[PlotRange],PlotTheme->OptionValue[PlotTheme]]];
+plotRadianceVsRadianceRandom[data_,OptionsPattern[{Seed->27181,PointNumber->10000,PlotRange->{{5,155},{5,155}},PlotTheme->{"Detailed","VibrantColor"},Title->None}]]:=Module[{},RandomSeed[OptionValue[Seed]];ListPlot[RandomChoice[Transpose[data],OptionValue[PointNumber]],FrameLabel->{"Radiance ([radiance])","Radiance ([radiance])"},PlotLabel->OptionValue[Title],PlotRange->OptionValue[PlotRange],PlotTheme->OptionValue[PlotTheme]]];
 
 
 (* ::Input::Initialization:: *)
@@ -64,7 +64,7 @@ plotResidualsVsTime[data_,OptionsPattern[{BinSizes->{{1/4},{0.1}},PlotRange->{Al
 
 
 (* ::Input::Initialization:: *)
-plotResidualsVsTimeRandom[data_,OptionsPattern[{Seed->27183,PointNumber->10000,PlotRange->{All,{-5,5}},PlotTheme->{"Detailed","VibrantColor"},Title->None}]]:=Module[{},RandomSeed[OptionValue[Seed]];ListPlot[RandomChoice[Transpose[{data[[1]]/86400/365.25+1970,data[[2]]}],OptionValue[PointNumber]],FrameLabel->{"Time (calendar year)","K residual ([radiance])"},PlotLabel->OptionValue[Title],PlotRange->OptionValue[PlotRange],PlotTheme->OptionValue[PlotTheme]]];
+plotResidualsVsTimeRandom[data_,OptionsPattern[{Seed->27181,PointNumber->10000,PlotRange->{All,{-5,5}},PlotTheme->{"Detailed","VibrantColor"},Title->None}]]:=Module[{},RandomSeed[OptionValue[Seed]];ListPlot[RandomChoice[Transpose[{data[[1]]/86400/365.25+1970,data[[2]]}],OptionValue[PointNumber]],FrameLabel->{"Time (calendar year)","K residual ([radiance])"},PlotLabel->OptionValue[Title],PlotRange->OptionValue[PlotRange],PlotTheme->OptionValue[PlotTheme]]];
 
 
 (* ::Input::Initialization:: *)
@@ -72,7 +72,7 @@ plotNormalizedResidualsVsTime[data_,OptionsPattern[{BinSizes->{{1/4},{0.1}},Plot
 
 
 (* ::Input::Initialization:: *)
-plotNormalizedResidualsVsTimeRandom[data_,OptionsPattern[{Seed->27183,PointNumber->10000,PlotRange->{All,{-5,5}},PlotTheme->{"Detailed","VibrantColor"},Title->None}]]:=Module[{},RandomSeed[OptionValue[Seed]];ListPlot[RandomChoice[Transpose[{data[[1]]/86400/365.25+1970,data[[2]]}],OptionValue[PointNumber]],FrameLabel->{"Time (calendar year)","Normalised K residual"},PlotLabel->OptionValue[Title],PlotRange->OptionValue[PlotRange],PlotTheme->OptionValue[PlotTheme]]];
+plotNormalizedResidualsVsTimeRandom[data_,OptionsPattern[{Seed->27181,PointNumber->10000,PlotRange->{All,{-5,5}},PlotTheme->{"Detailed","VibrantColor"},Title->None}]]:=Module[{},RandomSeed[OptionValue[Seed]];ListPlot[RandomChoice[Transpose[{data[[1]]/86400/365.25+1970,data[[2]]}],OptionValue[PointNumber]],FrameLabel->{"Time (calendar year)","Normalised K residual"},PlotLabel->OptionValue[Title],PlotRange->OptionValue[PlotRange],PlotTheme->OptionValue[PlotTheme]]];
 
 
 (* ::Input::Initialization:: *)
@@ -89,3 +89,11 @@ mean=Mean[data];sdev=StandardDeviation[data];median=Median[data];mdev=MeanDeviat
 pr=PlotRange/.Options[hist,PlotRange];
 plot=Plot[{PDF[NormalDistribution[mean,sdev],x],PDF[LaplaceDistribution[median,mdev],x]},{x,pr[[1,1]],pr[[1,2]]},PlotRange->pr,PlotTheme->{"Monochrome","ThinLines"}];
 Show[hist,plot]];
+
+
+(* ::Input::Initialization:: *)
+plotNormalizedResidualsTrend[data_,tmin_,tmax_,OptionsPattern[{ConfidenceLevel->0.99,GridLines->Automatic,PlotRange->{All,{-0.05,0.05}},PlotTheme->{"Monochrome","ThinLines"},Title->None}]]:=Module[{cl,lm,trend},lm=LinearModelFit[Transpose[{data[[1]]/86400/365.25+1970,data[[2]]}],{1,t},t];cl=OptionValue[ConfidenceLevel];trend=lm[{"BestFit","MeanPredictionBands"},ConfidenceLevel->cl];Plot[Evaluate[Flatten[trend]],{t,tmin,tmax},Axes->False,Frame->True,FrameLabel->{"Time (calendar year)","Mean normalised K residual"},GridLines->OptionValue[GridLines],PlotLabel->OptionValue[Title],PlotRange->OptionValue[PlotRange],PlotStyle->{Automatic,Dashed,Dashed},PlotTheme->OptionValue[PlotTheme],PlotLabels->{Placed[trend[[1]],{Scaled[1],Before}],None,None}]];
+
+
+(* ::Input::Initialization:: *)
+plotNormalizedResidualsTrendRandom[data_,tmin_,tmax_,OptionsPattern[{ConfidenceLevel->0.99,Seed->27181,PointNumber->10000,GridLines->Automatic,PlotRange->{All,{-0.05,0.05}},PlotTheme->{"Monochrome","ThinLines"},Title->None}]]:=Module[{cl,lm,trend},RandomSeed[OptionValue[Seed]];lm=LinearModelFit[RandomChoice[Transpose[{data[[1]]/86400/365.25+1970,data[[2]]}],OptionValue[PointNumber]],{1,t},t];cl=OptionValue[ConfidenceLevel];trend=lm[{"BestFit","MeanPredictionBands"},ConfidenceLevel->cl];Plot[Evaluate[Flatten[trend]],{t,tmin,tmax},Axes->False,Frame->True,FrameLabel->{"Time (calendar year)","Mean normalised K residual"},GridLines->OptionValue[GridLines],PlotLabel->OptionValue[Title],PlotRange->OptionValue[PlotRange],PlotStyle->{Automatic,Dashed,Dashed},PlotTheme->OptionValue[PlotTheme],PlotLabels->{Placed[trend[[1]],{Scaled[1],Before}],None,None}]];
