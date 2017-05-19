@@ -10,10 +10,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       158,          7]
-NotebookDataLength[     58199,       1440]
-NotebookOptionsPosition[     54381,       1314]
-NotebookOutlinePosition[     54795,       1332]
-CellTagsIndexPosition[     54752,       1329]
+NotebookDataLength[     61345,       1530]
+NotebookOptionsPosition[     57210,       1395]
+NotebookOutlinePosition[     57624,       1413]
+CellTagsIndexPosition[     57581,       1410]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -1309,6 +1309,87 @@ Cell[BoxData[
    3.7033129720993977`*^9}, {3.703313393242003*^9, 3.703313394892803*^9}, {
    3.704181333877839*^9, 3.704181356475905*^9}, {3.704181401454666*^9, 
    3.704181410172636*^9}}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Trend analysis of normalized residuals vs time (alltogether)", "Section",
+ CellChangeTimes->{{3.7029781241418962`*^9, 3.7029781384808292`*^9}, {
+   3.702982168490472*^9, 3.702982173001381*^9}, {3.702985498495274*^9, 
+   3.702985518317214*^9}, {3.703005326942132*^9, 3.703005340861847*^9}, 
+   3.7033130645854*^9, {3.704177504026471*^9, 3.704177510546774*^9}, {
+   3.70417947915456*^9, 3.704179483970518*^9}, {3.704179768231785*^9, 
+   3.704179773749797*^9}, {3.704183610247758*^9, 3.704183615681625*^9}}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"data", "=", 
+   RowBox[{"Map", "[", 
+    RowBox[{
+     RowBox[{
+      RowBox[{"(", 
+       RowBox[{"Import", "[", 
+        RowBox[{"#", ",", 
+         RowBox[{"{", 
+          RowBox[{"\"\<Datasets\>\"", ",", 
+           RowBox[{"{", 
+            RowBox[{"\"\<t\>\"", ",", "\"\<k_res_normalised\>\""}], "}"}]}], 
+          "}"}]}], "]"}], ")"}], "&"}], ",", "residualsDatasetNames"}], 
+    "]"}]}], ";"}]], "Input",
+ CellChangeTimes->{{3.703310218903105*^9, 3.703310332287218*^9}, {
+   3.703312719480535*^9, 3.7033127266422453`*^9}, 3.703585744932467*^9, {
+   3.704179825622142*^9, 3.704179828426547*^9}}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"data", "=", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"Catenate", "[", 
+      RowBox[{"Table", "[", 
+       RowBox[{
+        RowBox[{"data", "[", 
+         RowBox[{"[", 
+          RowBox[{"i", ",", "1"}], "]"}], "]"}], ",", 
+        RowBox[{"{", 
+         RowBox[{"i", ",", 
+          RowBox[{"Length", "[", "data", "]"}]}], "}"}]}], "]"}], "]"}], ",", 
+     
+     RowBox[{"Catenate", "[", 
+      RowBox[{"Table", "[", 
+       RowBox[{
+        RowBox[{"data", "[", 
+         RowBox[{"[", 
+          RowBox[{"i", ",", "2"}], "]"}], "]"}], ",", 
+        RowBox[{"{", 
+         RowBox[{"i", ",", 
+          RowBox[{"Length", "[", "data", "]"}]}], "}"}]}], "]"}], "]"}]}], 
+    "}"}]}], ";"}]], "Input",
+ CellChangeTimes->{{3.704178362405974*^9, 3.7041783901008997`*^9}}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"lm", "=", 
+   RowBox[{"LinearModelFit", "[", 
+    RowBox[{
+     RowBox[{"Transpose", "[", "data", "]"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"1", ",", "t"}], "}"}], ",", "t"}], "]"}]}], ";"}]], "Input",
+ CellChangeTimes->{{3.704183625266403*^9, 3.704183662388013*^9}, {
+  3.704183705061101*^9, 3.7041837200177507`*^9}, {3.704184022585487*^9, 
+  3.7041840266279097`*^9}}],
+
+Cell[BoxData[
+ RowBox[{"lm", "[", "\"\<ParameterTable\>\"", "]"}]], "Input",
+ CellChangeTimes->{{3.704183722257128*^9, 3.70418373288058*^9}}],
+
+Cell[BoxData[
+ RowBox[{"Sqrt", "[", 
+  RowBox[{"lm", "[", "\"\<EstimatedVariance\>\"", "]"}], "]"}]], "Input",
+ CellChangeTimes->{{3.704184174250347*^9, 3.704184194549592*^9}}],
+
+Cell[BoxData[""], "Input",
+ CellChangeTimes->{{3.7041859266631393`*^9, 3.7041859389575853`*^9}}]
 }, Open  ]]
 }, Open  ]]
 },
@@ -1440,6 +1521,15 @@ Cell[51417, 1250, 656, 8, 64, "Section"],
 Cell[52076, 1260, 716, 17, 32, "Input"],
 Cell[52795, 1279, 277, 6, 32, "Input"],
 Cell[53075, 1287, 1278, 23, 32, "Input"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[54390, 1315, 510, 6, 64, "Section"],
+Cell[54903, 1323, 639, 17, 32, "Input"],
+Cell[55545, 1342, 804, 25, 54, "Input"],
+Cell[56352, 1369, 408, 10, 32, "Input"],
+Cell[56763, 1381, 141, 2, 32, "Input"],
+Cell[56907, 1385, 176, 3, 32, "Input"],
+Cell[57086, 1390, 96, 1, 32, "Input"]
 }, Open  ]]
 }, Open  ]]
 }
