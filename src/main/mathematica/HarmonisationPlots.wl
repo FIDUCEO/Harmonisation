@@ -92,8 +92,12 @@ Show[hist,plot]];
 
 
 (* ::Input::Initialization:: *)
-plotNormalizedResidualsTrend[data_,tmin_,tmax_,OptionsPattern[{ConfidenceLevel->0.99,GridLines->Automatic,PlotRange->{All,{-0.05,0.05}},PlotTheme->{"Monochrome","ThinLines"},Title->None}]]:=Module[{cl,lm,trend},lm=LinearModelFit[Transpose[{data[[1]]/86400/365.25+1970,data[[2]]}],{1,t},t];cl=OptionValue[ConfidenceLevel];trend=lm[{"BestFit","MeanPredictionBands"},ConfidenceLevel->cl];Plot[Evaluate[Flatten[trend]],{t,tmin,tmax},Axes->False,Frame->True,FrameLabel->{"Time (calendar year)","Mean normalised K residual"},GridLines->OptionValue[GridLines],PlotLabel->OptionValue[Title],PlotRange->OptionValue[PlotRange],PlotStyle->{Automatic,Dashed,Dashed},PlotTheme->OptionValue[PlotTheme],PlotLabels->{Placed[trend[[1]],{Scaled[1],Before}],None,None}]];
+computeTrend[data_,OptionsPattern[{ConfidenceLevel->0.99}]]:=Module[{lm},lm=LinearModelFit[Transpose[{data[[1]]/86400/365.25+1970,data[[2]]}],{1,t},t];lm[{"BestFit","MeanPredictionBands"},ConfidenceLevel->OptionValue[ConfidenceLevel]]];
 
 
 (* ::Input::Initialization:: *)
-plotNormalizedResidualsTrendRandom[data_,tmin_,tmax_,OptionsPattern[{ConfidenceLevel->0.99,Seed->27181,PointNumber->10000,GridLines->Automatic,PlotRange->{All,{-0.05,0.05}},PlotTheme->{"Monochrome","ThinLines"},Title->None}]]:=Module[{cl,lm,trend},RandomSeed[OptionValue[Seed]];lm=LinearModelFit[RandomChoice[Transpose[{data[[1]]/86400/365.25+1970,data[[2]]}],OptionValue[PointNumber]],{1,t},t];cl=OptionValue[ConfidenceLevel];trend=lm[{"BestFit","MeanPredictionBands"},ConfidenceLevel->cl];Plot[Evaluate[Flatten[trend]],{t,tmin,tmax},Axes->False,Frame->True,FrameLabel->{"Time (calendar year)","Mean normalised K residual"},GridLines->OptionValue[GridLines],PlotLabel->OptionValue[Title],PlotRange->OptionValue[PlotRange],PlotStyle->{Automatic,Dashed,Dashed},PlotTheme->OptionValue[PlotTheme],PlotLabels->{Placed[trend[[1]],{Scaled[1],Before}],None,None}]];
+computeTrendRandom[data_,OptionsPattern[{ConfidenceLevel->0.99,Seed->27181,PointNumber->100000}]]:=Module[{lm},RandomSeed[OptionValue[Seed]];lm=LinearModelFit[RandomChoice[Transpose[{data[[1]]/86400/365.25+1970,data[[2]]}],OptionValue[PointNumber]],{1,t},t];lm[{"BestFit","MeanPredictionBands"},ConfidenceLevel->OptionValue[ConfidenceLevel]]];
+
+
+(* ::Input::Initialization:: *)
+plotNormalizedResidualsTrend[trend_,tmin_,tmax_,OptionsPattern[{GridLines->Automatic,PlotRange->{All,{-0.05,0.05}},PlotTheme->{"Monochrome","ThinLines"},Title->None}]]:=Plot[Evaluate[Flatten[trend]],{t,tmin,tmax},Axes->False,Frame->True,FrameLabel->{"Time (calendar year)","Mean normalised K residual"},GridLines->OptionValue[GridLines],PlotLabel->OptionValue[Title],PlotRange->OptionValue[PlotRange],PlotStyle->{Automatic,Dashed,Dashed},PlotTheme->OptionValue[PlotTheme],PlotLabels->{Placed[trend[[1]],{Scaled[1],Before}],None,None}];

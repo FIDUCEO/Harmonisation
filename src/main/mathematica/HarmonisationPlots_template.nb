@@ -10,10 +10,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       158,          7]
-NotebookDataLength[     62320,       1544]
-NotebookOptionsPosition[     58262,       1411]
-NotebookOutlinePosition[     58676,       1429]
-CellTagsIndexPosition[     58633,       1426]
+NotebookDataLength[     62920,       1560]
+NotebookOptionsPosition[     58783,       1425]
+NotebookOutlinePosition[     59196,       1443]
+CellTagsIndexPosition[     59153,       1440]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -1380,8 +1380,37 @@ Cell[BoxData[
   3.7042150419186172`*^9, 3.7042150446436567`*^9}}],
 
 Cell[BoxData[
+ RowBox[{"trend", "=", 
+  RowBox[{"computeTrendRandom", "[", 
+   RowBox[{"data", ",", 
+    RowBox[{"PointNumber", "\[Rule]", "100000"}]}], "]"}]}]], "Input",
+ CellChangeTimes->{{3.704253594783987*^9, 3.704253629260125*^9}}],
+
+Cell[BoxData[
  RowBox[{"plotNormalizedResidualsTrend", "[", 
-  RowBox[{"data", ",", "1981", ",", "2019", ",", 
+  RowBox[{"trend", ",", "1981", ",", "2019", ",", 
+   RowBox[{"PlotRange", "\[Rule]", 
+    RowBox[{"{", 
+     RowBox[{
+      RowBox[{"-", "0.05"}], ",", "0.05"}], "}"}]}]}], "]"}]], "Input",
+ CellChangeTimes->{{3.704219531624056*^9, 3.704219549736331*^9}, {
+   3.704220008948827*^9, 3.704220036448915*^9}, {3.704220287374872*^9, 
+   3.704220304547124*^9}, {3.704220393979233*^9, 3.704220416394021*^9}, {
+   3.704220719848297*^9, 3.704220720649239*^9}, {3.7042209713656816`*^9, 
+   3.704220976369286*^9}, {3.704221084389674*^9, 3.704221086435017*^9}, {
+   3.704221119670483*^9, 3.704221123347015*^9}, {3.70422147025803*^9, 
+   3.704221470604941*^9}, 3.704254017534203*^9, {3.704254131169354*^9, 
+   3.704254139480331*^9}}],
+
+Cell[BoxData[
+ RowBox[{"trend", "=", 
+  RowBox[{"computeTrend", "[", "data", "]"}]}]], "Input",
+ CellChangeTimes->{{3.704253594783987*^9, 3.704253629260125*^9}, {
+  3.704254162455357*^9, 3.704254169544382*^9}}],
+
+Cell[BoxData[
+ RowBox[{"plotNormalizedResidualsTrend", "[", 
+  RowBox[{"trend", ",", "1981", ",", "2019", ",", 
    RowBox[{"PlotRange", "\[Rule]", 
     RowBox[{"{", 
      RowBox[{
@@ -1389,28 +1418,13 @@ Cell[BoxData[
  CellChangeTimes->{{3.704219078463214*^9, 3.704219085452746*^9}, {
   3.704219173052597*^9, 3.704219186736134*^9}, {3.7042209512493143`*^9, 
   3.704220982278255*^9}, {3.704221257771194*^9, 3.7042212615244617`*^9}, {
-  3.704221474588696*^9, 3.7042214749276743`*^9}}],
-
-Cell[BoxData[
- RowBox[{"plotNormalizedResidualsTrendRandom", "[", 
-  RowBox[{"data", ",", "1981", ",", "2019", ",", 
-   RowBox[{"PlotRange", "\[Rule]", 
-    RowBox[{"{", 
-     RowBox[{
-      RowBox[{"-", "0.05"}], ",", "0.05"}], "}"}]}], ",", 
-   RowBox[{"PointNumber", "\[Rule]", "100000"}]}], "]"}]], "Input",
- CellChangeTimes->{{3.704219531624056*^9, 3.704219549736331*^9}, {
-  3.704220008948827*^9, 3.704220036448915*^9}, {3.704220287374872*^9, 
-  3.704220304547124*^9}, {3.704220393979233*^9, 3.704220416394021*^9}, {
-  3.704220719848297*^9, 3.704220720649239*^9}, {3.7042209713656816`*^9, 
-  3.704220976369286*^9}, {3.704221084389674*^9, 3.704221086435017*^9}, {
-  3.704221119670483*^9, 3.704221123347015*^9}, {3.70422147025803*^9, 
-  3.704221470604941*^9}}]
+  3.704221474588696*^9, 3.7042214749276743`*^9}, {3.704254148992351*^9, 
+  3.704254150311956*^9}}]
 }, Open  ]]
 }, Open  ]]
 },
 WindowSize->{808, 755},
-WindowMargins->{{Automatic, 243}, {Automatic, 15}},
+WindowMargins->{{Automatic, 94}, {24, Automatic}},
 PrintingCopies->1,
 PrintingPageRange->{1, Automatic},
 FrontEndVersion->"11.0 for Mac OS X x86 (32-bit, 64-bit Kernel) (September \
@@ -1542,8 +1556,10 @@ Cell[CellGroupData[{
 Cell[54914, 1325, 535, 7, 64, "Section"],
 Cell[55452, 1334, 639, 17, 32, "Input"],
 Cell[56094, 1353, 855, 26, 54, "Input"],
-Cell[56952, 1381, 515, 10, 32, "Input"],
-Cell[57470, 1393, 764, 14, 54, "Input"]
+Cell[56952, 1381, 237, 5, 32, "Input"],
+Cell[57192, 1388, 782, 14, 32, "Input"],
+Cell[57977, 1404, 210, 4, 32, "Input"],
+Cell[58190, 1410, 565, 11, 32, "Input"]
 }, Open  ]]
 }, Open  ]]
 }
