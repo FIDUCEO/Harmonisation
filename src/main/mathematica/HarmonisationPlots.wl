@@ -60,6 +60,22 @@ plotRadianceVsRadianceRandom[data_,OptionsPattern[{Seed->27181,PointNumber->1000
 
 
 (* ::Input::Initialization:: *)
+plotRadianceDifferenceVsRadiance[data_,OptionsPattern[{BinSize->{1.0,0.1},PlotRange->{{5,155},{-5,-5}},PlotTheme->"Detailed",Title->None}]]:=DensityHistogram[Transpose[data],OptionValue[BinSize],{"Log","PDF"},FrameLabel->{"Radiance ([radiance])","Radiance difference ([radiance])"},ColorFunction->"TemperatureMap",PlotLabel->OptionValue[Title],PlotRange->OptionValue[PlotRange],PlotRangePadding->None,PlotTheme->OptionValue[PlotTheme]];
+
+
+(* ::Input::Initialization:: *)
+plotRadianceDifferenceVsRadianceRandom[data_,OptionsPattern[{Seed->27181,PointNumber->10000,PlotRange->{{5,155},{-5,5}},PlotTheme->{"Detailed","VibrantColor"},Title->None}]]:=Module[{},RandomSeed[OptionValue[Seed]];ListPlot[RandomChoice[Transpose[data],OptionValue[PointNumber]],FrameLabel->{"Radiance ([radiance])","Radiance difference ([radiance])"},PlotLabel->OptionValue[Title],PlotRange->OptionValue[PlotRange],PlotTheme->OptionValue[PlotTheme]]];
+
+
+(* ::Input::Initialization:: *)
+plotRadianceDifferenceVsTime[data_,OptionsPattern[{BinSizes->{{1/4},{0.1}},PlotRange->{All,{-5,5}},PlotTheme->"Detailed",Title->None}]]:=DensityHistogram[Transpose[{data[[1]]/86400/365.25+1970,data[[2]]}],OptionValue[BinSizes],{"Log","PDF"},FrameLabel->{"Time (calendar year)","Radiance difference ([radiance])"},ColorFunction->"TemperatureMap",PlotLabel->OptionValue[Title],PlotRange->OptionValue[PlotRange],PlotRangePadding->None,PlotTheme->OptionValue[PlotTheme]];
+
+
+(* ::Input::Initialization:: *)
+plotRadianceDifferenceVsTimeRandom[data_,OptionsPattern[{Seed->27181,PointNumber->10000,PlotRange->{All,{-5,5}},PlotTheme->{"Detailed","VibrantColor"},Title->None}]]:=Module[{},RandomSeed[OptionValue[Seed]];ListPlot[RandomChoice[Transpose[{data[[1]]/86400/365.25+1970,data[[2]]}],OptionValue[PointNumber]],FrameLabel->{"Time (calendar year)","Radiance difference ([radiance])"},PlotLabel->OptionValue[Title],PlotRange->OptionValue[PlotRange],PlotTheme->OptionValue[PlotTheme]]];
+
+
+(* ::Input::Initialization:: *)
 plotResidualsVsTime[data_,OptionsPattern[{BinSizes->{{1/4},{0.1}},PlotRange->{All,{-5,5}},PlotTheme->"Detailed",Title->None}]]:=DensityHistogram[Transpose[{data[[1]]/86400/365.25+1970,data[[2]]}],OptionValue[BinSizes],{"Log","PDF"},FrameLabel->{"Time (calendar year)","K residual ([radiance])"},ColorFunction->"TemperatureMap",PlotLabel->OptionValue[Title],PlotRange->OptionValue[PlotRange],PlotRangePadding->None,PlotTheme->OptionValue[PlotTheme]];
 
 
