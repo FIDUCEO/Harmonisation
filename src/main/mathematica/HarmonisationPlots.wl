@@ -72,7 +72,7 @@ plotRadianceUncertaintyVsTime[data_,OptionsPattern[{BinSizes->{{1/4},{0.1}},Plot
 
 
 (* ::Input::Initialization:: *)
-plotRadianceUncertaintyVsTimeRandom[data_,OptionsPattern[{Seed->27181,PointNumber->10000,PlotRange->{All,Automatic},PlotTheme->{"Detailed","VibrantColor"},Title->None}]]:=Module[{},RandomSeed[OptionValue[Seed]];ListPlot[RandomChoice[Transpose[{data[[1]]/86400/365.25+1970,data[[2]]}],OptionValue[PointNumber]],FrameLabel->{"Time (calendar year)","Radiance ([radiance])"},PlotLabel->OptionValue[Title],PlotRange->OptionValue[PlotRange],PlotTheme->OptionValue[PlotTheme]]];
+plotRadianceUncertaintyVsTimeRandom[data_,OptionsPattern[{Seed->27181,PointNumber->10000,PlotRange->{All,Automatic},PlotTheme->{"Detailed","VibrantColor"},Title->None}]]:=Module[{},RandomSeed[OptionValue[Seed]];ListPlot[RandomChoice[Transpose[{data[[1]]/86400/365.25+1970,data[[2]]}],OptionValue[PointNumber]],FrameLabel->{"Time (calendar year)","Radiance uncertainty ([radiance])"},PlotLabel->OptionValue[Title],PlotRange->OptionValue[PlotRange],PlotTheme->OptionValue[PlotTheme]]];
 
 
 (* ::Input::Initialization:: *)
