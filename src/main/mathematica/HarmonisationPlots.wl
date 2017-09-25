@@ -60,6 +60,13 @@ plotRadianceVsRadianceRandom[data_,OptionsPattern[{Seed->27181,PointNumber->1000
 
 
 (* ::Input::Initialization:: *)
+plotRadianceVsRadianceRandomLegended[data_,names_,OptionsPattern[{Seed->27181,PointNumber->10000,PlotRange->{{5,155},{5,155}},PlotTheme->{"Detailed","VibrantColor"},Title->None}]]:=Module[{randomData,pointNumbers},RandomSeed[OptionValue[Seed]];
+pointNumbers=Table[Round[OptionValue[PointNumber]Length[data[[i,1]]]/Sum[Length[data[[j,1]]],{j,Length[data]}]],{i,Length[data]}];
+randomData=Table[RandomChoice[Transpose[{data[[i,1]],data[[i,2]]}],pointNumbers[[i]]],{i,Length[data]}];
+randomData=Table[Legended[randomData[[i]],names[[i]]],{i,Length[data]}];ListPlot[randomData,FrameLabel->{"Radiance ([radiance])","Radiance ([radiance])"},PlotLabel->OptionValue[Title],PlotRange->OptionValue[PlotRange],PlotTheme->OptionValue[PlotTheme]]];
+
+
+(* ::Input::Initialization:: *)
 plotRadianceVsTime[data_,OptionsPattern[{BinSizes->{{1/4},{1.0}},PlotRange->{All,{-5,5}},PlotTheme->"Detailed",Title->None}]]:=DensityHistogram[Transpose[{data[[1]]/86400/365.25+1970,data[[2]]}],OptionValue[BinSizes],{"Log","PDF"},FrameLabel->{"Time (calendar year)","Radiance ([radiance])"},ColorFunction->"TemperatureMap",PlotLabel->OptionValue[Title],PlotRange->OptionValue[PlotRange],PlotRangePadding->None,PlotTheme->OptionValue[PlotTheme]];
 
 
