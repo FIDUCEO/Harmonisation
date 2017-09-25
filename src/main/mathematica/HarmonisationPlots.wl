@@ -108,11 +108,25 @@ plotResidualsVsTimeRandom[data_,OptionsPattern[{Seed->27181,PointNumber->10000,P
 
 
 (* ::Input::Initialization:: *)
+plotResidualsVsTimeRandomLegended[data_,names_,OptionsPattern[{Seed->27181,PointNumber->10000,PlotRange->{All,{-5,5}},PlotTheme->{"Detailed","VibrantColor"},Title->None}]]:=Module[{randomData,pointNumbers},RandomSeed[OptionValue[Seed]];
+pointNumbers=Table[Round[OptionValue[PointNumber]Length[data[[i,1]]]/Sum[Length[data[[j,1]]],{j,Length[data]}]],{i,Length[data]}];
+randomData=Table[RandomChoice[Transpose[{data[[i,1]]/86400/365.25+1970,data[[i,2]]}],pointNumbers[[i]]],{i,Length[data]}];
+randomData=Table[Legended[randomData[[i]],names[[i]]],{i,Length[data]}];ListPlot[randomData,FrameLabel->{"Time (calendar year)","K residual ([radiance])"},PlotLabel->OptionValue[Title],PlotRange->OptionValue[PlotRange],PlotTheme->OptionValue[PlotTheme]]];
+
+
+(* ::Input::Initialization:: *)
 plotNormalizedResidualsVsTime[data_,OptionsPattern[{BinSizes->{{1/4},{0.1}},PlotRange->{All,{-7,7}},PlotTheme->"Detailed",Title->None}]]:=DensityHistogram[Transpose[{data[[1]]/86400/365.25+1970,data[[2]]}],OptionValue[BinSizes],{"Log","PDF"},FrameLabel->{"Time (calendar year)","Normalised K residual"},ColorFunction->"TemperatureMap",PlotLabel->OptionValue[Title],PlotRange->OptionValue[PlotRange],PlotRangePadding->None,PlotTheme->OptionValue[PlotTheme]];
 
 
 (* ::Input::Initialization:: *)
 plotNormalizedResidualsVsTimeRandom[data_,OptionsPattern[{Seed->27181,PointNumber->10000,PlotRange->{All,{-5,5}},PlotTheme->{"Detailed","VibrantColor"},Title->None}]]:=Module[{},RandomSeed[OptionValue[Seed]];ListPlot[RandomChoice[Transpose[{data[[1]]/86400/365.25+1970,data[[2]]}],OptionValue[PointNumber]],FrameLabel->{"Time (calendar year)","Normalised K residual"},PlotLabel->OptionValue[Title],PlotRange->OptionValue[PlotRange],PlotTheme->OptionValue[PlotTheme]]];
+
+
+(* ::Input::Initialization:: *)
+plotNormalizedResidualsVsTimeRandomLegended[data_,names_,OptionsPattern[{Seed->27181,PointNumber->10000,PlotRange->{All,{-5,5}},PlotTheme->{"Detailed","VibrantColor"},Title->None}]]:=Module[{randomData,pointNumbers},RandomSeed[OptionValue[Seed]];
+pointNumbers=Table[Round[OptionValue[PointNumber]Length[data[[i,1]]]/Sum[Length[data[[j,1]]],{j,Length[data]}]],{i,Length[data]}];
+randomData=Table[RandomChoice[Transpose[{data[[i,1]]/86400/365.25+1970,data[[i,2]]}],pointNumbers[[i]]],{i,Length[data]}];
+randomData=Table[Legended[randomData[[i]],names[[i]]],{i,Length[data]}];ListPlot[randomData,FrameLabel->{"Time (calendar year)","Normalised K residual"},PlotLabel->OptionValue[Title],PlotRange->OptionValue[PlotRange],PlotTheme->OptionValue[PlotTheme]]];
 
 
 (* ::Input::Initialization:: *)
