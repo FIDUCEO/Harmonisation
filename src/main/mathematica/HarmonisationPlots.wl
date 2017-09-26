@@ -161,4 +161,5 @@ computeTrendRandom[data_,OptionsPattern[{ConfidenceLevel->0.99,Seed->27181,Point
 
 
 (* ::Input::Initialization:: *)
-plotNormalizedResidualsTrend[trend_,tmin_,tmax_,OptionsPattern[{GridLines->Automatic,PlotRange->{All,{-0.05,0.05}},PlotTheme->{"Detailed","VibrantColor"},Title->None}]]:=Plot[Evaluate[Flatten[trend]],{t,tmin,tmax},Axes->False,Frame->True,FrameLabel->{"Time (calendar year)","Mean normalised K residual"},GridLines->OptionValue[GridLines],PlotLabel->OptionValue[Title],PlotRange->OptionValue[PlotRange],PlotStyle->{Automatic,{Black,Dashed,Thin},{Black,Dashed,Thin}},PlotTheme->OptionValue[PlotTheme],PlotLabels->{Placed[trend[[1]],{Scaled[1],Before}],None,None},PlotLegends->None];
+plotNormalizedResidualsTrend[trend_,tmin_,tmax_,OptionsPattern[{GridLines->Automatic,PlotRange->{All,{-0.05,0.05}},PlotTheme->{"Detailed","VibrantColor"},Title->None}]]:=Plot[Evaluate[Flatten[trend]],{t,tmin,tmax},Axes->False,Frame->True,FrameLabel->{"Time \!\(\*
+StyleBox[\"t\",\nFontSlant->\"Italic\"]\) (calendar year)","Mean normalised K residual"},GridLines->OptionValue[GridLines],PlotLabel->OptionValue[Title],PlotRange->OptionValue[PlotRange],PlotStyle->{Automatic,{Black,Dashed,Thin},{Black,Dashed,Thin}},PlotTheme->OptionValue[PlotTheme],PlotLabels->{Placed[trend[[1]],{Scaled[1],Before}],None,None},PlotLegends->None];
