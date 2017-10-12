@@ -12,8 +12,6 @@ import sys
 from netCDF4 import Dataset
 from numpy import sum, where, array_equal, isnan, zeros
 
-'''___Harmonisation Modules___'''
-
 '''___Authorship___'''
 __author__ = ["Sam Hunt"]
 __created__ = "28/09/2017"
@@ -381,6 +379,7 @@ def check_w_variable_values(rootgrp):
         if set(w_matrix_use[w_matrix_use!=0]) != set(range(1, max(w_matrix_use+1))):
             errors.append("W Matrix Value Error: Variable 'w_matrix_use' must index w matrix "
                           "use in H in numerical order from 1")
+        # --------------------------------------------------------------------------------------------------------------
 
         # TEST: Assert Uncertainty Vector indices in uncertainty_vector_use are in numerical order from 1 --------------
         uncertainty_vector_use = rootgrp.variables["uncertainty_vector_use"][:]
