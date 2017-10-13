@@ -163,7 +163,7 @@ def return_w_matrix_variables(w_matrices, uncertainty_vectors):
     # 1. Generate W matrix variable arrays
 
     # > w_matrix_nnz
-    w_matrix_nnz = zeros(len(w_matrices))
+    w_matrix_nnz = zeros(len(w_matrices), dtype=int)
     for i, w in enumerate(w_matrices):
         w_matrix_nnz[i] = w.nnz
 
@@ -188,7 +188,7 @@ def return_w_matrix_variables(w_matrices, uncertainty_vectors):
     # 2. Generate uncertainty vector variable arrays
 
     # > uncertainty_vector_row_count
-    uncertainty_vector_row_count = zeros(len(uncertainty_vectors))
+    uncertainty_vector_row_count = zeros(len(uncertainty_vectors), dtype=int)
     for i, u in enumerate(uncertainty_vectors):
         uncertainty_vector_row_count[i] = len(u)
 
