@@ -10,7 +10,7 @@ import sys
 
 '''___Third Party Modules___'''
 from netCDF4 import Dataset
-from numpy import sum, where, array_equal, isnan, zeros
+from numpy import sum, where, array_equal, zeros
 
 '''___Authorship___'''
 __author__ = ["Sam Hunt"]
@@ -25,9 +25,12 @@ __status__ = "Development"
 # VARIABLE DATA
 
 # Required variables and dimensions
-VARIABLE_DATA = {"H": {"dim": ["M", "m"], "dtype": "float64"},
-                 "Ur": {"dim": ["M", "m"], "dtype": "float64"},
-                 "Us": {"dim": ["M", "m"], "dtype": "float64"},
+VARIABLE_DATA = {"X1": {"dim": ["M", "m1"], "dtype": "float64"},
+                 "X2": {"dim": ["M", "m2"], "dtype": "float64"},
+                 "Ur1": {"dim": ["M", "m1"], "dtype": "float64"},
+                 "Ur2": {"dim": ["M", "m2"], "dtype": "float64"},
+                 "Us1": {"dim": ["M", "m1"], "dtype": "float64"},
+                 "Us2": {"dim": ["M", "m2"], "dtype": "float64"},
                  "K": {"dim": ["M"], "dtype": "float64"},
                  "Kr": {"dim": ["M"], "dtype": "float64"},
                  "Ks": {"dim": ["M"], "dtype": "float64"}}
@@ -43,7 +46,7 @@ W_VARIABLE_DATA = {"w_matrix_nnz": {"dim": ["w_matrix_count"], "dtype": "int32"}
                    "uncertainty_vector_use": {"dim": ["m"], "dtype": "int32"}}
 
 # Attributes
-ATTRS = ["sensor_i_name", "sensor_j_name"]
+ATTRS = ["sensor_1_name", "sensor_2_name"]
 
 
 def check_variable_included(rootgrp):
@@ -196,35 +199,10 @@ def check_attributes(rootgrp):
             errors.append("Attribute Error: Attribute '"+str(attr)+"' missing")
     # ------------------------------------------------------------------------------------------------------------------
 
-    # TEST: Assert sensor_i_name and sensor_j_name different -----------------------------------------------------------
-    if ("sensor_i_name" in test_attrs) and ("sensor_j_name" in test_attrs):
-        if rootgrp.sensor_i_name == rootgrp.sensor_j_name:
-            errors.append("Attribute Error: Attributes sensor_i_name & sensor_j_name must have different values")
-    # ------------------------------------------------------------------------------------------------------------------
-
-    return errors
-
-
-def check_dimension_sizes(rootgrp):
-    """
-    Return errors found with matchup dataset dimension sizes
-
-    :type rootgrp: netCDF4.Dataset
-    :param rootgrp: In memory representation of matchup dataset
-
-    :return:
-        :error: *list:str:
-
-        List of errors found during processing
-    """
-
-    errors = []     # Initialise list to store error messages
-
-    # TEST: Assert that dimension 'm' is even --------------------------------------------------------------------------
-    if "m" in rootgrp.dimensions:
-        if rootgrp.dimensions["m"].size % 2 != 0:
-            errors.append("Dimension Error: Dimension 'm' must be even -> "
-                          "sensor 1 and sensor 2 must share same measurement equation")
+    # TEST: Assert sensor_1_name and sensor_2_name different -----------------------------------------------------------
+    if ("sensor_1_name" in test_attrs) and ("sensor_2_name" in test_attrs):
+        if rootgrp.sensor_1_name == rootgrp.sensor_2_name:
+            errors.append("Attribute Error: Attributes sensor_1_name & sensor_2_name must have different values")
     # ------------------------------------------------------------------------------------------------------------------
 
     return errors
@@ -326,31 +304,12 @@ def check_variable_values(rootgrp):
                           "exception[s] found")
     # ------------------------------------------------------------------------------------------------------------------
 
-    # TEST: Assert Required Values of H, Ur , Us NaN for reference sensor pair -----------------------------------------
-    test_variables = ["H", "Ur", "Us"]
-    if (set(test_variables).issubset(rootgrp.variables.keys())) and ("sensor_i_name" in rootgrp.ncattrs()):
-        if rootgrp.sensor_i_name == -1:
-            for test_variable in test_variables:
-                if not isnan(rootgrp.variables[test_variable][:, 1:rootgrp.dimensions['m'].size/2]).all():
-                    errors.append("Value Error: All values "+test_variable+"[:, 1:"
-                                  + str(rootgrp.dimensions['m'].size/2) + "] for reference-sensor pair must be NaN")
-
-        for test_variable in test_variables:
-            if isnan(rootgrp.variables[test_variable][:, 1:rootgrp.dimensions['m'].size / 2]).all():
-                if rootgrp.sensor_i_name != -1:
-                    errors.append("Value Error: All values " + test_variable + "[:, 1:" +
-                                  str(rootgrp.dimensions['m'].size / 2) +
-                                  "] are NaN, only allowed for reference-sensor pair - i.e. attribute 'sensor_i_name'"
-                                  "must be -1 (not +" + str(rootgrp.sensor_i_name) + ")")
-
-    # ------------------------------------------------------------------------------------------------------------------
-
-    # TEST: Assert no negative uncertainties in Ur and Us --------------------------------------------------------------
-    test_variables = ["Ur", "Us"]
+    # TEST: Assert no negative uncertainties in Ur1, Ur2, Us1 and Us2 --------------------------------------------------
+    test_variables = ["Ur1", "Ur2", "Us1", "Ur2"]
     if set(test_variables).issubset(rootgrp.variables.keys()):
         for test_variable in test_variables:
             test_variable_val = rootgrp.variables[test_variable][:]
-            if not (test_variable_val.flatten()[~isnan(test_variable_val.flatten())] >= 0).all():
+            if not (test_variable_val.flatten() >= 0).all():
                 errors.append("Value Error: All values in " + test_variable + " must be greater than 0")
     # ------------------------------------------------------------------------------------------------------------------
 
@@ -378,20 +337,20 @@ def check_w_variable_values(rootgrp):
         w_matrix_use = rootgrp.variables["w_matrix_use"][:]
         if set(w_matrix_use[w_matrix_use!=0]) != set(range(1, max(w_matrix_use+1))):
             errors.append("W Matrix Value Error: Variable 'w_matrix_use' must index w matrix "
-                          "use in H in numerical order from 1")
+                          "use in X1 then X2 in numerical order from 1")
         # --------------------------------------------------------------------------------------------------------------
 
         # TEST: Assert Uncertainty Vector indices in uncertainty_vector_use are in numerical order from 1 --------------
         uncertainty_vector_use = rootgrp.variables["uncertainty_vector_use"][:]
         if set(uncertainty_vector_use[uncertainty_vector_use!=0]) != set(range(1, max(uncertainty_vector_use + 1))):
             errors.append("Uncertainty Vector Value Error: Variable 'uncertainty_vector_use' must index uncertainty "
-                          "vector use in H in numerical order from 1")
+                          "vector use in X1 then X2 in numerical order from 1")
         # --------------------------------------------------------------------------------------------------------------
 
-        # TEST: Assert H columns assigned with W matrix also assign with Uncertainty Vector ----------------------------
+        # TEST: Assert X1 and X2 columns assigned with W matrix also assign with Uncertainty Vector --------------------
         if not array_equal(where(w_matrix_use!=0)[0], where(uncertainty_vector_use!=0)[0]):
-            errors.append("W Matrix Value Error: Mismatch between H columns with w matrix given by 'w_matrix_use' ("
-                          + str(where(w_matrix_use!=0)[0]) + ") and H columns with an uncertainty vector given by "
+            errors.append("W Matrix Value Error: Mismatch between X1/X2 columns with w matrix given by 'w_matrix_use' ("
+                          + str(where(w_matrix_use!=0)[0]) + ") and X1/X2 columns with an uncertainty vector given by "
                           "'uncertainty_vector_use' (" + str(where(uncertainty_vector_use!=0)[0])
                           + ") - should be the same")
         # --------------------------------------------------------------------------------------------------------------
@@ -453,39 +412,68 @@ def check_uncertainty_assignment(rootgrp):
     errors = []  # Initialise list to store error messages
 
     # TEST: Assert assert 1 and only 1 error correlation form is attributed to each sensor state variable --------------
-    if set(["H", "Us", "Ur"]).issubset(rootgrp.variables.keys()):
+    if set(["X1", "X2", "Ur1", "Ur2", "Us1", "Us2"]).issubset(rootgrp.variables.keys()):
 
-        m = rootgrp.dimensions['m'].size
+        m1 = rootgrp.dimensions['m1'].size
+        m2 = rootgrp.dimensions['m2'].size
+        m = m1 + m2
 
         w_matrix_use = zeros(m)
         if "w_matrix_use" in rootgrp.variables.keys():
             w_matrix_use = rootgrp.variables['w_matrix_use']
 
-        Ur = rootgrp.variables["Ur"][:]
-        Us = rootgrp.variables["Us"][:]
+        # Sensor 1
+        Ur1 = rootgrp.variables["Ur1"][:]
+        Us1 = rootgrp.variables["Us1"][:]
 
-        for col in range(m):
+        for col in range(m1):
             rand = False
             randsys = False
             w = False
-            if not isnan(rootgrp.variables['H'][0,col]):
-                if (Ur[:, col] > 0).all() and (Us[:, col] == 0).all():
-                    rand = True
-                if (Ur[:, col] > 0).all() and (Us[:, col] > 0).all():
-                    randsys = True
-                if w_matrix_use[col] > 0:
-                    w = True
+            if (Ur1[:, col] > 0).all() and (Us1[:, col] == 0).all():
+                rand = True
+            if (Ur1[:, col] > 0).all() and (Us1[:, col] > 0).all():
+                randsys = True
+            if w_matrix_use[col] > 0:
+                w = True
 
-                if (rand and (not randsys and not w)) \
-                        or (randsys and (not rand and not w)) or (w and (not rand and not randsys)):
-                    pass
-                else:
-                    errors.append("Variable Correlation Form Assignement Error: Variable in H[:, " + str(col) +
-                                  "] correlation assigned as:"
-                                  "\n - random correlation: " + str(rand) +
-                                  "\n - random+systematic correlation: " + str(randsys) +
-                                  "\n - w-matrix correlation: " + str(w) +
-                                  "\n Must have one and only one form")
+            if (rand and (not randsys and not w)) \
+                    or (randsys and (not rand and not w)) or (w and (not rand and not randsys)):
+                pass
+            else:
+                errors.append("Variable Correlation Form Assignement Error: Variable in X1[:, " + str(col) +
+                              "] correlation assigned as:"
+                              "\n - random correlation: " + str(rand) +
+                              "\n - random+systematic correlation: " + str(randsys) +
+                              "\n - w-matrix correlation: " + str(w) +
+                              "\n Must have one and only one form")
+
+        # Sensor 2
+        Ur2 = rootgrp.variables["Ur2"][:]
+        Us2 = rootgrp.variables["Us2"][:]
+
+        for col in range(m2):
+            rand = False
+            randsys = False
+            w = False
+            if (Ur2[:, col] > 0).all() and (Us2[:, col] == 0).all():
+                rand = True
+            if (Ur2[:, col] > 0).all() and (Us2[:, col] > 0).all():
+                randsys = True
+            if w_matrix_use[col+m1] > 0:
+                w = True
+
+            if (rand and (not randsys and not w)) \
+                    or (randsys and (not rand and not w)) or (w and (not rand and not randsys)):
+                pass
+            else:
+                errors.append("Variable Correlation Form Assignement Error: Variable in X2[:, " + str(col) +
+                              "] correlation assigned as:"
+                              "\n - random correlation: " + str(rand) +
+                              "\n - random+systematic correlation: " + str(randsys) +
+                              "\n - w-matrix correlation: " + str(w) +
+                              "\n Must have one and only one form")
+
     # ------------------------------------------------------------------------------------------------------------------
 
     return errors
@@ -509,7 +497,6 @@ def main(path):
     errors += check_variable_dtype(rootgrp)
     errors += check_variable_dimension(rootgrp)
     errors += check_attributes(rootgrp)
-    errors += check_dimension_sizes(rootgrp)
     errors += check_w_matrix_variable_dimensions(rootgrp)
     errors += check_variable_values(rootgrp)
     errors += check_w_variable_values(rootgrp)

@@ -19,7 +19,8 @@ __email__ = "sam.hunt@npl.co.uk"
 __status__ = "Development"
 
 
-def write_input_file(file_path, H, Us, Ur, K, Kr, Ks, sensor_i_name, sensor_j_name, additional_variables):
+def write_input_file(file_path, X1, X2, Ur1, Ur2, Us1, Us2, K, Kr, Ks,
+                     sensor_1_name, sensor_2_name, additional_variables):
     """
     Write harmonisation input file from input data arrays (no w matrix variables, see func append_W_to_input_file(...)
     for this functionality)
@@ -27,14 +28,23 @@ def write_input_file(file_path, H, Us, Ur, K, Kr, Ks, sensor_i_name, sensor_j_na
     :type file_path: str
     :param file_path: match-up file path
 
-    :type H: numpy.ndarray
-    :param H: Radiances and counts per matchup
+    :type X1: numpy.ndarray
+    :param X1: Radiances and counts per matchup for sensor 1
 
-    :type Us: numpy.ndarray
-    :param Us: Systematic uncertainties for H array
+    :type X2: numpy.ndarray
+    :param X2: Radiances and counts per matchup for sensor 2
 
-    :type Ur: numpy.ndarray
-    :param Ur: Random uncertainties for H array
+    :type Ur1: numpy.ndarray
+    :param Ur1: Random uncertainties for X1 array
+
+    :type Ur2: numpy.ndarray
+    :param Ur2: Random uncertainties for X2 array
+
+    :type Us1: numpy.ndarray
+    :param Us1: Systematic uncertainties for X1 array
+
+    :type Us2: numpy.ndarray
+    :param Us2: Systematic uncertainties for X2 array
 
     :type K: numpy.ndarray
     :param K: K (sensor-to-sensor differences) for zero shift case
@@ -45,11 +55,11 @@ def write_input_file(file_path, H, Us, Ur, K, Kr, Ks, sensor_i_name, sensor_j_na
     :type Ks: numpy.ndarray
     :param Ks: K (sensor-to-sensor differences) systematic uncertainties for zero shift case
 
-    :type sensor_i_name: int
-    :param sensor_i_name: sensor i ID
+    :type sensor_1_name: int
+    :param sensor_1_name: sensor i ID
 
-    :type sensor_j_name: int
-    :param sensor_j_name: sensor j ID
+    :type sensor_2_name: int
+    :param sensor_2_name: sensor j ID
 
     :type additional_variables: dict
     :param additional_variables: dictionary of additional, non-required variable to add to harmonisation input files.
@@ -68,32 +78,48 @@ def write_input_file(file_path, H, Us, Ur, K, Kr, Ks, sensor_i_name, sensor_j_na
     rootgrp = Dataset(file_path, mode='w')
 
     # 2. Create attributes
-    rootgrp.sensor_i_name = sensor_i_name
-    rootgrp.sensor_j_name = sensor_j_name
+    rootgrp.sensor_1_name = sensor_1_name
+    rootgrp.sensor_2_name = sensor_2_name
 
     # 2. Create dimensions
     # > M - number of matchups
-    M_dim = rootgrp.createDimension("M", H.shape[0])
+    M_dim = rootgrp.createDimension("M", X1.shape[0])
 
     # > m - number of columns in H
-    m_dim = rootgrp.createDimension("m", H.shape[1])
+    m1_dim = rootgrp.createDimension("m1", X1.shape[1])
+    m2_dim = rootgrp.createDimension("m2", X2.shape[1])
 
     # 3. Create new variables
 
-    # > H - Radiances and counts per matchup
-    H_var = rootgrp.createVariable('H', 'f8', ('M', 'm'), zlib=True, complevel=9)
-    H_var.description = "H array (M,m). Radiances and counts per matchup"
-    H_var[:] = H[:]
+    # > X1 - Radiances and counts per matchup for sensor 1
+    X1_var = rootgrp.createVariable('X1', 'f8', ('M', 'm1'), zlib=True, complevel=9)
+    X1_var.description = "Radiances and counts per matchup for sensor 1"
+    X1_var[:] = X1[:]
 
-    # > Us - Systematic uncertainties for H array
-    Us_var = rootgrp.createVariable('Us', 'f8', ('M', 'm'), zlib=True, complevel=9)
-    Us_var.description = "Systematic uncertainties for H array"
-    Us_var[:] = Us[:]
+    # > X2 - Radiances and counts per matchup for sensor 2
+    X2_var = rootgrp.createVariable('X2', 'f8', ('M', 'm2'), zlib=True, complevel=9)
+    X2_var.description = "Radiances and counts per matchup for sensor 2"
+    X2_var[:] = X2[:]
 
     # > Ur - Random uncertainties for H array
-    Ur_var = rootgrp.createVariable('Ur', 'f8', ('M', 'm'), zlib=True, complevel=9)
-    Ur_var.description = "Random uncertainties for H array"
-    Ur_var[:] = Ur[:]
+    Ur1_var = rootgrp.createVariable('Ur1', 'f8', ('M', 'm1'), zlib=True, complevel=9)
+    Ur1_var.description = "Random uncertainties for X1 array"
+    Ur1_var[:] = Ur1[:]
+
+    # > Ur - Random uncertainties for H array
+    Ur2_var = rootgrp.createVariable('Ur2', 'f8', ('M', 'm2'), zlib=True, complevel=9)
+    Ur2_var.description = "Random uncertainties for X2 array"
+    Ur2_var[:] = Ur2[:]
+
+    # > Us - Systematic uncertainties for H array
+    Us1_var = rootgrp.createVariable('Us1', 'f8', ('M', 'm1'), zlib=True, complevel=9)
+    Us1_var.description = "Systematic uncertainties for X1 array"
+    Us1_var[:] = Us1[:]
+
+    # > Us - Systematic uncertainties for H array
+    Us2_var = rootgrp.createVariable('Us2', 'f8', ('M', 'm2'), zlib=True, complevel=9)
+    Us2_var.description = "Systematic uncertainties for X2 array"
+    Us2_var[:] = Us2[:]
 
     # > K - K (sensor-to-sensor differences) for zero shift case
     K_var = rootgrp.createVariable('K', 'f8', ('M',), zlib=True, complevel=9)
@@ -120,6 +146,7 @@ def write_input_file(file_path, H, Us, Ur, K, Kr, Ks, sensor_i_name, sensor_j_na
     rootgrp.close()
 
     return 0
+
 
 def return_w_matrix_variables(w_matrices, uncertainty_vectors):
     """
@@ -236,6 +263,9 @@ def append_W_to_input_file(filepath,
     rootgrp = Dataset(filepath, mode='a')
 
     # 2. Create dimensions
+    # > m - combined columns of X1 and X2
+    m_dim = rootgrp.createDimension("m", len(w_matrix_use))
+
     # > w_matrix_count - number of W matrices
     w_matrix_count_dim = rootgrp.createDimension("w_matrix_count", len(w_matrix_nnz))
 
@@ -277,19 +307,21 @@ def append_W_to_input_file(filepath,
 
     # > w_matrix_use - a mapping from H array column index to W
     w_matrix_use_var = rootgrp.createVariable('w_matrix_use', 'i4', ('m',), zlib=True, complevel=9)
-    w_matrix_use_var.description = "mapping from H array column index to W"
+    w_matrix_use_var.description = "mapping from X1 and X2 array column index to W"
 
     # > uncertainty_vector_row_count - number of rows of each uncertainty vector
-    uncertainty_vector_row_count_var = rootgrp.createVariable('uncertainty_vector_row_count', 'i4', ('uncertainty_vector_count',), zlib=True, complevel=9)
+    uncertainty_vector_row_count_var = rootgrp.createVariable('uncertainty_vector_row_count', 'i4',
+                                                              ('uncertainty_vector_count',), zlib=True, complevel=9)
     uncertainty_vector_row_count_var.description = "number of rows of each uncertainty vector"
 
     # > uncertainty_vector - uncertainty of each scanline value
-    uncertainty_vector_var = rootgrp.createVariable('uncertainty_vector', 'f8', ('uncertainty_vector_sum_row',), zlib=True, complevel=9)
+    uncertainty_vector_var = rootgrp.createVariable('uncertainty_vector', 'f8', ('uncertainty_vector_sum_row',),
+                                                    zlib=True, complevel=9)
     uncertainty_vector_var.description = "uncertainty of each scanline value"
 
     # > uncertainty_vector_use - a mapping from H array column index to uncertainty vector
     uncertainty_vector_use_var = rootgrp.createVariable('uncertainty_vector_use', 'i4', ('m',), zlib=True, complevel=9)
-    uncertainty_vector_use_var.description = "mapping from H array column index to uncertainty vector"
+    uncertainty_vector_use_var.description = "mapping from X1 and X2 array column index to uncertainty vector"
 
     # 4. Add data
     w_matrix_nnz_var[:] = w_matrix_nnz[:]
