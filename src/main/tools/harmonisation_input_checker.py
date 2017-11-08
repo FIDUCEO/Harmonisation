@@ -33,7 +33,8 @@ VARIABLE_DATA = {"X1": {"dim": ["M", "m1"], "dtype": "float64"},
                  "Us2": {"dim": ["M", "m2"], "dtype": "float64"},
                  "K": {"dim": ["M"], "dtype": "float64"},
                  "Kr": {"dim": ["M"], "dtype": "float64"},
-                 "Ks": {"dim": ["M"], "dtype": "float64"}}
+                 "Ks": {"dim": ["M"], "dtype": "float64"},
+                 "uncertainty_type": {"dim": ["m"], "dtype": "int32"}}
 
 # Optional W matrix variable dimensions (if included complete set required)
 W_VARIABLE_DATA = {"w_matrix_nnz": {"dim": ["w_matrix_count"], "dtype": "int32"},
@@ -412,21 +413,35 @@ def check_uncertainty_assignment(rootgrp):
     errors = []  # Initialise list to store error messages
 
     # TEST: Assert assert 1 and only 1 error correlation form is attributed to each sensor state variable --------------
-    if set(["X1", "X2", "Ur1", "Ur2", "Us1", "Us2"]).issubset(rootgrp.variables.keys()):
+    if set(["X1", "X2", "Ur1", "Ur2", "Us1", "Us2", "uncertainty_type"]).issubset(rootgrp.variables.keys()):
 
         m1 = rootgrp.dimensions['m1'].size
         m2 = rootgrp.dimensions['m2'].size
         m = m1 + m2
+        uncertainty_type = rootgrp.variables["uncertainty_type"][:]
 
         w_matrix_use = zeros(m)
         if "w_matrix_use" in rootgrp.variables.keys():
             w_matrix_use = rootgrp.variables['w_matrix_use']
 
-        # Sensor 1
+        # 1. Sensor 1
         Ur1 = rootgrp.variables["Ur1"][:]
         Us1 = rootgrp.variables["Us1"][:]
 
         for col in range(m1):
+
+            # (a) Find uncertainty_type asserted in file variable
+            if uncertainty_type[col] == 1:
+                uncertainty_str = "independent"
+            if uncertainty_type[col] == 2:
+                uncertainty_str = "independent+systematic"
+            if uncertainty_type[col] == 3:
+                uncertainty_str = "structured"
+            if uncertainty_type[col] not in set([1, 2, 3]):
+                uncertainty_str = "[NOT ASSIGNED!]"
+                "Value Error: All values of 'uncertainty_type' variable must be equal to either 1, 2 or 3"
+
+            # (b) Find uncertainty_type implied by the data
             rand = False
             randsys = False
             w = False
@@ -437,22 +452,48 @@ def check_uncertainty_assignment(rootgrp):
             if w_matrix_use[col] > 0:
                 w = True
 
+            # Compare how (a) and (b) match:
+            if uncertainty_type[col] == 1 and rand is True:
+                pass
+            elif uncertainty_type[col] == 2 and randsys is True:
+                pass
+            elif uncertainty_type[col] == 3 and w is True:
+                pass
+            else:
+                errors.append("Variable Correlation Form Assignement Error: Variable in X1[:, " + str(col) +
+                              "] correlation assigned as "+uncertainty_str+" but data for: "
+                              "\n - independent error correlation: " + str(rand) +
+                              "\n - independent+systematic correlation: " + str(randsys) +
+                              "\n - structured correlation: " + str(w))
+
             if (rand and (not randsys and not w)) \
                     or (randsys and (not rand and not w)) or (w and (not rand and not randsys)):
                 pass
             else:
                 errors.append("Variable Correlation Form Assignement Error: Variable in X1[:, " + str(col) +
-                              "] correlation assigned as:"
+                              "] correlation assigned as "+uncertainty_str+" but data for: "
                               "\n - random correlation: " + str(rand) +
                               "\n - random+systematic correlation: " + str(randsys) +
                               "\n - w-matrix correlation: " + str(w) +
-                              "\n Must have one and only one form")
+                              "\n Must have one and only one form!")
 
-        # Sensor 2
+        # 2. cSensor 2
         Ur2 = rootgrp.variables["Ur2"][:]
         Us2 = rootgrp.variables["Us2"][:]
 
         for col in range(m2):
+
+            # (a) Find uncertainty_type asserted in file variable
+            if uncertainty_type[col+m1] == 1:
+                uncertainty_str = "independent"
+            if uncertainty_type[col+m1] == 2:
+                uncertainty_str = "independent+systematic"
+            if uncertainty_type[col+m1] == 3:
+                uncertainty_str = "structured"
+            if uncertainty_type[col+m1] not in set([1, 2, 3]):
+                "Value Error: All values of 'uncertainty_type' variable must be equal to either 1, 2 or 3"
+
+            # (b) Find uncertainty_type implied by the data
             rand = False
             randsys = False
             w = False
@@ -463,16 +504,30 @@ def check_uncertainty_assignment(rootgrp):
             if w_matrix_use[col+m1] > 0:
                 w = True
 
+            # Compare how (a) and (b) match:
+            if uncertainty_type[col+m1] == 1 and rand is True:
+                pass
+            elif uncertainty_type[col+m1] == 2 and randsys is True:
+                pass
+            elif uncertainty_type[col+m1] == 3 and w is True:
+                pass
+            else:
+                errors.append("Variable Correlation Form Assignement Error: Variable in X2[:, " + str(col) +
+                              "] correlation assigned as " + uncertainty_str + " but data for: "
+                              "\n - independent error correlation: " + str(rand) +
+                              "\n - independent+systematic correlation: " + str(randsys) +
+                              "\n - structured correlation: " + str(w))
+
             if (rand and (not randsys and not w)) \
                     or (randsys and (not rand and not w)) or (w and (not rand and not randsys)):
                 pass
             else:
                 errors.append("Variable Correlation Form Assignement Error: Variable in X2[:, " + str(col) +
-                              "] correlation assigned as:"
+                              "] correlation assigned as " + uncertainty_str + " but data for: "
                               "\n - random correlation: " + str(rand) +
                               "\n - random+systematic correlation: " + str(randsys) +
                               "\n - w-matrix correlation: " + str(w) +
-                              "\n Must have one and only one form")
+                              "\n Must have one and only one form!")
 
     # ------------------------------------------------------------------------------------------------------------------
 

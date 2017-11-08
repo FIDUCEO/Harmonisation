@@ -19,7 +19,7 @@ __email__ = "sam.hunt@npl.co.uk"
 __status__ = "Development"
 
 
-def write_input_file(file_path, X1, X2, Ur1, Ur2, Us1, Us2, K, Kr, Ks,
+def write_input_file(file_path, X1, X2, Ur1, Ur2, Us1, Us2, uncertainty_type, K, Kr, Ks,
                      sensor_1_name, sensor_2_name, additional_variables):
     """
     Write harmonisation input file from input data arrays (no w matrix variables, see func append_W_to_input_file(...)
@@ -45,6 +45,9 @@ def write_input_file(file_path, X1, X2, Ur1, Ur2, Us1, Us2, K, Kr, Ks,
 
     :type Us2: numpy.ndarray
     :param Us2: Systematic uncertainties for X2 array
+
+    :type uncertainty_type: numpy.ndarray
+    :param uncertainty_type: Uncertainty correlation type per X1 and X2 column
 
     :type K: numpy.ndarray
     :param K: K (sensor-to-sensor differences) for zero shift case
@@ -85,7 +88,8 @@ def write_input_file(file_path, X1, X2, Ur1, Ur2, Us1, Us2, K, Kr, Ks,
     # > M - number of matchups
     M_dim = rootgrp.createDimension("M", X1.shape[0])
 
-    # > m - number of columns in H
+    # > m - number of columns in X1 and X2 arrays
+    m_dim = rootgrp.createDimension("m", X1.shape[1]+X2.shape[1])
     m1_dim = rootgrp.createDimension("m1", X1.shape[1])
     m2_dim = rootgrp.createDimension("m2", X2.shape[1])
 
@@ -120,6 +124,14 @@ def write_input_file(file_path, X1, X2, Ur1, Ur2, Us1, Us2, K, Kr, Ks,
     Us2_var = rootgrp.createVariable('Us2', 'f8', ('M', 'm2'), zlib=True, complevel=9)
     Us2_var.description = "Systematic uncertainties for X2 array"
     Us2_var[:] = Us2[:]
+
+    # > uncertainty_type - Uncertainty correlation type per X1 and X2 column
+    uncertainty_type_var = rootgrp.createVariable('uncertainty_type', 'i4', ('m',), zlib=True, complevel=9)
+    uncertainty_type_var.description = "Uncertainty correlation type per X1 and X2 column, labelled as, " + \
+                                       "(1) Independent Error Correlation, " + \
+                                       "(2) Independent + Systematic Error Correlation, or " + \
+                                       "(3) Structured Error Correlation"
+    uncertainty_type_var[:] = uncertainty_type[:]
 
     # > K - K (sensor-to-sensor differences) for zero shift case
     K_var = rootgrp.createVariable('K', 'f8', ('M',), zlib=True, complevel=9)
@@ -263,9 +275,6 @@ def append_W_to_input_file(filepath,
     rootgrp = Dataset(filepath, mode='a')
 
     # 2. Create dimensions
-    # > m - combined columns of X1 and X2
-    m_dim = rootgrp.createDimension("m", len(w_matrix_use))
-
     # > w_matrix_count - number of W matrices
     w_matrix_count_dim = rootgrp.createDimension("w_matrix_count", len(w_matrix_nnz))
 
