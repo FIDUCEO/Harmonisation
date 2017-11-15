@@ -34,6 +34,8 @@ VARIABLE_DATA = {"X1": {"dim": ["M", "m1"], "dtype": "float64"},
                  "K": {"dim": ["M"], "dtype": "float64"},
                  "Kr": {"dim": ["M"], "dtype": "float64"},
                  "Ks": {"dim": ["M"], "dtype": "float64"},
+                 "time1": {"dim": ["M"], "dtype": "float64"},
+                 "time2": {"dim": ["M"], "dtype": "float64"},
                  "uncertainty_type": {"dim": ["m"], "dtype": "int32"}}
 
 # Optional W matrix variable dimensions (if included complete set required)

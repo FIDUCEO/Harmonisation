@@ -19,8 +19,8 @@ __email__ = "sam.hunt@npl.co.uk"
 __status__ = "Development"
 
 
-def write_input_file(file_path, X1, X2, Ur1, Ur2, Us1, Us2, uncertainty_type, K, Kr, Ks,
-                     sensor_1_name, sensor_2_name, additional_variables):
+def write_input_file(file_path, X1, X2, Ur1, Ur2, Us1, Us2, uncertainty_type, K, Kr, Ks, time1, time2,
+                     sensor_1_name, sensor_2_name, additional_variables=None):
     """
     Write harmonisation input file from input data arrays (no w matrix variables, see func append_W_to_input_file(...)
     for this functionality)
@@ -58,6 +58,12 @@ def write_input_file(file_path, X1, X2, Ur1, Ur2, Us1, Us2, uncertainty_type, K,
     :type Ks: numpy.ndarray
     :param Ks: K (sensor-to-sensor differences) systematic uncertainties for zero shift case
 
+    :type time1: numpy.ndarray
+    :param time1: "Match-up time sensor 1, seconds since 1970-01-01"
+
+    :type time2: numpy.ndarray
+    :param time2: "Match-up time sensor 2, seconds since 1970-01-01"
+
     :type sensor_1_name: int
     :param sensor_1_name: sensor i ID
 
@@ -65,7 +71,9 @@ def write_input_file(file_path, X1, X2, Ur1, Ur2, Us1, Us2, uncertainty_type, K,
     :param sensor_2_name: sensor j ID
 
     :type additional_variables: dict
-    :param additional_variables: dictionary of additional, non-required variable to add to harmonisation input files.
+    :param additional_variables: dictionary of additional, non-required variable to add to harmonisation input files. To
+    be for e.g. testing, diagnostics etc.
+
     One dictionary entry per additional variable, with each entry as:
 
     "variable_name": {"data": data_array, "dtype": dtype_str, "dim": dim_tuple, "Description", desc_str}
@@ -148,11 +156,23 @@ def write_input_file(file_path, X1, X2, Ur1, Ur2, Us1, Us2, uncertainty_type, K,
     Ks_var.description = "K (sensor-to-sensor differences) systematic uncertainties for zero shift case"
     Ks_var[:] = Ks[:]
 
-    for variable in additional_variables.keys():
-        additional_var = rootgrp.createVariable(variable, additional_variables[variable]['dtype'],
-                                                additional_variables[variable]['dim'], zlib=True, complevel=9)
-        additional_var.Description = additional_variables[variable]['Description']
-        additional_var[:] = additional_variables[variable]['data'][:]
+    # > time1 - Sensor 1 time of match-up
+    time1_var = rootgrp.createVariable('time1', 'f8', ('M',), zlib=True, complevel=9)
+    time1_var.description = "Match-up time sensor 1, seconds since 1970-01-01"
+    time1_var[:] = time1[:]
+
+    # > time 2 - Sensor 2 time of match-up
+    time2_var = rootgrp.createVariable('time2', 'f8', ('M',), zlib=True, complevel=9)
+    time2_var.description = "Match-up time sensor 2, seconds since 1970-01-01"
+    time2_var[:] = time2[:]
+
+    # > additional variables - non-required variable to add to harmonisation input files
+    if additional_variables is not None:
+        for variable in additional_variables.keys():
+            additional_var = rootgrp.createVariable(variable, additional_variables[variable]['dtype'],
+                                                    additional_variables[variable]['dim'], zlib=True, complevel=9)
+            additional_var.Description = additional_variables[variable]['Description']
+            additional_var[:] = additional_variables[variable]['data'][:]
 
     # 5. Close file
     rootgrp.close()
