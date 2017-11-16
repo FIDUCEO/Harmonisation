@@ -388,8 +388,7 @@ def main(input_file_path, output_file_path):
     return 0
 
 if __name__ == "__main__":
-    main("/home/seh2/downloads/n09_n08.nc", "/home/seh2/downloads/n09_n08_test.nc")
-    #main(argv[1], argv[2])
+    main(argv[1], argv[2])
 
 
 
