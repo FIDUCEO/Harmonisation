@@ -335,22 +335,34 @@ def main(input_file_path, output_file_path):
     del w_matrices, uncertainty_vectors
 
     # c. Assign type/use matrices
-    w_matrix_use = array([1, 1, 0, 0, 0, 2, 2, 0, 0, 0], dtype=int8)
-    uncertainty_vector_use = array([1, 2, 0, 0, 0, 3, 4, 0, 0, 0], dtype=int8)
-    uncertainty_type = array([3, 3, 1, 2, 2, 3, 3, 1, 2, 2], dtype=int8)
+    w_matrix_use1 = array([1, 1, 0, 0, 0], dtype=int8)
+    w_matrix_use2 = array([2, 2, 0, 0, 0], dtype=int8)
+    uncertainty_vector_use1 = array([1, 2, 0, 0, 0], dtype=int8)
+    uncertainty_vector_use2 = array([3, 4, 0, 0, 0], dtype=int8)
+    uncertainty_type1 = array([3, 3, 1, 2, 2], dtype=int8)
+    uncertainty_type2 = array([3, 3, 1, 2, 2], dtype=int8)
     if sensor_1_name == -1:
-        w_matrix_use = array([0, 1, 1, 0, 0, 0], dtype=int8)
-        uncertainty_vector_use = array([0, 1, 2, 0, 0, 0], dtype=int8)
-        uncertainty_type = array([1, 3, 3, 1, 2, 2], dtype=int8)
+        w_matrix_use1 = array([0], dtype=int8)
+        w_matrix_use2 = array([1, 1, 0, 0, 0], dtype=int8)
+        uncertainty_vector_use1 = array([0], dtype=int8)
+        uncertainty_vector_use2 = array([1, 2, 0, 0, 0], dtype=int8)
+        uncertainty_type1 = array([1], dtype=int8)
+        uncertainty_type2 = array([3, 3, 1, 2, 2], dtype=int8)
 
     if X2.shape[1] == 4:
-        w_matrix_use = array([1, 1, 0, 0, 2, 2, 0, 0], dtype=int8)
-        uncertainty_vector_use = array([1, 2, 0, 0, 3, 4, 0, 0], dtype=int8)
-        uncertainty_type = array([3, 3, 1, 1, 3, 3, 1, 1], dtype=int8)
+        w_matrix_use1 = array([1, 1, 0, 0], dtype=int8)
+        w_matrix_use2 = array([2, 2, 0, 0], dtype=int8)
+        uncertainty_vector_use1 = array([1, 2, 0, 0], dtype=int8)
+        uncertainty_vector_use2 = array([3, 4, 0, 0], dtype=int8)
+        uncertainty_type1 = array([3, 3, 1, 1], dtype=int8)
+        uncertainty_type2 = array([3, 3, 1, 1], dtype=int8)
         if sensor_1_name == -1:
-            w_matrix_use = array([0, 1, 1, 0, 0], dtype=int8)
-            uncertainty_vector_use = array([0, 1, 2, 0, 0], dtype=int8)
-            uncertainty_type = array([1, 3, 3, 1, 1], dtype=int8)
+            w_matrix_use1 = array([0], dtype=int8)
+            w_matrix_use2 = array([1, 1, 0, 0], dtype=int8)
+            uncertainty_vector_use1 = array([0], dtype=int8)
+            uncertainty_vector_use2 = array([1, 2, 0, 0], dtype=int8)
+            uncertainty_type1 = array([1], dtype=int8)
+            uncertainty_type2 = array([3, 3, 1, 1], dtype=int8)
 
     # 3. Update file to include W matrix variables
     print "Writing to new file:", output_file_path
@@ -358,7 +370,7 @@ def main(input_file_path, output_file_path):
     # a. Update existing file to comply with new specification
     write_input_file(output_file_path,
                      X1, X2,
-                     Ur1, Ur2, Us1, Us2, uncertainty_type,
+                     Ur1, Ur2, Us1, Us2, uncertainty_type1, uncertainty_type2,
                      K[valid_averages], Kr[valid_averages], Ks[valid_averages],
                      time_sensor_1[valid_averages], time_sensor_2[valid_averages],
                      sensor_1_name, sensor_2_name)
@@ -367,7 +379,7 @@ def main(input_file_path, output_file_path):
     append_W_to_input_file(output_file_path,
                            w_matrix_val, w_matrix_row, w_matrix_col, w_matrix_nnz,
                            uncertainty_vector_row_count, uncertainty_vector,
-                           w_matrix_use, uncertainty_vector_use)
+                           w_matrix_use1, w_matrix_use2, uncertainty_vector_use1, uncertainty_vector_use2)
 
     # 4. Test harmonisation
     test_input_file(output_file_path)
@@ -376,7 +388,8 @@ def main(input_file_path, output_file_path):
     return 0
 
 if __name__ == "__main__":
-    main(argv[1], argv[2])
+    main("/home/seh2/downloads/n09_n08.nc", "/home/seh2/downloads/n09_n08_test.nc")
+    #main(argv[1], argv[2])
 
 
 

@@ -19,8 +19,8 @@ __email__ = "sam.hunt@npl.co.uk"
 __status__ = "Development"
 
 
-def write_input_file(file_path, X1, X2, Ur1, Ur2, Us1, Us2, uncertainty_type, K, Kr, Ks, time1, time2,
-                     sensor_1_name, sensor_2_name, additional_variables=None):
+def write_input_file(file_path, X1, X2, Ur1, Ur2, Us1, Us2, uncertainty_type1, uncertainty_type2, K, Kr, Ks,
+                     time1, time2, sensor_1_name, sensor_2_name, additional_variables=None):
     """
     Write harmonisation input file from input data arrays (no w matrix variables, see func append_W_to_input_file(...)
     for this functionality)
@@ -46,8 +46,11 @@ def write_input_file(file_path, X1, X2, Ur1, Ur2, Us1, Us2, uncertainty_type, K,
     :type Us2: numpy.ndarray
     :param Us2: Systematic uncertainties for X2 array
 
-    :type uncertainty_type: numpy.ndarray
-    :param uncertainty_type: Uncertainty correlation type per X1 and X2 column
+    :type uncertainty_type1: numpy.ndarray
+    :param uncertainty_type1: Uncertainty correlation type per X1 column
+
+    :type uncertainty_type2: numpy.ndarray
+    :param uncertainty_type2: Uncertainty correlation type per X2 column
 
     :type K: numpy.ndarray
     :param K: K (sensor-to-sensor differences) for zero shift case
@@ -97,7 +100,6 @@ def write_input_file(file_path, X1, X2, Ur1, Ur2, Us1, Us2, uncertainty_type, K,
     M_dim = rootgrp.createDimension("M", X1.shape[0])
 
     # > m - number of columns in X1 and X2 arrays
-    m_dim = rootgrp.createDimension("m", X1.shape[1]+X2.shape[1])
     m1_dim = rootgrp.createDimension("m1", X1.shape[1])
     m2_dim = rootgrp.createDimension("m2", X2.shape[1])
 
@@ -113,33 +115,41 @@ def write_input_file(file_path, X1, X2, Ur1, Ur2, Us1, Us2, uncertainty_type, K,
     X2_var.description = "Radiances and counts per matchup for sensor 2"
     X2_var[:] = X2[:]
 
-    # > Ur - Random uncertainties for H array
+    # > Ur1 - Random uncertainties for X1 array
     Ur1_var = rootgrp.createVariable('Ur1', 'f8', ('M', 'm1'), zlib=True, complevel=9)
     Ur1_var.description = "Random uncertainties for X1 array"
     Ur1_var[:] = Ur1[:]
 
-    # > Ur - Random uncertainties for H array
+    # > Ur2 - Random uncertainties for X2 array
     Ur2_var = rootgrp.createVariable('Ur2', 'f8', ('M', 'm2'), zlib=True, complevel=9)
     Ur2_var.description = "Random uncertainties for X2 array"
     Ur2_var[:] = Ur2[:]
 
-    # > Us - Systematic uncertainties for H array
+    # > Us1 - Systematic uncertainties for X1 array
     Us1_var = rootgrp.createVariable('Us1', 'f8', ('M', 'm1'), zlib=True, complevel=9)
     Us1_var.description = "Systematic uncertainties for X1 array"
     Us1_var[:] = Us1[:]
 
-    # > Us - Systematic uncertainties for H array
+    # > Us2 - Systematic uncertainties for X2 array
     Us2_var = rootgrp.createVariable('Us2', 'f8', ('M', 'm2'), zlib=True, complevel=9)
     Us2_var.description = "Systematic uncertainties for X2 array"
     Us2_var[:] = Us2[:]
 
-    # > uncertainty_type - Uncertainty correlation type per X1 and X2 column
-    uncertainty_type_var = rootgrp.createVariable('uncertainty_type', 'i4', ('m',), zlib=True, complevel=9)
-    uncertainty_type_var.description = "Uncertainty correlation type per X1 and X2 column, labelled as, " + \
+    # > uncertainty_type1 - Uncertainty correlation type per X1 column
+    uncertainty_type1_var = rootgrp.createVariable('uncertainty_type1', 'i4', ('m1',), zlib=True, complevel=9)
+    uncertainty_type1_var.description = "Uncertainty correlation type per X1 column, labelled as, " + \
                                        "(1) Independent Error Correlation, " + \
                                        "(2) Independent + Systematic Error Correlation, or " + \
                                        "(3) Structured Error Correlation"
-    uncertainty_type_var[:] = uncertainty_type[:]
+    uncertainty_type1_var[:] = uncertainty_type1[:]
+
+    # > uncertainty_type2 - Uncertainty correlation type per X2 column
+    uncertainty_type2_var = rootgrp.createVariable('uncertainty_type2', 'i4', ('m2',), zlib=True, complevel=9)
+    uncertainty_type2_var.description = "Uncertainty correlation type per X2 column, labelled as, " + \
+                                        "(1) Independent Error Correlation, " + \
+                                        "(2) Independent + Systematic Error Correlation, or " + \
+                                        "(3) Structured Error Correlation"
+    uncertainty_type2_var[:] = uncertainty_type2[:]
 
     # > K - K (sensor-to-sensor differences) for zero shift case
     K_var = rootgrp.createVariable('K', 'f8', ('M',), zlib=True, complevel=9)
@@ -268,7 +278,7 @@ def return_w_matrix_variables(w_matrices, uncertainty_vectors):
 def append_W_to_input_file(filepath,
                            w_matrix_val, w_matrix_row, w_matrix_col, w_matrix_nnz,
                            uncertainty_vector_row_count, uncertainty_vector,
-                           w_matrix_use, uncertainty_vector_use):
+                           w_matrix_use1, w_matrix_use2, uncertainty_vector_use1, uncertainty_vector_use2):
     """
     Append set of W matrix variable arrays to a given harmonisation input file
 
@@ -289,6 +299,18 @@ def append_W_to_input_file(filepath,
 
     :type uncertainty_vector: numpy.ndarray
     :param uncertainty_vector: Concatenated array of uncertainty vectors
+
+    :type w_matrix_use1: numpy.ndarray
+    :param w_matrix_use1: mapping from X1 array column index to W
+
+    :type w_matrix_use2: numpy.ndarray
+    :param w_matrix_use2: mapping from X2 array column index to W
+
+    :type uncertainty_vector_use1: numpy.ndarray
+    :param uncertainty_vector_use1: a mapping from X1 array column index to uncertainty vector
+
+    :type uncertainty_vector_use2: numpy.ndarray
+    :param uncertainty_vector_use2: a mapping from X2 array column index to uncertainty vector
     """
 
     # 1. Open file
@@ -334,9 +356,13 @@ def append_W_to_input_file(filepath,
     w_matrix_val_var = rootgrp.createVariable('w_matrix_val', 'f8', ('w_matrix_sum_nnz',), zlib=True, complevel=9)
     w_matrix_val_var.description = "CSR values for all W matrices"
 
-    # > w_matrix_use - a mapping from H array column index to W
-    w_matrix_use_var = rootgrp.createVariable('w_matrix_use', 'i4', ('m',), zlib=True, complevel=9)
-    w_matrix_use_var.description = "mapping from X1 and X2 array column index to W"
+    # > w_matrix_use1 - a mapping from X2 array column index to W
+    w_matrix_use1_var = rootgrp.createVariable('w_matrix_use1', 'i4', ('m1',), zlib=True, complevel=9)
+    w_matrix_use1_var.description = "mapping from X1 array column index to W"
+
+    # > w_matrix_use2 - a mapping from X2 array column index to W
+    w_matrix_use2_var = rootgrp.createVariable('w_matrix_use2', 'i4', ('m2',), zlib=True, complevel=9)
+    w_matrix_use2_var.description = "mapping from X2 array column index to W"
 
     # > uncertainty_vector_row_count - number of rows of each uncertainty vector
     uncertainty_vector_row_count_var = rootgrp.createVariable('uncertainty_vector_row_count', 'i4',
@@ -348,20 +374,26 @@ def append_W_to_input_file(filepath,
                                                     zlib=True, complevel=9)
     uncertainty_vector_var.description = "uncertainty of each scanline value"
 
-    # > uncertainty_vector_use - a mapping from H array column index to uncertainty vector
-    uncertainty_vector_use_var = rootgrp.createVariable('uncertainty_vector_use', 'i4', ('m',), zlib=True, complevel=9)
-    uncertainty_vector_use_var.description = "mapping from X1 and X2 array column index to uncertainty vector"
+    # > uncertainty_vector_use1 - a mapping from X1 array column index to uncertainty vector
+    uncertainty_vector_use1_var = rootgrp.createVariable('uncertainty_vector_use1', 'i4', ('m1',), zlib=True, complevel=9)
+    uncertainty_vector_use1_var.description = "mapping from X1 array column index to uncertainty vector"
+
+    # > uncertainty_vector_use2 - a mapping from X2 array column index to uncertainty vector
+    uncertainty_vector_use2_var = rootgrp.createVariable('uncertainty_vector_use2', 'i4', ('m2',), zlib=True, complevel=9)
+    uncertainty_vector_use2_var.description = "mapping from X2 array column index to uncertainty vector"
 
     # 4. Add data
     w_matrix_nnz_var[:] = w_matrix_nnz[:]
     w_matrix_row_var[:] = w_matrix_row[:]
     w_matrix_col_var[:] = w_matrix_col[:]
     w_matrix_val_var[:] = w_matrix_val[:]
-    w_matrix_use_var[:] = w_matrix_use[:]
+    w_matrix_use1_var[:] = w_matrix_use1[:]
+    w_matrix_use2_var[:] = w_matrix_use2[:]
 
     uncertainty_vector_row_count_var[:] = uncertainty_vector_row_count[:]
     uncertainty_vector_var[:] = uncertainty_vector[:]
-    uncertainty_vector_use_var[:] = uncertainty_vector_use[:]
+    uncertainty_vector_use1_var[:] = uncertainty_vector_use1[:]
+    uncertainty_vector_use2_var[:] = uncertainty_vector_use2[:]
 
     # 5. Close file
     rootgrp.close()

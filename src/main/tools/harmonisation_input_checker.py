@@ -10,7 +10,7 @@ import sys
 
 '''___Third Party Modules___'''
 from netCDF4 import Dataset
-from numpy import sum, where, array_equal, zeros
+from numpy import sum, where, array_equal, zeros, append
 
 '''___Authorship___'''
 __author__ = ["Sam Hunt"]
@@ -36,17 +36,20 @@ VARIABLE_DATA = {"X1": {"dim": ["M", "m1"], "dtype": "float64"},
                  "Ks": {"dim": ["M"], "dtype": "float64"},
                  "time1": {"dim": ["M"], "dtype": "float64"},
                  "time2": {"dim": ["M"], "dtype": "float64"},
-                 "uncertainty_type": {"dim": ["m"], "dtype": "int32"}}
+                 "uncertainty_type1": {"dim": ["m1"], "dtype": "int32"},
+                 "uncertainty_type2": {"dim": ["m2"], "dtype": "int32"}}
 
 # Optional W matrix variable dimensions (if included complete set required)
 W_VARIABLE_DATA = {"w_matrix_nnz": {"dim": ["w_matrix_count"], "dtype": "int32"},
                    "w_matrix_row": {"dim": ['w_matrix_count', 'w_matrix_num_row'], "dtype": "int32"},
                    "w_matrix_col": {"dim": ["w_matrix_sum_nnz"], "dtype": "int32"},
                    "w_matrix_val": {"dim": ["w_matrix_sum_nnz"], "dtype": "float64"},
-                   "w_matrix_use": {"dim": ["m"], "dtype": "int32"},
+                   "w_matrix_use1": {"dim": ["m1"], "dtype": "int32"},
+                   "w_matrix_use2": {"dim": ["m2"], "dtype": "int32"},
                    "uncertainty_vector_row_count": {"dim": ["uncertainty_vector_count"], "dtype": "int32"},
                    "uncertainty_vector": {"dim": ["uncertainty_vector_sum_row"], "dtype": "float64"},
-                   "uncertainty_vector_use": {"dim": ["m"], "dtype": "int32"}}
+                   "uncertainty_vector_use1": {"dim": ["m1"], "dtype": "int32"},
+                   "uncertainty_vector_use2": {"dim": ["m2"], "dtype": "int32"}}
 
 # Attributes
 ATTRS = ["sensor_1_name", "sensor_2_name"]
@@ -231,7 +234,7 @@ def check_w_matrix_variable_dimensions(rootgrp):
         # TEST: Assert the size of dimension 'w_matrix_count' is equal to the number of w matrices indexed in variable -
         #       'w_matrix_use' -----------------------------------------------------------------------------------------
         dim_num_ws = rootgrp.dimensions["w_matrix_count"].size
-        use_num_ws = max(rootgrp.variables["w_matrix_use"][:])
+        use_num_ws = max(max(rootgrp.variables["w_matrix_use1"][:]),max(rootgrp.variables["w_matrix_use2"][:]))
         if dim_num_ws != use_num_ws:
             errors.append("W Matrix Dimension Error: Size of dimension 'w_matrix_count' ("+str(dim_num_ws) +
                           ") must match number of labelled W matrices in variable 'w_matrix_use'(" + str(use_num_ws) +
@@ -239,9 +242,10 @@ def check_w_matrix_variable_dimensions(rootgrp):
         # --------------------------------------------------------------------------------------------------------------
 
         # TEST: Assert the size of dimension 'uncertainty_vector_count' is equal to the number of uncertainty vectors --
-        #       indexed in variable 'uncertainty_vector_use' -----------------------------------------------------------
+        #       indexed in variable 'uncertainty_vector_use1' and 'uncertainty_vector_use2' ----------------------------
         dim_num_u_vecs = rootgrp.dimensions["uncertainty_vector_count"].size
-        use_num_u_vecs = max(rootgrp.variables["uncertainty_vector_use"][:])
+        use_num_u_vecs = max(max(rootgrp.variables["uncertainty_vector_use1"][:]),
+                             max(rootgrp.variables["uncertainty_vector_use2"][:]))
         if dim_num_u_vecs != use_num_u_vecs:
             errors.append("Uncertainty Vector Dimension Error: Size of dimension 'uncertainty_vector_count' ("
                           + str(dim_num_u_vecs) + ") must match number of labelled uncertainty vectors in variable"
@@ -335,21 +339,21 @@ def check_w_variable_values(rootgrp):
     errors = []     # Initialise list to store error messages
 
     if set(W_VARIABLE_DATA.keys()).issubset(rootgrp.variables.keys()):
+        w_matrix_use = append(rootgrp.variables["w_matrix_use1"][:], rootgrp.variables["w_matrix_use2"][:])
+        uncertainty_vector_use = append(rootgrp.variables["uncertainty_vector_use1"][:],
+                                        rootgrp.variables["uncertainty_vector_use2"][:])
 
         # TEST: Assert W Matrix indices in w_matrix_use are in numerical order from 1 ----------------------------------
-        w_matrix_use = rootgrp.variables["w_matrix_use"][:]
         if set(w_matrix_use[w_matrix_use!=0]) != set(range(1, max(w_matrix_use+1))):
             errors.append("W Matrix Value Error: Variable 'w_matrix_use' must index w matrix "
                           "use in X1 then X2 in numerical order from 1")
         # --------------------------------------------------------------------------------------------------------------
-
         # TEST: Assert Uncertainty Vector indices in uncertainty_vector_use are in numerical order from 1 --------------
-        uncertainty_vector_use = rootgrp.variables["uncertainty_vector_use"][:]
+
         if set(uncertainty_vector_use[uncertainty_vector_use!=0]) != set(range(1, max(uncertainty_vector_use + 1))):
             errors.append("Uncertainty Vector Value Error: Variable 'uncertainty_vector_use' must index uncertainty "
                           "vector use in X1 then X2 in numerical order from 1")
         # --------------------------------------------------------------------------------------------------------------
-
         # TEST: Assert X1 and X2 columns assigned with W matrix also assign with Uncertainty Vector --------------------
         if not array_equal(where(w_matrix_use!=0)[0], where(uncertainty_vector_use!=0)[0]):
             errors.append("W Matrix Value Error: Mismatch between X1/X2 columns with w matrix given by 'w_matrix_use' ("
@@ -388,8 +392,7 @@ def check_w_variable_values(rootgrp):
         # --------------------------------------------------------------------------------------------------------------
 
         # TEST: Assert all index variables values >= 0 -----------------------------------------------------------------
-        index_variables = ["w_matrix_nnz", "w_matrix_row", "w_matrix_col", "w_matrix_use",
-                           "uncertainty_vector_row_count", "uncertainty_vector_use"]
+        index_variables = ["w_matrix_nnz", "w_matrix_row", "w_matrix_col", "uncertainty_vector_row_count"]
         for variable in index_variables:
             if not (rootgrp.variables[variable][:] >= 0).all():
                 errors.append("W Matrix Value Error: Not all values of variable '"+variable+"' >= 0 - indices "
@@ -415,16 +418,21 @@ def check_uncertainty_assignment(rootgrp):
     errors = []  # Initialise list to store error messages
 
     # TEST: Assert assert 1 and only 1 error correlation form is attributed to each sensor state variable --------------
-    if set(["X1", "X2", "Ur1", "Ur2", "Us1", "Us2", "uncertainty_type"]).issubset(rootgrp.variables.keys()):
+    if set(["X1", "X2", "Ur1", "Ur2", "Us1", "Us2", "uncertainty_type1", "uncertainty_type2"])\
+            .issubset(rootgrp.variables.keys()):
 
         m1 = rootgrp.dimensions['m1'].size
         m2 = rootgrp.dimensions['m2'].size
-        m = m1 + m2
-        uncertainty_type = rootgrp.variables["uncertainty_type"][:]
+        uncertainty_type1 = rootgrp.variables["uncertainty_type1"][:]
+        uncertainty_type2 = rootgrp.variables["uncertainty_type2"][:]
 
-        w_matrix_use = zeros(m)
-        if "w_matrix_use" in rootgrp.variables.keys():
-            w_matrix_use = rootgrp.variables['w_matrix_use']
+        w_matrix_use1 = zeros(m1)
+        if "w_matrix_use1" in rootgrp.variables.keys():
+            w_matrix_use1 = rootgrp.variables['w_matrix_use1']
+
+        w_matrix_use2 = zeros(m2)
+        if "w_matrix_use2" in rootgrp.variables.keys():
+            w_matrix_use2 = rootgrp.variables['w_matrix_use2']
 
         # 1. Sensor 1
         Ur1 = rootgrp.variables["Ur1"][:]
@@ -433,13 +441,13 @@ def check_uncertainty_assignment(rootgrp):
         for col in range(m1):
 
             # (a) Find uncertainty_type asserted in file variable
-            if uncertainty_type[col] == 1:
+            if uncertainty_type1[col] == 1:
                 uncertainty_str = "independent"
-            if uncertainty_type[col] == 2:
+            if uncertainty_type1[col] == 2:
                 uncertainty_str = "independent+systematic"
-            if uncertainty_type[col] == 3:
+            if uncertainty_type1[col] == 3:
                 uncertainty_str = "structured"
-            if uncertainty_type[col] not in set([1, 2, 3]):
+            if uncertainty_type1[col] not in set([1, 2, 3]):
                 uncertainty_str = "[NOT ASSIGNED!]"
                 "Value Error: All values of 'uncertainty_type' variable must be equal to either 1, 2 or 3"
 
@@ -451,15 +459,15 @@ def check_uncertainty_assignment(rootgrp):
                 rand = True
             if (Ur1[:, col] > 0).all() and (Us1[:, col] > 0).all():
                 randsys = True
-            if w_matrix_use[col] > 0:
+            if w_matrix_use1[col] > 0:
                 w = True
 
             # Compare how (a) and (b) match:
-            if uncertainty_type[col] == 1 and rand is True:
+            if uncertainty_type1[col] == 1 and rand is True:
                 pass
-            elif uncertainty_type[col] == 2 and randsys is True:
+            elif uncertainty_type1[col] == 2 and randsys is True:
                 pass
-            elif uncertainty_type[col] == 3 and w is True:
+            elif uncertainty_type1[col] == 3 and w is True:
                 pass
             else:
                 errors.append("Variable Correlation Form Assignement Error: Variable in X1[:, " + str(col) +
@@ -479,20 +487,20 @@ def check_uncertainty_assignment(rootgrp):
                               "\n - w-matrix correlation: " + str(w) +
                               "\n Must have one and only one form!")
 
-        # 2. cSensor 2
+        # 2. Sensor 2
         Ur2 = rootgrp.variables["Ur2"][:]
         Us2 = rootgrp.variables["Us2"][:]
 
         for col in range(m2):
 
             # (a) Find uncertainty_type asserted in file variable
-            if uncertainty_type[col+m1] == 1:
+            if uncertainty_type2[col] == 1:
                 uncertainty_str = "independent"
-            if uncertainty_type[col+m1] == 2:
+            if uncertainty_type2[col] == 2:
                 uncertainty_str = "independent+systematic"
-            if uncertainty_type[col+m1] == 3:
+            if uncertainty_type2[col] == 3:
                 uncertainty_str = "structured"
-            if uncertainty_type[col+m1] not in set([1, 2, 3]):
+            if uncertainty_type2[col] not in set([1, 2, 3]):
                 "Value Error: All values of 'uncertainty_type' variable must be equal to either 1, 2 or 3"
 
             # (b) Find uncertainty_type implied by the data
@@ -503,15 +511,15 @@ def check_uncertainty_assignment(rootgrp):
                 rand = True
             if (Ur2[:, col] > 0).all() and (Us2[:, col] > 0).all():
                 randsys = True
-            if w_matrix_use[col+m1] > 0:
+            if w_matrix_use2[col] > 0:
                 w = True
 
             # Compare how (a) and (b) match:
-            if uncertainty_type[col+m1] == 1 and rand is True:
+            if uncertainty_type2[col] == 1 and rand is True:
                 pass
-            elif uncertainty_type[col+m1] == 2 and randsys is True:
+            elif uncertainty_type2[col] == 2 and randsys is True:
                 pass
-            elif uncertainty_type[col+m1] == 3 and w is True:
+            elif uncertainty_type2[col] == 3 and w is True:
                 pass
             else:
                 errors.append("Variable Correlation Form Assignement Error: Variable in X2[:, " + str(col) +
