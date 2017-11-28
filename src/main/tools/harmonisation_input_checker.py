@@ -41,15 +41,15 @@ VARIABLE_DATA = {"X1": {"dim": ["M", "m1"], "dtype": "float64"},
 
 # Optional W matrix variable dimensions (if included complete set required)
 W_VARIABLE_DATA = {"w_matrix_nnz": {"dim": ["w_matrix_count"], "dtype": "int32"},
-                   "w_matrix_row": {"dim": ['w_matrix_count', 'w_matrix_num_row'], "dtype": "int32"},
-                   "w_matrix_col": {"dim": ["w_matrix_sum_nnz"], "dtype": "int32"},
-                   "w_matrix_val": {"dim": ["w_matrix_sum_nnz"], "dtype": "float64"},
+                   "w_matrix_row": {"dim": ['w_matrix_count', 'w_matrix_row_count'], "dtype": "int32"},
+                   "w_matrix_col": {"dim": ["w_matrix_nnz_sum"], "dtype": "int32"},
+                   "w_matrix_val": {"dim": ["w_matrix_nnz_sum"], "dtype": "float64"},
                    "w_matrix_use1": {"dim": ["m1"], "dtype": "int32"},
                    "w_matrix_use2": {"dim": ["m2"], "dtype": "int32"},
-                   "uncertainty_vector_row_count": {"dim": ["uncertainty_vector_count"], "dtype": "int32"},
-                   "uncertainty_vector": {"dim": ["uncertainty_vector_sum_row"], "dtype": "float64"},
-                   "uncertainty_vector_use1": {"dim": ["m1"], "dtype": "int32"},
-                   "uncertainty_vector_use2": {"dim": ["m2"], "dtype": "int32"}}
+                   "u_matrix_row_count": {"dim": ["u_matrix_count"], "dtype": "int32"},
+                   "u_matrix_val": {"dim": ["u_matrix_row_count_sum"], "dtype": "float64"},
+                   "u_matrix_use1": {"dim": ["m1"], "dtype": "int32"},
+                   "u_matrix_use2": {"dim": ["m2"], "dtype": "int32"}}
 
 # Attributes
 ATTRS = ["sensor_1_name", "sensor_2_name"]
@@ -241,45 +241,45 @@ def check_w_matrix_variable_dimensions(rootgrp):
                           ")")
         # --------------------------------------------------------------------------------------------------------------
 
-        # TEST: Assert the size of dimension 'uncertainty_vector_count' is equal to the number of uncertainty vectors --
-        #       indexed in variable 'uncertainty_vector_use1' and 'uncertainty_vector_use2' ----------------------------
-        dim_num_u_vecs = rootgrp.dimensions["uncertainty_vector_count"].size
-        use_num_u_vecs = max(max(rootgrp.variables["uncertainty_vector_use1"][:]),
-                             max(rootgrp.variables["uncertainty_vector_use2"][:]))
+        # TEST: Assert the size of dimension 'u_matrix_count' is equal to the number of u matrices ---------------------
+        #       indexed in variable 'u_matrix_use1' and 'u_matrix_use2' ------------------------------------------------
+        dim_num_u_vecs = rootgrp.dimensions["u_matrix_count"].size
+        use_num_u_vecs = max(max(rootgrp.variables["u_matrix_use1"][:]),
+                             max(rootgrp.variables["u_matrix_use2"][:]))
         if dim_num_u_vecs != use_num_u_vecs:
-            errors.append("Uncertainty Vector Dimension Error: Size of dimension 'uncertainty_vector_count' ("
-                          + str(dim_num_u_vecs) + ") must match number of labelled uncertainty vectors in variable"
-                          " 'uncertainty_vector_use'(" + str(use_num_u_vecs) + ")")
+            errors.append("U Matrix Dimension Error: Size of dimension 'u_matrix_count' ("
+                          + str(dim_num_u_vecs) + ") must match number of labelled u matrices in variable"
+                          " 'u_matrix_use'(" + str(use_num_u_vecs) + ")")
         # --------------------------------------------------------------------------------------------------------------
 
         # TEST: Assert that the row size of w matrices is equal to the number of matchups ------------------------------
-        w_matrix_num_row_size = rootgrp.dimensions["w_matrix_num_row"].size
+        w_matrix_row_count_size = rootgrp.dimensions["w_matrix_row_count"].size
         M_size = rootgrp.dimensions["M"].size
-        if w_matrix_num_row_size != M_size+1:
-            errors.append("W Matrix Dimension Error: Size of dimension 'w_matrix_row_num' (" +
-                          str(w_matrix_num_row_size) + ") must equal number of matchups + 1 (" + str(M_size) +
+        if w_matrix_row_count_size != M_size+1:
+            errors.append("W Matrix Dimension Error: Size of dimension 'w_matrix_row_count_num' (" +
+                          str(w_matrix_row_count_size) + ") must equal number of matchups + 1 (" + str(M_size) +
                           " + 1 = "+str(M_size+1)+")")
         # --------------------------------------------------------------------------------------------------------------
 
-        # TEST: Assert the size of dimension 'w_matrix_sum_nnz' is equal to the sum of each w matrix nnz combined, as --
+        # TEST: Assert the size of dimension 'w_matrix_nnz_sum' is equal to the sum of each w matrix nnz combined, as --
         #       given in the variable 'w_matrix_nnz' -------------------------------------------------------------------
-        w_matrix_sum_nnz_size = rootgrp.dimensions["w_matrix_sum_nnz"].size
+        w_matrix_nnz_sum_size = rootgrp.dimensions["w_matrix_nnz_sum"].size
         w_matrix_nnz_combined = sum(rootgrp.variables["w_matrix_nnz"][:])
-        if w_matrix_sum_nnz_size != w_matrix_nnz_combined:
-            errors.append("W Matrix Dimension Error: Size of dimension 'w_matrix_sum_nnz' (" +
-                          str(w_matrix_sum_nnz_size) + ") must equal combined per w matrix nnz's contained in variable"
+        if w_matrix_nnz_sum_size != w_matrix_nnz_combined:
+            errors.append("W Matrix Dimension Error: Size of dimension 'w_matrix_nnz_sum' (" +
+                          str(w_matrix_nnz_sum_size) + ") must equal combined per w matrix nnz's contained in variable"
                           "'w_matrix_nnz' (" + str(w_matrix_nnz_combined) + ")")
         # --------------------------------------------------------------------------------------------------------------
 
-        # TEST: Assert the size of dimension 'uncertainty_vector_sum_row' is equal to the sum of each uncertainty vector
-        #       number of rows combined, as given in the variable 'uncertainty_vector_row_count' -----------------------
-        uncertainty_vector_sum_row_size = rootgrp.dimensions["uncertainty_vector_sum_row"].size
-        uncertainty_vector_row_count_combined = sum(rootgrp.variables["uncertainty_vector_row_count"][:])
-        if uncertainty_vector_sum_row_size != uncertainty_vector_row_count_combined:
-            errors.append("Uncertainty Vector Dimension Error: Size of dimension 'uncertainty_vector_sum_row' ("
-                          + str(uncertainty_vector_sum_row_size) + ") must equal combined per uncertainty vector"
-                          " row counts contained in variable 'uncertainty_vector_row_count' (" +
-                          str(uncertainty_vector_row_count_combined) + ")")
+        # TEST: Assert the size of dimension 'u_matrix_row_count_sum' is equal to the sum of each u matrix number of ---
+        #       rows combined, as given in the variable 'u_matrix_row_count' -------------------------------------------
+        u_matrix_row_count_sum_size = rootgrp.dimensions["u_matrix_row_count_sum"].size
+        u_matrix_row_count_combined = sum(rootgrp.variables["u_matrix_row_count"][:])
+        if u_matrix_row_count_sum_size != u_matrix_row_count_combined:
+            errors.append("U Matrix Dimension Error: Size of dimension 'u_matrix_row_count_sum' ("
+                          + str(u_matrix_row_count_sum_size) + ") must equal combined per u matrix"
+                          " row counts contained in variable 'u_matrix_row_count' (" +
+                          str(u_matrix_row_count_combined) + ")")
         # --------------------------------------------------------------------------------------------------------------
 
     return errors
@@ -340,32 +340,31 @@ def check_w_variable_values(rootgrp):
 
     if set(W_VARIABLE_DATA.keys()).issubset(rootgrp.variables.keys()):
         w_matrix_use = append(rootgrp.variables["w_matrix_use1"][:], rootgrp.variables["w_matrix_use2"][:])
-        uncertainty_vector_use = append(rootgrp.variables["uncertainty_vector_use1"][:],
-                                        rootgrp.variables["uncertainty_vector_use2"][:])
+        u_matrix_use = append(rootgrp.variables["u_matrix_use1"][:], rootgrp.variables["u_matrix_use2"][:])
 
         # TEST: Assert W Matrix indices in w_matrix_use are in numerical order from 1 ----------------------------------
         if set(w_matrix_use[w_matrix_use!=0]) != set(range(1, max(w_matrix_use+1))):
             errors.append("W Matrix Value Error: Variable 'w_matrix_use' must index w matrix "
                           "use in X1 then X2 in numerical order from 1")
         # --------------------------------------------------------------------------------------------------------------
-        # TEST: Assert Uncertainty Vector indices in uncertainty_vector_use are in numerical order from 1 --------------
+        # TEST: Assert U Matrix indices in u_matrix_use are in numerical order from 1 ----------------------------------
 
-        if set(uncertainty_vector_use[uncertainty_vector_use!=0]) != set(range(1, max(uncertainty_vector_use + 1))):
-            errors.append("Uncertainty Vector Value Error: Variable 'uncertainty_vector_use' must index uncertainty "
-                          "vector use in X1 then X2 in numerical order from 1")
+        if set(u_matrix_use[u_matrix_use!=0]) != set(range(1, max(u_matrix_use + 1))):
+            errors.append("U Matrix Value Error: Variable 'u_matrix_use' must index u matrix "
+                          "use in X1 then X2 in numerical order from 1")
         # --------------------------------------------------------------------------------------------------------------
-        # TEST: Assert X1 and X2 columns assigned with W matrix also assign with Uncertainty Vector --------------------
-        if not array_equal(where(w_matrix_use!=0)[0], where(uncertainty_vector_use!=0)[0]):
+        # TEST: Assert X1 and X2 columns assigned with W matrix also assign with U Matrix ------------------------------
+        if not array_equal(where(w_matrix_use!=0)[0], where(u_matrix_use!=0)[0]):
             errors.append("W Matrix Value Error: Mismatch between X1/X2 columns with w matrix given by 'w_matrix_use' ("
-                          + str(where(w_matrix_use!=0)[0]) + ") and X1/X2 columns with an uncertainty vector given by "
-                          "'uncertainty_vector_use' (" + str(where(uncertainty_vector_use!=0)[0])
+                          + str(where(w_matrix_use!=0)[0]) + ") and X1/X2 columns with an u matrix given by "
+                          "'u_matrix_use' (" + str(where(u_matrix_use!=0)[0])
                           + ") - should be the same")
         # --------------------------------------------------------------------------------------------------------------
 
-        # TEST: Assert W matrix column widths equal to length of uncertainty vectors they are paired with --------------
+        # TEST: Assert W matrix column widths equal to rows of u matrix they are paired with ---------------------------
         w_matrix_nnz = rootgrp.variables["w_matrix_nnz"][:]
         w_matrix_col = rootgrp.variables["w_matrix_col"][:]
-        uncertainty_vector_row_count = rootgrp.variables["uncertainty_vector_row_count"][:]
+        u_matrix_row_count = rootgrp.variables["u_matrix_row_count"][:]
         istart = 0
         iend = 0
         for i, w_matrix_nnz_i in enumerate(w_matrix_nnz):
@@ -373,26 +372,26 @@ def check_w_variable_values(rootgrp):
             iend += w_matrix_nnz_i
             max_col = max(w_matrix_col[istart:iend]) + 1
 
-            # Compare w matrix column width to size of uncertainty vectors paired with it
-            i_w_u_vectors = uncertainty_vector_use[where(w_matrix_use == i+1)[0]] - 1
+            # Compare w matrix column width number of rows in u matrix paired with it
+            i_w_u_vectors = u_matrix_use[where(w_matrix_use == i+1)[0]] - 1
             for i_w_u_vector in i_w_u_vectors:
-                max_row = uncertainty_vector_row_count[i_w_u_vector]
+                max_row = u_matrix_row_count[i_w_u_vector]
                 if max_row != max_col:
                     errors.append("W Matrix Value Error: Number of columns of w matrix " + str(i+1) + " (" +
-                                  str(max_col) + ") do no correspond to number of rows of uncertainty vector " +
+                                  str(max_col) + ") do not correspond to number of rows of u matrix " +
                                   str(i_w_u_vector+1) + " (" + str(max_row) + ")")
             istart = iend
         # --------------------------------------------------------------------------------------------------------------
 
-        # TEST: Assert all uncertainty vector values > 0 ---------------------------------------------------------------
-        uncertainty_vector = rootgrp.variables['uncertainty_vector'][:]
-        if not (uncertainty_vector > 0).all():
-            errors.append("W Matrix Value Error: Not all values of variable 'uncertainty_vector' > 0 - uncertainties "
+        # TEST: Assert all U Matrix values > 0 ---------------------------------------------------------------
+        u_matrix_val = rootgrp.variables['u_matrix_val'][:]
+        if not (u_matrix_val > 0).all():
+            errors.append("U Matrix Value Error: Not all values of variable 'u_matrix' > 0 - uncertainties "
                           "must be greater than zero")
         # --------------------------------------------------------------------------------------------------------------
 
         # TEST: Assert all index variables values >= 0 -----------------------------------------------------------------
-        index_variables = ["w_matrix_nnz", "w_matrix_row", "w_matrix_col", "uncertainty_vector_row_count"]
+        index_variables = ["w_matrix_nnz", "w_matrix_row", "w_matrix_col", "u_matrix_row_count"]
         for variable in index_variables:
             if not (rootgrp.variables[variable][:] >= 0).all():
                 errors.append("W Matrix Value Error: Not all values of variable '"+variable+"' >= 0 - indices "

@@ -190,18 +190,18 @@ def write_input_file(file_path, X1, X2, Ur1, Ur2, Us1, Us2, uncertainty_type1, u
     return 0
 
 
-def return_w_matrix_variables(w_matrices, uncertainty_vectors):
+def return_w_matrix_variables(w_matrices, u_matrices):
     """
-    Produce harmonisation input file W matrix variable arrays from lists of Ws matrices and uncertainty vectors.
-    NB: Also additionally required for the file would be w_matrix_use and uncertainty_vector_use variable arrays.
+    Produce harmonisation input file W matrix variable arrays from lists of W and U matrices.
+    NB: Also additionally required for the file would be w_matrix_use1/2 and u_matrix_use1/2 variable arrays.
 
     :type w_matrices: list:scipy.sparse.csr_matrix
     :param w_matrices: List of scipy.sparse.csr_matrix object W matrices
-                       (In the order they will be indexed in harmonisation input file w_matrix_use variable)
+                       (In the order they will be indexed in harmonisation input file w_matrix_use1/2 variable)
 
-    :type uncertainty_vectors: list:numpy.ndarray
-    :param uncertainty_vectors: List of uncertainty vectors
-                         (In the order they will be indexed in harmonisation input file uncertainty_vector_use variable)
+    :type u_matrices: list:numpy.ndarray
+    :param u_matrices: List of U matrices
+                         (In the order they will be indexed in harmonisation input file u_matrices_use1/2 variable)
 
     :return:
         :w_matrix_val: *numpy.ndarray*
@@ -220,13 +220,13 @@ def return_w_matrix_variables(w_matrices, uncertainty_vectors):
 
         Number of non-zeros elements per W matrix
 
-        :uncertainty_vector_row_count: *numpy.ndarray*
+        :u_matrix_row_count: *numpy.ndarray*
 
         Number of elements per uncertainty vector
 
-        :uncertainty_vector: *numpy.ndarray*
+        :u_matrix_val: *numpy.ndarray*
 
-        Concatenated array of uncertainty vectors
+        Concatenated array of u matrix diagonals
     """
 
     # 1. Generate W matrix variable arrays
@@ -254,31 +254,31 @@ def return_w_matrix_variables(w_matrices, uncertainty_vectors):
     for i, w in enumerate(w_matrices):
         w_matrix_row[i, :] = w.indptr
 
-    # 2. Generate uncertainty vector variable arrays
+    # 2. Generate u matrix variable arrays
 
-    # > uncertainty_vector_row_count
-    uncertainty_vector_row_count = zeros(len(uncertainty_vectors), dtype=int)
-    for i, u in enumerate(uncertainty_vectors):
-        uncertainty_vector_row_count[i] = len(u)
+    # > u_matrix_row_count
+    u_matrix_row_count = zeros(len(u_matrices), dtype=int)
+    for i, u in enumerate(u_matrices):
+        u_matrix_row_count[i] = len(u)
 
-    # > uncertainty_vector
-    total_row = sum(uncertainty_vector_row_count)
-    uncertainty_vector = zeros(total_row)
+    # > u_matrix_val
+    total_row = sum(u_matrix_row_count)
+    u_matrix_val = zeros(total_row)
 
     istart = 0
     iend = 0
-    for u, u_row in zip(uncertainty_vectors, uncertainty_vector_row_count):
+    for u, u_row in zip(u_matrices, u_matrix_row_count):
         iend += u_row
-        uncertainty_vector[istart:iend] = u
+        u_matrix_val[istart:iend] = u
         istart = iend
 
-    return w_matrix_val, w_matrix_row, w_matrix_col, w_matrix_nnz, uncertainty_vector_row_count, uncertainty_vector
+    return w_matrix_val, w_matrix_row, w_matrix_col, w_matrix_nnz, u_matrix_row_count, u_matrix_val
 
 
 def append_W_to_input_file(filepath,
                            w_matrix_val, w_matrix_row, w_matrix_col, w_matrix_nnz,
-                           uncertainty_vector_row_count, uncertainty_vector,
-                           w_matrix_use1, w_matrix_use2, uncertainty_vector_use1, uncertainty_vector_use2):
+                           u_matrix_row_count, u_matrix_val,
+                           w_matrix_use1, w_matrix_use2, u_matrix_use1, u_matrix_use2):
     """
     Append set of W matrix variable arrays to a given harmonisation input file
 
@@ -294,11 +294,11 @@ def append_W_to_input_file(filepath,
     :type w_matrix_nnz: numpy.ndarray
     :param w_matrix_nnz: Number of non-zeros elements per W matrix
 
-    :type uncertainty_vector_row_count: numpy.ndarray
-    :param uncertainty_vector_row_count: Number of elements per uncertainty vector
+    :type u_matrix_row_count: numpy.ndarray
+    :param u_matrix_row_count: Number of non-zero elements per u matrix
 
-    :type uncertainty_vector: numpy.ndarray
-    :param uncertainty_vector: Concatenated array of uncertainty vectors
+    :type u_matrix_val: numpy.ndarray
+    :param u_matrix_val: Concatenated array of u matrix non-zero values
 
     :type w_matrix_use1: numpy.ndarray
     :param w_matrix_use1: mapping from X1 array column index to W
@@ -306,11 +306,11 @@ def append_W_to_input_file(filepath,
     :type w_matrix_use2: numpy.ndarray
     :param w_matrix_use2: mapping from X2 array column index to W
 
-    :type uncertainty_vector_use1: numpy.ndarray
-    :param uncertainty_vector_use1: a mapping from X1 array column index to uncertainty vector
+    :type u_matrix_use1: numpy.ndarray
+    :param u_matrix_use1: a mapping from X1 array column index to U
 
-    :type uncertainty_vector_use2: numpy.ndarray
-    :param uncertainty_vector_use2: a mapping from X2 array column index to uncertainty vector
+    :type u_matrix_use2: numpy.ndarray
+    :param u_matrix_use2: a mapping from X2 array column index to U
     """
 
     # 1. Open file
@@ -325,16 +325,16 @@ def append_W_to_input_file(filepath,
         num_row = w_matrix_row.shape[1]
     else:
         num_row = len(w_matrix_row)
-    w_matrix_num_row_dim = rootgrp.createDimension("w_matrix_num_row", num_row)
+    w_matrix_row_count_dim = rootgrp.createDimension("w_matrix_row_count", num_row)
 
     # > w_matrix_sum_nnz - sum of non-zero elements in all W matrices
-    w_matrix_sum_nnz_dim = rootgrp.createDimension("w_matrix_sum_nnz", sum(w_matrix_nnz))
+    w_matrix_nnz_sum_dim = rootgrp.createDimension("w_matrix_nnz_sum", sum(w_matrix_nnz))
 
-    # > uncertainty_vector_count - number of uncertainty vectors
-    uncertainty_vector_count_dim = rootgrp.createDimension("uncertainty_vector_count", len(uncertainty_vector_row_count))
+    # > u_matrix_count - number of u matrices
+    u_matrix_count_dim = rootgrp.createDimension("u_matrix_count", len(u_matrix_row_count))
 
-    # > uncertainty_vector_sum_row - sum of rows in uncertainty vector
-    uncertainty_vector_sum_row_dim = rootgrp.createDimension("uncertainty_vector_sum_row", sum(uncertainty_vector_row_count))
+    # > u_matrix_row_count_sum - sum of rows in u matrices
+    u_matrix_row_count_sum_dim = rootgrp.createDimension("u_matrix_row_count_sum", sum(u_matrix_row_count))
 
     # 3. Create new variables
     # > w_matrix_nnz - number of non-zero elements for each W matrix
@@ -342,18 +342,18 @@ def append_W_to_input_file(filepath,
     w_matrix_nnz_var.description = "number of non-zero elements for each W matrix"
 
     # > w_matrix_row - CSR row numbers for each W matrix
-    row_dims = ('w_matrix_num_row',)
+    row_dims = ('w_matrix_row_count',)
     if len(w_matrix_row.shape) > 1:
-        row_dims = ('w_matrix_count', 'w_matrix_num_row')
+        row_dims = ('w_matrix_count', 'w_matrix_row_count')
     w_matrix_row_var = rootgrp.createVariable('w_matrix_row', 'i4', row_dims, zlib=True, complevel=9)
     w_matrix_row_var.description = "CSR row numbers for each W matrix"
 
     # > w_matrix_col - CSR column numbers for all W matrices
-    w_matrix_col_var = rootgrp.createVariable('w_matrix_col', 'i4', ('w_matrix_sum_nnz',), zlib=True, complevel=9)
+    w_matrix_col_var = rootgrp.createVariable('w_matrix_col', 'i4', ('w_matrix_nnz_sum',), zlib=True, complevel=9)
     w_matrix_col_var.description = "CSR column numbers for all W matrices"
 
     # > w_matrix_val - CSR values for all W matrices
-    w_matrix_val_var = rootgrp.createVariable('w_matrix_val', 'f8', ('w_matrix_sum_nnz',), zlib=True, complevel=9)
+    w_matrix_val_var = rootgrp.createVariable('w_matrix_val', 'f8', ('w_matrix_nnz_sum',), zlib=True, complevel=9)
     w_matrix_val_var.description = "CSR values for all W matrices"
 
     # > w_matrix_use1 - a mapping from X2 array column index to W
@@ -364,23 +364,23 @@ def append_W_to_input_file(filepath,
     w_matrix_use2_var = rootgrp.createVariable('w_matrix_use2', 'i4', ('m2',), zlib=True, complevel=9)
     w_matrix_use2_var.description = "mapping from X2 array column index to W"
 
-    # > uncertainty_vector_row_count - number of rows of each uncertainty vector
-    uncertainty_vector_row_count_var = rootgrp.createVariable('uncertainty_vector_row_count', 'i4',
-                                                              ('uncertainty_vector_count',), zlib=True, complevel=9)
-    uncertainty_vector_row_count_var.description = "number of rows of each uncertainty vector"
+    # > u_matrix_row_count - number of rows of each u matrix
+    u_matrix_row_count_var = rootgrp.createVariable('u_matrix_row_count', 'i4',
+                                                              ('u_matrix_count',), zlib=True, complevel=9)
+    u_matrix_row_count_var.description = "number of rows of each u matrix"
 
-    # > uncertainty_vector - uncertainty of each scanline value
-    uncertainty_vector_var = rootgrp.createVariable('uncertainty_vector', 'f8', ('uncertainty_vector_sum_row',),
+    # > u matrix val - uncertainty of each scanline value
+    u_matrix_val_var = rootgrp.createVariable('u_matrix_val', 'f8', ('u_matrix_row_count_sum',),
                                                     zlib=True, complevel=9)
-    uncertainty_vector_var.description = "uncertainty of each scanline value"
+    u_matrix_val_var.description = "u matrix non-zero diagonal elements"
 
-    # > uncertainty_vector_use1 - a mapping from X1 array column index to uncertainty vector
-    uncertainty_vector_use1_var = rootgrp.createVariable('uncertainty_vector_use1', 'i4', ('m1',), zlib=True, complevel=9)
-    uncertainty_vector_use1_var.description = "mapping from X1 array column index to uncertainty vector"
+    # > u_matrix_use1 - a mapping from X1 array column index to U
+    u_matrix_use1_var = rootgrp.createVariable('u_matrix_use1', 'i4', ('m1',), zlib=True, complevel=9)
+    u_matrix_use1_var.description = "mapping from X1 array column index to U"
 
-    # > uncertainty_vector_use2 - a mapping from X2 array column index to uncertainty vector
-    uncertainty_vector_use2_var = rootgrp.createVariable('uncertainty_vector_use2', 'i4', ('m2',), zlib=True, complevel=9)
-    uncertainty_vector_use2_var.description = "mapping from X2 array column index to uncertainty vector"
+    # > u_matrix_use2 - a mapping from X2 array column index to U
+    u_matrix_use2_var = rootgrp.createVariable('u_matrix_use2', 'i4', ('m2',), zlib=True, complevel=9)
+    u_matrix_use2_var.description = "mapping from X2 array column index to U"
 
     # 4. Add data
     w_matrix_nnz_var[:] = w_matrix_nnz[:]
@@ -390,10 +390,10 @@ def append_W_to_input_file(filepath,
     w_matrix_use1_var[:] = w_matrix_use1[:]
     w_matrix_use2_var[:] = w_matrix_use2[:]
 
-    uncertainty_vector_row_count_var[:] = uncertainty_vector_row_count[:]
-    uncertainty_vector_var[:] = uncertainty_vector[:]
-    uncertainty_vector_use1_var[:] = uncertainty_vector_use1[:]
-    uncertainty_vector_use2_var[:] = uncertainty_vector_use2[:]
+    u_matrix_row_count_var[:] = u_matrix_row_count[:]
+    u_matrix_val_var[:] = u_matrix_val[:]
+    u_matrix_use1_var[:] = u_matrix_use1[:]
+    u_matrix_use2_var[:] = u_matrix_use2[:]
 
     # 5. Close file
     rootgrp.close()
