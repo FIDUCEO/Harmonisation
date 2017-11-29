@@ -25,31 +25,31 @@ __status__ = "Development"
 # VARIABLE DATA
 
 # Required variables and dimensions
-VARIABLE_DATA = {"X1": {"dim": ["M", "m1"], "dtype": "float64"},
-                 "X2": {"dim": ["M", "m2"], "dtype": "float64"},
-                 "Ur1": {"dim": ["M", "m1"], "dtype": "float64"},
-                 "Ur2": {"dim": ["M", "m2"], "dtype": "float64"},
-                 "Us1": {"dim": ["M", "m1"], "dtype": "float64"},
-                 "Us2": {"dim": ["M", "m2"], "dtype": "float64"},
-                 "K": {"dim": ["M"], "dtype": "float64"},
-                 "Kr": {"dim": ["M"], "dtype": "float64"},
-                 "Ks": {"dim": ["M"], "dtype": "float64"},
-                 "time1": {"dim": ["M"], "dtype": "float64"},
-                 "time2": {"dim": ["M"], "dtype": "float64"},
-                 "uncertainty_type1": {"dim": ["m1"], "dtype": "int32"},
-                 "uncertainty_type2": {"dim": ["m2"], "dtype": "int32"}}
+VARIABLE_DATA = {"X1": {"dim": ["M", "m1"], "dtype": ["float32", "float64"]},
+                 "X2": {"dim": ["M", "m2"], "dtype": ["float32", "float64"]},
+                 "Ur1": {"dim": ["M", "m1"], "dtype": ["float32", "float64"]},
+                 "Ur2": {"dim": ["M", "m2"], "dtype": ["float32", "float64"]},
+                 "Us1": {"dim": ["M", "m1"], "dtype": ["float32", "float64"]},
+                 "Us2": {"dim": ["M", "m2"], "dtype": ["float32", "float64"]},
+                 "K": {"dim": ["M"], "dtype": ["float32", "float64"]},
+                 "Kr": {"dim": ["M"], "dtype": ["float32", "float64"]},
+                 "Ks": {"dim": ["M"], "dtype": ["float32", "float64"]},
+                 "time1": {"dim": ["M"], "dtype": ["float32", "float64"]},
+                 "time2": {"dim": ["M"], "dtype": ["float32", "float64"]},
+                 "uncertainty_type1": {"dim": ["m1"], "dtype": ["int32"]},
+                 "uncertainty_type2": {"dim": ["m2"], "dtype": ["int32"]}}
 
 # Optional W matrix variable dimensions (if included complete set required)
-W_VARIABLE_DATA = {"w_matrix_nnz": {"dim": ["w_matrix_count"], "dtype": "int32"},
-                   "w_matrix_row": {"dim": ['w_matrix_count', 'w_matrix_row_count'], "dtype": "int32"},
-                   "w_matrix_col": {"dim": ["w_matrix_nnz_sum"], "dtype": "int32"},
-                   "w_matrix_val": {"dim": ["w_matrix_nnz_sum"], "dtype": "float64"},
-                   "w_matrix_use1": {"dim": ["m1"], "dtype": "int32"},
-                   "w_matrix_use2": {"dim": ["m2"], "dtype": "int32"},
-                   "u_matrix_row_count": {"dim": ["u_matrix_count"], "dtype": "int32"},
-                   "u_matrix_val": {"dim": ["u_matrix_row_count_sum"], "dtype": "float64"},
-                   "u_matrix_use1": {"dim": ["m1"], "dtype": "int32"},
-                   "u_matrix_use2": {"dim": ["m2"], "dtype": "int32"}}
+W_VARIABLE_DATA = {"w_matrix_nnz": {"dim": ["w_matrix_count"], "dtype": ["int32"]},
+                   "w_matrix_row": {"dim": ['w_matrix_count', 'w_matrix_row_count'], "dtype": ["int32"]},
+                   "w_matrix_col": {"dim": ["w_matrix_nnz_sum"], "dtype": ["int32"]},
+                   "w_matrix_val": {"dim": ["w_matrix_nnz_sum"], "dtype": ["float32", "float64"]},
+                   "w_matrix_use1": {"dim": ["m1"], "dtype": ["int32"]},
+                   "w_matrix_use2": {"dim": ["m2"], "dtype": ["int32"]},
+                   "u_matrix_row_count": {"dim": ["u_matrix_count"], "dtype": ["int32"]},
+                   "u_matrix_val": {"dim": ["u_matrix_row_count_sum"], "dtype": ["float32", "float64"]},
+                   "u_matrix_use1": {"dim": ["m1"], "dtype": ["int32"]},
+                   "u_matrix_use2": {"dim": ["m2"], "dtype": ["int32"]}}
 
 # Attributes
 ATTRS = ["sensor_1_name", "sensor_2_name"]
@@ -133,7 +133,7 @@ def check_variable_dimension(rootgrp):
         elif variable in W_VARIABLE_DATA.keys():
             expected_dims = W_VARIABLE_DATA[variable]["dim"]
 
-        if (expected_dims != []) and (test_dims != expected_dims):
+        if (expected_dims != []) and (test_dims not in expected_dims):
             errors.append("Dimension Error: Dimension of '" + variable + "' must be " + str(expected_dims) + ", not "
                           + str(test_dims))
     # ------------------------------------------------------------------------------------------------------------------
