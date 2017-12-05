@@ -127,15 +127,17 @@ def check_variable_dimension(rootgrp):
     for variable in file_dims.keys():
         test_dims = file_dims[variable]
 
-        expected_dims = []
         if variable in VARIABLE_DATA.keys():
             expected_dims = VARIABLE_DATA[variable]["dim"]
+            if (expected_dims != []) and (test_dims != expected_dims):
+                errors.append("Dimension Error: Dimension of '" + variable + "' must be " + str(expected_dims) +
+                              ", not " + str(test_dims))
+
         elif variable in W_VARIABLE_DATA.keys():
             expected_dims = W_VARIABLE_DATA[variable]["dim"]
-
-        if (expected_dims != []) and (test_dims not in expected_dims):
-            errors.append("Dimension Error: Dimension of '" + variable + "' must be " + str(expected_dims) + ", not "
-                          + str(test_dims))
+            if (expected_dims != []) and (test_dims != expected_dims):
+                errors.append("Dimension Error: Dimension of '" + variable + "' must be " + str(expected_dims) +
+                              ", not " + str(test_dims))
     # ------------------------------------------------------------------------------------------------------------------
 
     return errors
@@ -167,15 +169,19 @@ def check_variable_dtype(rootgrp):
     for variable in file_dtype.keys():
         test_dtype = file_dtype[variable]
 
-        expected_dtype = []
         if variable in VARIABLE_DATA.keys():
             expected_dtype = VARIABLE_DATA[variable]["dtype"]
+
+            if (expected_dtype != []) and (test_dtype not in expected_dtype):
+                errors.append("Data Type Error: dtype of '" + variable + "' must be " + str(expected_dtype) + ", not "
+                              + str(test_dtype))
+
         elif variable in W_VARIABLE_DATA.keys():
             expected_dtype = W_VARIABLE_DATA[variable]["dtype"]
 
-        if (expected_dtype != []) and (test_dtype != expected_dtype):
-            errors.append("Data Type Error: dtype of '" + variable + "' must be " + str(expected_dtype) + ", not "
-                          + str(test_dtype))
+            if (expected_dtype != []) and (test_dtype not in expected_dtype):
+                errors.append("Data Type Error: dtype of '" + variable + "' must be " + str(expected_dtype) + ", not "
+                              + str(test_dtype))
     # ------------------------------------------------------------------------------------------------------------------
 
     return errors
@@ -189,7 +195,7 @@ def check_attributes(rootgrp):
     :param rootgrp: In memory representation of matchup dataset
 
     :return:
-        :error: *list:str:
+        :error: *list:str*
 
         List of errors found during processing
     """
@@ -445,21 +451,26 @@ def check_uncertainty_assignment(rootgrp):
             if uncertainty_type1[col] == 2:
                 uncertainty_str = "independent+systematic"
             if uncertainty_type1[col] == 3:
-                uncertainty_str = "structured"
-            if uncertainty_type1[col] not in set([1, 2, 3]):
+                uncertainty_str = "w-matrix"
+            if uncertainty_type1[col] == 3:
+                uncertainty_str = "w-matrix+systematic"
+            if uncertainty_type1[col] not in set([1, 2, 3, 4]):
                 uncertainty_str = "[NOT ASSIGNED!]"
-                "Value Error: All values of 'uncertainty_type' variable must be equal to either 1, 2 or 3"
+                "Value Error: All values of 'uncertainty_type1' variable must be equal to either 1, 2, 3 or 4"
 
             # (b) Find uncertainty_type implied by the data
             rand = False
             randsys = False
             w = False
+            wsys = False
             if (Ur1[:, col] > 0).all() and (Us1[:, col] == 0).all():
                 rand = True
             if (Ur1[:, col] > 0).all() and (Us1[:, col] > 0).all():
                 randsys = True
-            if w_matrix_use1[col] > 0:
+            if w_matrix_use1[col] > 0 and (Us1[:, col] == 0).all():
                 w = True
+            if w_matrix_use1[col] > 0 and (Us1[:, col] > 0).all():
+                wsys = True
 
             # Compare how (a) and (b) match:
             if uncertainty_type1[col] == 1 and rand is True:
@@ -468,15 +479,20 @@ def check_uncertainty_assignment(rootgrp):
                 pass
             elif uncertainty_type1[col] == 3 and w is True:
                 pass
+            elif uncertainty_type1[col] == 4 and wsys is True:
+                pass
             else:
                 errors.append("Variable Correlation Form Assignement Error: Variable in X1[:, " + str(col) +
                               "] correlation assigned as "+uncertainty_str+" but data for: "
                               "\n - independent error correlation: " + str(rand) +
                               "\n - independent+systematic correlation: " + str(randsys) +
-                              "\n - structured correlation: " + str(w))
+                              "\n - w-matrix correlation: " + str(w) +
+                              "\n - w-matrix+systematic: " + str(wsys))
 
-            if (rand and (not randsys and not w)) \
-                    or (randsys and (not rand and not w)) or (w and (not rand and not randsys)):
+            if (rand and (not randsys and not w and not wsys)) \
+                    or (randsys and (not rand and not w) and not wsys) \
+                        or (w and (not rand and not randsys and not wsys))\
+                            or (wsys and (not rand and not randsys and not w)):
                 pass
             else:
                 errors.append("Variable Correlation Form Assignement Error: Variable in X1[:, " + str(col) +
@@ -484,6 +500,7 @@ def check_uncertainty_assignment(rootgrp):
                               "\n - random correlation: " + str(rand) +
                               "\n - random+systematic correlation: " + str(randsys) +
                               "\n - w-matrix correlation: " + str(w) +
+                              "\n - w-matrix+systematic correlation: " + str(wsys) +
                               "\n Must have one and only one form!")
 
         # 2. Sensor 2
@@ -498,20 +515,26 @@ def check_uncertainty_assignment(rootgrp):
             if uncertainty_type2[col] == 2:
                 uncertainty_str = "independent+systematic"
             if uncertainty_type2[col] == 3:
-                uncertainty_str = "structured"
-            if uncertainty_type2[col] not in set([1, 2, 3]):
-                "Value Error: All values of 'uncertainty_type' variable must be equal to either 1, 2 or 3"
+                uncertainty_str = "w-matrix"
+            if uncertainty_type2[col] == 3:
+                uncertainty_str = "w-matrix+systematic"
+            if uncertainty_type2[col] not in set([1, 2, 3, 4]):
+                uncertainty_str = "[NOT ASSIGNED!]"
+                "Value Error: All values of 'uncertainty_type2' variable must be equal to either 1, 2, 3 or 4"
 
             # (b) Find uncertainty_type implied by the data
             rand = False
             randsys = False
             w = False
+            wsys = False
             if (Ur2[:, col] > 0).all() and (Us2[:, col] == 0).all():
                 rand = True
             if (Ur2[:, col] > 0).all() and (Us2[:, col] > 0).all():
                 randsys = True
-            if w_matrix_use2[col] > 0:
+            if w_matrix_use2[col] > 0 and (Us2[:, col] == 0).all():
                 w = True
+            if w_matrix_use2[col] > 0 and (Us2[:, col] > 0).all():
+                wsys = True
 
             # Compare how (a) and (b) match:
             if uncertainty_type2[col] == 1 and rand is True:
@@ -520,15 +543,20 @@ def check_uncertainty_assignment(rootgrp):
                 pass
             elif uncertainty_type2[col] == 3 and w is True:
                 pass
+            elif uncertainty_type2[col] == 4 and wsys is True:
+                pass
             else:
                 errors.append("Variable Correlation Form Assignement Error: Variable in X2[:, " + str(col) +
                               "] correlation assigned as " + uncertainty_str + " but data for: "
                               "\n - independent error correlation: " + str(rand) +
                               "\n - independent+systematic correlation: " + str(randsys) +
-                              "\n - structured correlation: " + str(w))
+                              "\n - w-matrix correlation: " + str(w) +
+                              "\n - w-matrix+systematic: " + str(wsys))
 
-            if (rand and (not randsys and not w)) \
-                    or (randsys and (not rand and not w)) or (w and (not rand and not randsys)):
+            if (rand and (not randsys and not w and not wsys)) \
+                or (randsys and (not rand and not w) and not wsys) \
+                    or (w and (not rand and not randsys and not wsys)) \
+                        or (wsys and (not rand and not randsys and not w)):
                 pass
             else:
                 errors.append("Variable Correlation Form Assignement Error: Variable in X2[:, " + str(col) +
@@ -536,6 +564,7 @@ def check_uncertainty_assignment(rootgrp):
                               "\n - random correlation: " + str(rand) +
                               "\n - random+systematic correlation: " + str(randsys) +
                               "\n - w-matrix correlation: " + str(w) +
+                              "\n - w-matrix+systematic correlation: " + str(wsys) +
                               "\n Must have one and only one form!")
 
     # ------------------------------------------------------------------------------------------------------------------
