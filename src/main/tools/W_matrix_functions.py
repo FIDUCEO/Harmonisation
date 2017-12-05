@@ -138,17 +138,19 @@ def write_input_file(file_path, X1, X2, Ur1, Ur2, Us1, Us2, uncertainty_type1, u
     # > uncertainty_type1 - Uncertainty correlation type per X1 column
     uncertainty_type1_var = rootgrp.createVariable('uncertainty_type1', 'i4', ('m1',), zlib=True, complevel=9)
     uncertainty_type1_var.description = "Uncertainty correlation type per X1 column, labelled as, " + \
-                                       "(1) Independent Error Correlation, " + \
-                                       "(2) Independent + Systematic Error Correlation, or " + \
-                                       "(3) Structured Error Correlation"
+                                        "(1) Independent Error Correlation, " + \
+                                        "(2) Independent + Systematic Error Correlation, " + \
+                                        "(3) Structured Error Correlation, or" + \
+                                        "(4) Structured + Systematic Error Correlation"
     uncertainty_type1_var[:] = uncertainty_type1[:]
 
     # > uncertainty_type2 - Uncertainty correlation type per X2 column
     uncertainty_type2_var = rootgrp.createVariable('uncertainty_type2', 'i4', ('m2',), zlib=True, complevel=9)
     uncertainty_type2_var.description = "Uncertainty correlation type per X2 column, labelled as, " + \
                                         "(1) Independent Error Correlation, " + \
-                                        "(2) Independent + Systematic Error Correlation, or " + \
-                                        "(3) Structured Error Correlation"
+                                        "(2) Independent + Systematic Error Correlation, " + \
+                                        "(3) Structured Error Correlation, or" + \
+                                        "(4) Structured + Systematic Error Correlation"
     uncertainty_type2_var[:] = uncertainty_type2[:]
 
     # > K - K (sensor-to-sensor differences) for zero shift case
