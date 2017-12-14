@@ -47,78 +47,78 @@ mesh=If[parameterGrouping>0,{Length[matrix]/parameterGrouping-1,Length[matrix]/p
 
 
 (* ::Input::Initialization:: *)
-plotMeanResiduals[data_,OptionsPattern[{Exaggerate->100,PlotRange->Automatic,PlotTheme->{"Detailed","OpenMarkersThick","VibrantColor"}}]]:=Module[{exaggerate,plotRange,mean,stdev,range,labels,frameTicks},mean=data[[1]];exaggerate=OptionValue[Exaggerate];
-plotRange=OptionValue[PlotRange];stdev=data[[2]];range=Max[Abs[{mean-exaggerate stdev,mean+exaggerate stdev}]];labels=data[[3]];frameTicks=Table[{i,Rotate[(StringReplace[StringJoin[labels[[i]]],RegularExpression[" {2,}"]->""]),90 Degree]},{i,Length[labels]}];ListPlot[{mean,mean-exaggerate stdev,mean+exaggerate stdev},Filling->{1->{2},1->{3}},FillingStyle->Thick,FrameLabel->{"Sensors","Mean K residual ([radiance])"},FrameTicks->{{Automatic,Automatic},{frameTicks,Automatic}},GridLines->{Table[i,{i,Length[mean]}],Automatic},PlotRange->{{0,Length[mean]+1},plotRange},PlotStyle->{Automatic,Opacity[0],Opacity[0]},PlotTheme->OptionValue[PlotTheme]]]
+plotMeanResiduals[data_,OptionsPattern[{Exaggerate->1,PlotRange->Automatic,PlotTheme->{"Detailed","OpenMarkersThick","VibrantColor"}}]]:=Module[{exaggerate,plotRange,mean,stdev,range,labels,frameTicks},mean=data[[1]];exaggerate=OptionValue[Exaggerate];
+plotRange=OptionValue[PlotRange];stdev=data[[2]];range=Max[Abs[{mean-exaggerate stdev,mean+exaggerate stdev}]];labels=data[[3]];frameTicks=Table[{i,Rotate[(StringReplace[StringJoin[labels[[i]]],RegularExpression[" {2,}"]->""]),90 Degree]},{i,Length[labels]}];ListPlot[{mean,mean-exaggerate stdev,mean+exaggerate stdev},Filling->{1->{2},1->{3}},FillingStyle->Thick,FrameLabel->{"Sensors","Mean K residual (arb. unit)"},FrameTicks->{{Automatic,Automatic},{frameTicks,Automatic}},GridLines->{Table[i,{i,Length[mean]}],Automatic},PlotRange->{{0,Length[mean]+1},plotRange},PlotStyle->{Automatic,Opacity[0],Opacity[0]},PlotTheme->OptionValue[PlotTheme]]]
 
 
 (* ::Input::Initialization:: *)
-plotRadianceVsRadiance[data_,OptionsPattern[{BinSize->{1.0},PlotRange->{{5,155},{5,155}},PlotTheme->"Detailed",Title->None}]]:=DensityHistogram[Transpose[data],OptionValue[BinSize],{"Log","PDF"},FrameLabel->{"Radiance ([radiance])","Radiance ([radiance])"},ColorFunction->"TemperatureMap",PlotLabel->OptionValue[Title],PlotRange->OptionValue[PlotRange],PlotRangePadding->None,PlotTheme->OptionValue[PlotTheme]];
+plotMeasurandVsMeasurand[data_,OptionsPattern[{BinSize->{1.0},PlotRange->{{5,155},{5,155}},PlotTheme->"Detailed",Title->None}]]:=DensityHistogram[Transpose[data],OptionValue[BinSize],{"Log","PDF"},FrameLabel->{"Reference or recalibrated measurand (1st sensor, arb. unit)","Recalibrated measurand (2nd sensor, arb. unit)"},ColorFunction->"TemperatureMap",PlotLabel->OptionValue[Title],PlotRange->OptionValue[PlotRange],PlotRangePadding->None,PlotTheme->OptionValue[PlotTheme]];
 
 
 (* ::Input::Initialization:: *)
-plotRadianceVsRadianceRandom[data_,OptionsPattern[{Seed->27181,PointNumber->10000,PlotRange->{{5,155},{5,155}},PlotTheme->{"Detailed","VibrantColor"},Title->None}]]:=Module[{},RandomSeed[OptionValue[Seed]];ListPlot[RandomChoice[Transpose[data],OptionValue[PointNumber]],FrameLabel->{"Radiance ([radiance])","Radiance ([radiance])"},PlotLabel->OptionValue[Title],PlotRange->OptionValue[PlotRange],PlotTheme->OptionValue[PlotTheme]]];
+plotMeasurandVsMeasurandRandom[data_,OptionsPattern[{Seed->27181,PointNumber->10000,PlotRange->{{5,155},{5,155}},PlotTheme->{"Detailed","VibrantColor"},Title->None}]]:=Module[{},RandomSeed[OptionValue[Seed]];ListPlot[RandomChoice[Transpose[data],OptionValue[PointNumber]],FrameLabel->{"Reference or recalibrated measurand (1st sensor, arb. unit)","Recalibrated measurand (2nd sensor, arb. unit)"},PlotLabel->OptionValue[Title],PlotRange->OptionValue[PlotRange],PlotTheme->OptionValue[PlotTheme]]];
 
 
 (* ::Input::Initialization:: *)
-plotRadianceVsRadianceRandomLegended[data_,names_,OptionsPattern[{Seed->27181,PointNumber->10000,PlotRange->{{5,155},{5,155}},PlotTheme->{"Detailed","VibrantColor"},Title->None}]]:=Module[{randomData,pointNumbers},RandomSeed[OptionValue[Seed]];
+plotMeasurandVsMeasurandRandomLegended[data_,names_,OptionsPattern[{Seed->27181,PointNumber->10000,PlotRange->{{5,155},{5,155}},PlotTheme->{"Detailed","VibrantColor"},Title->None}]]:=Module[{randomData,pointNumbers},RandomSeed[OptionValue[Seed]];
 pointNumbers=Table[Round[OptionValue[PointNumber]Length[data[[i,1]]]/Sum[Length[data[[j,1]]],{j,Length[data]}]],{i,Length[data]}];
 randomData=Table[RandomChoice[Transpose[{data[[i,1]],data[[i,2]]}],pointNumbers[[i]]],{i,Length[data]}];
-randomData=Table[Legended[randomData[[i]],names[[i]]],{i,Length[data]}];ListPlot[randomData,FrameLabel->{"Radiance ([radiance])","Radiance ([radiance])"},PlotLabel->OptionValue[Title],PlotRange->OptionValue[PlotRange],PlotTheme->OptionValue[PlotTheme]]];
+randomData=Table[Legended[randomData[[i]],names[[i]]],{i,Length[data]}];ListPlot[randomData,FrameLabel->{"Reference or recalibrated measurand (1st sensor, arb. unit)","Recalibrated measurand (2nd sensor, arb. unit)"},PlotLabel->OptionValue[Title],PlotRange->OptionValue[PlotRange],PlotTheme->OptionValue[PlotTheme]]];
 
 
 (* ::Input::Initialization:: *)
-plotRadianceVsTime[data_,OptionsPattern[{BinSizes->{{1/4},{1.0}},PlotRange->{All,{-5,5}},PlotTheme->"Detailed",Title->None}]]:=DensityHistogram[Transpose[{data[[1]]/86400/365.25+1970,data[[2]]}],OptionValue[BinSizes],{"Log","PDF"},FrameLabel->{"Time (calendar year)","Radiance ([radiance])"},ColorFunction->"TemperatureMap",PlotLabel->OptionValue[Title],PlotRange->OptionValue[PlotRange],PlotRangePadding->None,PlotTheme->OptionValue[PlotTheme]];
+plotMeasurandVsTime[data_,OptionsPattern[{BinSizes->{{1/4},{1.0}},PlotRange->{All,{-5,5}},PlotTheme->"Detailed",Title->None}]]:=DensityHistogram[Transpose[{data[[1]]/86400/365.25+1970,data[[2]]}],OptionValue[BinSizes],{"Log","PDF"},FrameLabel->{"Time (calendar year)","Measurand (arb. unit)"},ColorFunction->"TemperatureMap",PlotLabel->OptionValue[Title],PlotRange->OptionValue[PlotRange],PlotRangePadding->None,PlotTheme->OptionValue[PlotTheme]];
 
 
 (* ::Input::Initialization:: *)
-plotRadianceVsTimeRandom[data_,OptionsPattern[{Seed->27181,PointNumber->10000,PlotRange->{All,{5,155}},PlotTheme->{"Detailed","VibrantColor"},Title->None}]]:=Module[{},RandomSeed[OptionValue[Seed]];ListPlot[RandomChoice[Transpose[{data[[1]]/86400/365.25+1970,data[[2]]}],OptionValue[PointNumber]],FrameLabel->{"Time (calendar year)","Radiance ([radiance])"},PlotLabel->OptionValue[Title],PlotRange->OptionValue[PlotRange],PlotTheme->OptionValue[PlotTheme]]];
+plotMeasurandVsTimeRandom[data_,OptionsPattern[{Seed->27181,PointNumber->10000,PlotRange->{All,{5,155}},PlotTheme->{"Detailed","VibrantColor"},Title->None}]]:=Module[{},RandomSeed[OptionValue[Seed]];ListPlot[RandomChoice[Transpose[{data[[1]]/86400/365.25+1970,data[[2]]}],OptionValue[PointNumber]],FrameLabel->{"Time (calendar year)","Measurand (arb. unit)"},PlotLabel->OptionValue[Title],PlotRange->OptionValue[PlotRange],PlotTheme->OptionValue[PlotTheme]]];
 
 
 (* ::Input::Initialization:: *)
-plotRadianceUncertaintyVsTime[data_,OptionsPattern[{BinSizes->{{1/4},{0.1}},PlotRange->{All,{-5,5}},PlotTheme->"Detailed",Title->None}]]:=DensityHistogram[Transpose[{data[[1]]/86400/365.25+1970,data[[2]]}],OptionValue[BinSizes],{"Log","PDF"},FrameLabel->{"Time (calendar year)","Radiance uncertainty ([radiance])"},ColorFunction->"TemperatureMap",PlotLabel->OptionValue[Title],PlotRange->OptionValue[PlotRange],PlotRangePadding->None,PlotTheme->OptionValue[PlotTheme]];
+plotMeasurandUncertaintyVsTime[data_,OptionsPattern[{BinSizes->{{1/4},{0.1}},PlotRange->{All,{-5,5}},PlotTheme->"Detailed",Title->None}]]:=DensityHistogram[Transpose[{data[[1]]/86400/365.25+1970,data[[2]]}],OptionValue[BinSizes],{"Log","PDF"},FrameLabel->{"Time (calendar year)","Measurand uncertainty (arb. unit)"},ColorFunction->"TemperatureMap",PlotLabel->OptionValue[Title],PlotRange->OptionValue[PlotRange],PlotRangePadding->None,PlotTheme->OptionValue[PlotTheme]];
 
 
 (* ::Input::Initialization:: *)
-plotRadianceUncertaintyVsTimeRandom[data_,OptionsPattern[{Seed->27181,PointNumber->10000,PlotRange->{All,Automatic},PlotTheme->{"Detailed","VibrantColor"},Title->None}]]:=Module[{},RandomSeed[OptionValue[Seed]];ListPlot[RandomChoice[Transpose[{data[[1]]/86400/365.25+1970,data[[2]]}],OptionValue[PointNumber]],FrameLabel->{"Time (calendar year)","Radiance uncertainty ([radiance])"},PlotLabel->OptionValue[Title],PlotRange->OptionValue[PlotRange],PlotTheme->OptionValue[PlotTheme]]];
+plotMeasurandUncertaintyVsTimeRandom[data_,OptionsPattern[{Seed->27181,PointNumber->10000,PlotRange->{All,Automatic},PlotTheme->{"Detailed","VibrantColor"},Title->None}]]:=Module[{},RandomSeed[OptionValue[Seed]];ListPlot[RandomChoice[Transpose[{data[[1]]/86400/365.25+1970,data[[2]]}],OptionValue[PointNumber]],FrameLabel->{"Time (calendar year)","Measurand uncertainty (arb. unit)"},PlotLabel->OptionValue[Title],PlotRange->OptionValue[PlotRange],PlotTheme->OptionValue[PlotTheme]]];
 
 
 (* ::Input::Initialization:: *)
-plotRadianceDifferenceVsRadiance[data_,OptionsPattern[{BinSize->{1.0,0.1},PlotRange->{{5,155},{-5,-5}},PlotTheme->"Detailed",Title->None}]]:=DensityHistogram[Transpose[data],OptionValue[BinSize],{"Log","PDF"},FrameLabel->{"Radiance ([radiance])","Radiance difference ([radiance])"},ColorFunction->"TemperatureMap",PlotLabel->OptionValue[Title],PlotRange->OptionValue[PlotRange],PlotRangePadding->None,PlotTheme->OptionValue[PlotTheme]];
+plotMeasurandDifferenceVsMeasurand[data_,OptionsPattern[{BinSize->{1.0,0.1},PlotRange->{{5,155},{-5,-5}},PlotTheme->"Detailed",Title->None}]]:=DensityHistogram[Transpose[data],OptionValue[BinSize],{"Log","PDF"},FrameLabel->{"Reference or recalibrated measurand (1st sensor, arb. unit)","K (arb. unit)"},ColorFunction->"TemperatureMap",PlotLabel->OptionValue[Title],PlotRange->OptionValue[PlotRange],PlotRangePadding->None,PlotTheme->OptionValue[PlotTheme]];
 
 
 (* ::Input::Initialization:: *)
-plotRadianceDifferenceVsRadianceRandom[data_,OptionsPattern[{Seed->27181,PointNumber->10000,PlotRange->{{5,155},{-5,5}},PlotTheme->{"Detailed","VibrantColor"},Title->None}]]:=Module[{},RandomSeed[OptionValue[Seed]];ListPlot[RandomChoice[Transpose[data],OptionValue[PointNumber]],FrameLabel->{"Radiance ([radiance])","Radiance difference ([radiance])"},PlotLabel->OptionValue[Title],PlotRange->OptionValue[PlotRange],PlotTheme->OptionValue[PlotTheme]]];
+plotMeasurandDifferenceVsMeasurandRandom[data_,OptionsPattern[{Seed->27181,PointNumber->10000,PlotRange->{{5,155},{-5,5}},PlotTheme->{"Detailed","VibrantColor"},Title->None}]]:=Module[{},RandomSeed[OptionValue[Seed]];ListPlot[RandomChoice[Transpose[data],OptionValue[PointNumber]],FrameLabel->{"Reference or recalibrated measurand (1st sensor, arb. unit)","K (arb. unit)"},PlotLabel->OptionValue[Title],PlotRange->OptionValue[PlotRange],PlotTheme->OptionValue[PlotTheme]]];
 
 
 (* ::Input::Initialization:: *)
-plotRadianceDifferenceVsTime[data_,OptionsPattern[{BinSizes->{{1/4},{0.1}},PlotRange->{All,{-5,5}},PlotTheme->"Detailed",Title->None}]]:=DensityHistogram[Transpose[{data[[1]]/86400/365.25+1970,data[[2]]}],OptionValue[BinSizes],{"Log","PDF"},FrameLabel->{"Time (calendar year)","Radiance difference ([radiance])"},ColorFunction->"TemperatureMap",PlotLabel->OptionValue[Title],PlotRange->OptionValue[PlotRange],PlotRangePadding->None,PlotTheme->OptionValue[PlotTheme]];
+plotMeasurandDifferenceVsTime[data_,OptionsPattern[{BinSizes->{{1/4},{0.1}},PlotRange->{All,{-5,5}},PlotTheme->"Detailed",Title->None}]]:=DensityHistogram[Transpose[{data[[1]]/86400/365.25+1970,data[[2]]}],OptionValue[BinSizes],{"Log","PDF"},FrameLabel->{"Time (calendar year)","K (arb. unit)"},ColorFunction->"TemperatureMap",PlotLabel->OptionValue[Title],PlotRange->OptionValue[PlotRange],PlotRangePadding->None,PlotTheme->OptionValue[PlotTheme]];
 
 
 (* ::Input::Initialization:: *)
-plotRadianceDifferenceVsTimeRandom[data_,OptionsPattern[{Seed->27181,PointNumber->10000,PlotRange->{All,{-5,5}},PlotTheme->{"Detailed","VibrantColor"},Title->None}]]:=Module[{},RandomSeed[OptionValue[Seed]];ListPlot[RandomChoice[Transpose[{data[[1]]/86400/365.25+1970,data[[2]]}],OptionValue[PointNumber]],FrameLabel->{"Time (calendar year)","Radiance difference ([radiance])"},PlotLabel->OptionValue[Title],PlotRange->OptionValue[PlotRange],PlotTheme->OptionValue[PlotTheme]]];
+plotMeasurandDifferenceVsTimeRandom[data_,OptionsPattern[{Seed->27181,PointNumber->10000,PlotRange->{All,{-5,5}},PlotTheme->{"Detailed","VibrantColor"},Title->None}]]:=Module[{},RandomSeed[OptionValue[Seed]];ListPlot[RandomChoice[Transpose[{data[[1]]/86400/365.25+1970,data[[2]]}],OptionValue[PointNumber]],FrameLabel->{"Time (calendar year)","K (arb. unit)"},PlotLabel->OptionValue[Title],PlotRange->OptionValue[PlotRange],PlotTheme->OptionValue[PlotTheme]]];
 
 
 (* ::Input::Initialization:: *)
-plotResidualsVsRadiance[data_,OptionsPattern[{BinSize->{1.0,0.1},PlotRange->{{5,155},{-5,-5}},PlotTheme->"Detailed",Title->None}]]:=DensityHistogram[Transpose[data],OptionValue[BinSize],{"Log","PDF"},FrameLabel->{"Radiance ([radiance])","K residual ([radiance])"},ColorFunction->"TemperatureMap",PlotLabel->OptionValue[Title],PlotRange->OptionValue[PlotRange],PlotRangePadding->None,PlotTheme->OptionValue[PlotTheme]];
+plotResidualsVsRadiance[data_,OptionsPattern[{BinSize->{1.0,0.1},PlotRange->{{5,155},{-5,-5}},PlotTheme->"Detailed",Title->None}]]:=DensityHistogram[Transpose[data],OptionValue[BinSize],{"Log","PDF"},FrameLabel->{"Measurand (arb. unit)","K residual (arb. unit)"},ColorFunction->"TemperatureMap",PlotLabel->OptionValue[Title],PlotRange->OptionValue[PlotRange],PlotRangePadding->None,PlotTheme->OptionValue[PlotTheme]];
 
 
 (* ::Input::Initialization:: *)
-plotResidualsVsRadianceRandom[data_,OptionsPattern[{Seed->27181,PointNumber->10000,PlotRange->{{5,155},{-5,5}},PlotTheme->{"Detailed","VibrantColor"},Title->None}]]:=Module[{},RandomSeed[OptionValue[Seed]];ListPlot[RandomChoice[Transpose[data],OptionValue[PointNumber]],FrameLabel->{"Radiance ([radiance])","K residual ([radiance])"},PlotLabel->OptionValue[Title],PlotRange->OptionValue[PlotRange],PlotTheme->OptionValue[PlotTheme]]];
+plotResidualsVsRadianceRandom[data_,OptionsPattern[{Seed->27181,PointNumber->10000,PlotRange->{{5,155},{-5,5}},PlotTheme->{"Detailed","VibrantColor"},Title->None}]]:=Module[{},RandomSeed[OptionValue[Seed]];ListPlot[RandomChoice[Transpose[data],OptionValue[PointNumber]],FrameLabel->{"Measurand (arb. unit)","K residual (arb. unit)"},PlotLabel->OptionValue[Title],PlotRange->OptionValue[PlotRange],PlotTheme->OptionValue[PlotTheme]]];
 
 
 (* ::Input::Initialization:: *)
-plotResidualsVsTime[data_,OptionsPattern[{BinSizes->{{1/4},{0.1}},PlotRange->{All,{-5,5}},PlotTheme->"Detailed",Title->None}]]:=DensityHistogram[Transpose[{data[[1]]/86400/365.25+1970,data[[2]]}],OptionValue[BinSizes],{"Log","PDF"},FrameLabel->{"Time (calendar year)","K residual ([radiance])"},ColorFunction->"TemperatureMap",PlotLabel->OptionValue[Title],PlotRange->OptionValue[PlotRange],PlotRangePadding->None,PlotTheme->OptionValue[PlotTheme]];
+plotResidualsVsTime[data_,OptionsPattern[{BinSizes->{{1/4},{0.1}},PlotRange->{All,{-5,5}},PlotTheme->"Detailed",Title->None}]]:=DensityHistogram[Transpose[{data[[1]]/86400/365.25+1970,data[[2]]}],OptionValue[BinSizes],{"Log","PDF"},FrameLabel->{"Time (calendar year)","K residual (arb. unit)"},ColorFunction->"TemperatureMap",PlotLabel->OptionValue[Title],PlotRange->OptionValue[PlotRange],PlotRangePadding->None,PlotTheme->OptionValue[PlotTheme]];
 
 
 (* ::Input::Initialization:: *)
-plotResidualsVsTimeRandom[data_,OptionsPattern[{Seed->27181,PointNumber->10000,PlotRange->{All,{-5,5}},PlotTheme->{"Detailed","VibrantColor"},Title->None}]]:=Module[{},RandomSeed[OptionValue[Seed]];ListPlot[RandomChoice[Transpose[{data[[1]]/86400/365.25+1970,data[[2]]}],OptionValue[PointNumber]],FrameLabel->{"Time (calendar year)","K residual ([radiance])"},PlotLabel->OptionValue[Title],PlotRange->OptionValue[PlotRange],PlotTheme->OptionValue[PlotTheme]]];
+plotResidualsVsTimeRandom[data_,OptionsPattern[{Seed->27181,PointNumber->10000,PlotRange->{All,{-5,5}},PlotTheme->{"Detailed","VibrantColor"},Title->None}]]:=Module[{},RandomSeed[OptionValue[Seed]];ListPlot[RandomChoice[Transpose[{data[[1]]/86400/365.25+1970,data[[2]]}],OptionValue[PointNumber]],FrameLabel->{"Time (calendar year)","K residual (arb. unit)"},PlotLabel->OptionValue[Title],PlotRange->OptionValue[PlotRange],PlotTheme->OptionValue[PlotTheme]]];
 
 
 (* ::Input::Initialization:: *)
 plotResidualsVsTimeRandomLegended[data_,names_,OptionsPattern[{Seed->27181,PointNumber->10000,PlotRange->{All,{-5,5}},PlotTheme->{"Detailed","VibrantColor"},Title->None}]]:=Module[{randomData,pointNumbers},RandomSeed[OptionValue[Seed]];
 pointNumbers=Table[Round[OptionValue[PointNumber]Length[data[[i,1]]]/Sum[Length[data[[j,1]]],{j,Length[data]}]],{i,Length[data]}];
 randomData=Table[RandomChoice[Transpose[{data[[i,1]]/86400/365.25+1970,data[[i,2]]}],pointNumbers[[i]]],{i,Length[data]}];
-randomData=Table[Legended[randomData[[i]],names[[i]]],{i,Length[data]}];ListPlot[randomData,FrameLabel->{"Time (calendar year)","K residual ([radiance])"},PlotLabel->OptionValue[Title],PlotRange->OptionValue[PlotRange],PlotTheme->OptionValue[PlotTheme]]];
+randomData=Table[Legended[randomData[[i]],names[[i]]],{i,Length[data]}];ListPlot[randomData,FrameLabel->{"Time (calendar year)","K residual (arb. unit)"},PlotLabel->OptionValue[Title],PlotRange->OptionValue[PlotRange],PlotTheme->OptionValue[PlotTheme]]];
 
 
 (* ::Input::Initialization:: *)
@@ -137,7 +137,7 @@ randomData=Table[Legended[randomData[[i]],names[[i]]],{i,Length[data]}];ListPlot
 
 
 (* ::Input::Initialization:: *)
-plotResidualsHistogram[data_,OptionsPattern[{BinSize->{0.05},PlotRange->Automatic,PlotTheme->{"Detailed","VibrantColor"},Title->None}]]:=Module[{hist,plot,pr,mean,sdev,median,mdev},hist=Histogram[data,OptionValue[BinSize],"PDF",FrameLabel->{"K residual ([radiance])","Probability density"},PlotLabel->OptionValue[Title],PlotRange->OptionValue[PlotRange],PlotTheme->OptionValue[PlotTheme]];
+plotResidualsHistogram[data_,OptionsPattern[{BinSize->{0.05},PlotRange->Automatic,PlotTheme->{"Detailed","VibrantColor"},Title->None}]]:=Module[{hist,plot,pr,mean,sdev,median,mdev},hist=Histogram[data,OptionValue[BinSize],"PDF",FrameLabel->{"K residual (arb. unit)","Probability density"},PlotLabel->OptionValue[Title],PlotRange->OptionValue[PlotRange],PlotTheme->OptionValue[PlotTheme]];
 mean=Mean[data];sdev=StandardDeviation[data];median=Median[data];mdev=MeanDeviation[data];
 pr=PlotRange/.Options[hist,PlotRange];
 plot=Plot[{PDF[NormalDistribution[mean,sdev],x],PDF[LaplaceDistribution[median,mdev],x]},{x,pr[[1,1]],pr[[1,2]]},PlotRange->pr,PlotTheme->{"Monochrome","ThinLines"}];
