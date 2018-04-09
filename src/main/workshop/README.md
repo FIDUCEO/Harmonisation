@@ -6,8 +6,11 @@
 ### Installing prerequisites
 
 To use the notebook you need to have Python 3 and [Jupyter](https://jupyter.org) installed. If you do not have Python 3
-installed, install it. The most convenient way to install Python 3 is the [Homebrew](https://brew.sh) package manager,
-which allows you to install everything you need, and get rid of it when you do not need it anymore, including itself.
+or Jupyter installed, install it. The most simple way is to install [Anaconda](https://www.anaconda.com).
+
+For the more experienced users the more convenient way to install Python 3 and Jupyter may be the [Homebrew](https://brew.sh)
+package manager, which allows you to install everything you need, and get rid of it when you do not need it anymore,
+including itself.
 
 To install Homebrew open a Terminal window and type
 
