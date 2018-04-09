@@ -16,7 +16,7 @@ Then install Python 3 by typing
 
     brew install python
 
-and bring the Python's Pip package manager up to date
+and bring Python's Pip package manager up to date
 
     pip3 install --upgrade pip setuptools wheel
 
