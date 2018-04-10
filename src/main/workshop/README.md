@@ -8,7 +8,7 @@
 To use the notebook you need to have Python 3 and [Jupyter](https://jupyter.org) installed. If you do not have Python 3
 or Jupyter installed, install it. The most simple way is to install [Anaconda](https://www.anaconda.com).
 
-For the more experienced users the more convenient way to install Python 3 and Jupyter may be the [Homebrew](https://brew.sh)
+For more experienced users the more convenient way to install Python 3 and Jupyter may be the [Homebrew](https://brew.sh)
 package manager, which allows you to install everything you need, and get rid of it when you do not need it anymore,
 including itself.
 
@@ -24,9 +24,9 @@ To bring Python's Pip package manager up to date type
 
     pip3 install --upgrade pip setuptools wheel
 
-To install Jupyter type
+To install Jupyter (and dependencies) type
 
-    pip3 install jupyter
+    pip3 install jupyter matplotlib numpy scipy
 
 You have completed the installation of prerequisites.
 
