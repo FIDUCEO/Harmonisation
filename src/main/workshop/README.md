@@ -1,7 +1,7 @@
 # Lisbon Workshop, 17-19 April 2018
 
 
-## How to get started (mac OS)
+## How to get started -- mac OS
 
 ### Installing prerequisites
 
@@ -51,3 +51,22 @@ To uninstall Python 3 type
 To uninstall homebrew type
 
     ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/uninstall)"
+
+## How to get started -- Windows
+
+### Installing prerequisites
+
+To use the notebook you need to have Python 3 and [Jupyter](https://jupyter.org) installed. If you do not have Python 3
+or Jupyter installed, install it. The most simple way is to install [Anaconda](https://www.anaconda.com).
+
+### Opening the notebook
+
+On the folder that contains the notebook hold down the shift key and right-click. On the menu that appears click “Open command window here”. Then get started with the following command:
+
+	jupyter notebook
+
+A browser window opens and shows the directory contents. Click on the notebook and play with it!
+
+### Uninstalling prerequisites
+
+Navigate to "Uninstall a Program" in your Control Panel. Uninstall your Anaconda Python distribution from there in the usual way. 
