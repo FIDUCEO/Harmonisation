@@ -3,8 +3,11 @@
 ## How to fetch the interactive lecture from GitHub
 
 Open a web browser and visit the [Lisbon Workshop on GitHub](https://github.com/FIDUCEO/Harmonisation/tree/master/src/main/workshop).
-Right click on the `harmonisation_interactive_lecture.ipynb` file listed on top of the page to download it to your computer. You may
-download the interactive lecture to any location. 
+Right click on the
+
+    harmonisation_interactive_lecture.ipynb
+
+file listed on top of the page to download it to your computer. You may download the interactive lecture to any location. 
 
 ## How to get started -- mac OS
 
