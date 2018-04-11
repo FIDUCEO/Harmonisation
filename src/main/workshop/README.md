@@ -10,17 +10,18 @@ file listed on top of the page to download it to your computer. You may download
 
 ### Installing prerequisites
 
-#### Anaconda way
-
 To use the interactive lecture you need to have Python 3 and [Jupyter](https://jupyter.org) installed. If you do not have Python 3
-or Jupyter installed, install it. The most simple way is to install [Anaconda](https://www.anaconda.com). Download the
-Anaconda installer and follow the instructions on the Anaconda web site.
-
-#### Homebrew way
+or Jupyter installed, install it. The most simple way is to install [Anaconda](https://www.anaconda.com).
 
 For more experienced users the more convenient way to install Python 3 and Jupyter may be the [Homebrew](https://brew.sh)
 package manager, which allows you to install everything you need, and get rid of it when you do not need it anymore,
 including itself.
+
+#### Anaconda
+
+Download the [Anaconda installer](https://www.anaconda.com/download/#macos) and follow the instructions on the Anaconda web site.
+
+#### Homebrew
 
 To install Homebrew open a Terminal window and type
 
