@@ -6,7 +6,7 @@ Open a web browser and visit the [Lisbon Workshop on GitHub](https://github.com/
 Right click on the [harmonisation_interactive_lecture.ipynb](https://github.com/FIDUCEO/Harmonisation/blob/master/src/main/workshop/harmonisation_interactive_lecture.ipynb)
 file listed on top of the page to download it to your computer. You may download the interactive lecture to any location. 
 
-## How to get started -- mac OS
+## How to get started on macOS
 
 ### Installing prerequisites
 
@@ -82,7 +82,7 @@ To uninstall homebrew itself type
 
     ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/uninstall)"
 
-## How to get started -- Windows
+## How to get started on Windows
 
 ### Installing prerequisites
 
