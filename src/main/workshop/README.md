@@ -40,7 +40,7 @@ To install Jupyter (and Python modules required by the interactive lecture) type
 
 You have completed the installation of prerequisites.
 
-### Opening the notebook
+### Opening the interactive lecture
 
 Now you are ready to start the interactive lecture. Open a Terminal window, `cd` into the directory where the lecture resides
 and type
@@ -53,7 +53,7 @@ A browser window opens and shows the directory contents. Click on the interactiv
 
 #### Anaconda
 
-To uninstall Anaconda open a Termonal window and type
+To uninstall Anaconda open a Terminal window and type
 
     conda install anaconda-clean
 
@@ -90,14 +90,16 @@ To use the interactive lecture you need to have Python 3 and [Jupyter](https://j
 or Jupyter installed, install it. The most simple way is to install [Anaconda](https://www.anaconda.com). Download the
 Anaconda installer and follow the instructions on the Anaconda web site.
 
-### Opening the notebook
+### Opening the interactive lecture
 
-On the folder that contains the interactive lecture hold down the shift key and right-click. On the menu that appears click “Open command window here”. Then get started with the following command:
+On the folder that contains the interactive lecture hold down the shift key and right-click. On the menu that appears
+click “Open command window here”. Then get started with the following command:
 
-	jupyter notebook
+    jupyter notebook
 
 A browser window opens and shows the directory contents. Click on the interactive lecture and play with it!
 
 ### Uninstalling prerequisites
 
-Navigate to "Uninstall a Program" in your Control Panel. Uninstall your Anaconda Python distribution from there in the usual way. 
+Navigate to "Uninstall a Program" in your Control Panel. Uninstall your Anaconda Python distribution from
+there in the usual way. 
