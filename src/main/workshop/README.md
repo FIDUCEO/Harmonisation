@@ -6,6 +6,30 @@ Open a web browser and visit the [Lisbon Workshop on GitHub](https://github.com/
 Right click on the [harmonisation_interactive_lecture.ipynb](https://github.com/FIDUCEO/Harmonisation/blob/master/src/main/workshop/harmonisation_interactive_lecture.ipynb)
 file listed on top of the page to download it to your computer. You may download the interactive lecture to any location. 
 
+## How to get started on Linux
+
+### Installing prerequisites
+
+To use the interactive lecture you need to have Python 3 and [Jupyter](https://jupyter.org) installed. If you do not have Python 3
+or Jupyter installed, install it. The most simple way may be to install [Anaconda](https://www.anaconda.com).
+
+Either download the [Anaconda installer](https://www.anaconda.com/download/#macos) and follow the instructions on the Anaconda web
+site or use your system's package manager to install Jupyter and Python 3.
+
+### Opening the interactive lecture
+
+Now you are ready to start the interactive lecture. Open a Terminal window, `cd` into the directory where the lecture resides
+and type
+
+    jupyter notebook
+
+A browser window opens and shows the directory contents. Click on the interactive lecture and play with it!
+
+### Uninstalling prerequisites
+
+If you installed Anaconda from the Anaconda web site, the uninstallation procedure described for macOS below may work for Linux
+as well.
+
 ## How to get started on macOS
 
 ### Installing prerequisites
