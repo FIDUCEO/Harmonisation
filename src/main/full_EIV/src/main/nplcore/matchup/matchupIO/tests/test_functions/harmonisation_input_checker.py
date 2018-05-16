@@ -5,8 +5,6 @@ Usage:
 python harmonisation_input_checker.py path/to/matchup/file.nc
 """
 
-from __future__ import print_function
-
 '''___Python Modules___'''
 import sys
 
@@ -582,7 +580,7 @@ def main(path):
     :param path: path of harmonisation input file to
     """
 
-    print("Testing File:", path)
+    print "Testing File:", path
 
     # 1. Find any errors!
     rootgrp = Dataset(path)
@@ -602,14 +600,14 @@ def main(path):
     # 2. Report errors
 
     if errors == []:
-        print("Test Passed")
+        print "Test Passed"
     else:
-        print("The following errors have been detected:")
+        print "The following errors have been detected:"
         for error in errors:
-            print(">", error)
-    print("")
+            print ">", error
+    print ""
 
-    return len(errors)>0
+    return 0
 
 if __name__ == "__main__":
-    sys.exit(main(sys.argv[1]))
+    main(sys.argv[1])

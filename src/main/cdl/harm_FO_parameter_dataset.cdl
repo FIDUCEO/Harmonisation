@@ -1,0 +1,52 @@
+netcdf harm_FO_parameter_dataset {
+dimensions:
+	m = 22 ;
+	n = 48 ;
+	l_name = 80 ;
+variables:
+	double parameter(n) ;
+		parameter:description = "Harmonisation parameters" ;
+	double parameter_uncertainty(n) ;
+		parameter_uncertainty:description = "Harmonisation parameter uncertainties" ;
+	double parameter_covariance_matrix(n, n) ;
+		parameter_covariance_matrix:description = "Harmonisation parameter covariance matrix" ;
+	double parameter_correlation_matrix(n, n) ;
+		parameter_correlation_matrix:description = "Harmonisation parameter correlation matrix" ;
+	double parameter_hessian_matrix(n, n) ;
+		parameter_hessian_matrix:description = "Harmonisation parameter Hessian matrix" ;
+	char parameter_sensors(n, l_name) ;
+		parameter_sensors:description = "Sensors associated with harmonisation parameters" ;
+	double k_res_mean(m) ;
+		k_res_mean:description = "The mean harmonisation residual" ;
+	double k_res_mean_stdev(m) ;
+		k_res_mean_stdev:description = "The standard deviation of the mean harmonisation residual" ;
+	double k_res_stdev(m) ;
+		k_res_stdev:description = "The standard deviation of the harmonisation residual" ;
+	double k_res_uncertainty_l_mean(m) ;
+		k_res_uncertainty_l_mean:description = "The mean of the uncertainty of the harmonisation residual due to the uncertainty of the measurand difference" ;
+	double k_res_uncertainty_h_mean(m) ;
+		k_res_uncertainty_h_mean:description = "The mean of the uncertainty of the harmonisation residual due to the uncertainty of the measurand adjustment" ;
+	char k_res_sensors(m, l_name) ;
+		k_res_sensors:description = "The sensors associated with the harmonisation residual" ;
+
+// global attributes:
+		:matchup_dataset = "AVHRR_RSIM_4_RSA_____" ;
+		:matchup_dataset_begin = "19830524" ;
+		:matchup_dataset_end = "20151231" ;
+		:cost = 25543529.0157435 ;
+		:cost_dof = 97640876 ;
+		:cost_p_value = 1. ;
+		:cost_matchup = 25543529.0157435 ;
+		:cost_matchup_reduced = 0.261606921836133 ;
+		:cost_sensors = 0. ;
+		:k_res_mean = -0.0127909518256868 ;
+		:k_res_mean_stdev = 3.43650692511633e-05 ;
+		:k_res_stdev = 0.339572926098615 ;
+		:k_res_uncertainty_l_mean = 0.473155122239903 ;
+		:k_res_uncertainty_h_mean = 0.27440654736106 ;
+		:software = "FO" ;
+		:software_version = "2.0" ;
+		:software_tag = "e998838" ;
+		:job = "jobs/job_sim_v2.nml" ;
+		:job_id = "02" ;
+}

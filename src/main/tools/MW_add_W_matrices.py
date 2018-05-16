@@ -8,10 +8,12 @@ python MW_add_W_matrices.py path/to/matchup/file_in.nc path/to/matchup/file_out.
 '''___Python Modules___'''
 from sys import argv
 from shutil import copyfile
+from os import listdir
+from os.path import join as pjoin
 
 '''___Third Party Modules___'''
 from netCDF4 import Dataset
-from numpy import array, int8
+from numpy import array, int8, ones
 
 '''___NPL Modules___'''
 from generate_w_matrices import generate_rolling_average_w_matrix
@@ -26,6 +28,10 @@ __version__ = "0.0"
 __maintainer__ = "Sam Hunt"
 __email__ = "sam.hunt@npl.co.uk"
 __status__ = "Development"
+
+AMSUB_sensors = ["15"]
+MHS_sensors = ["19", "A", "B"]
+ref_sensors = ["18"]
 
 
 def read_matchup_data(file_path):
@@ -52,13 +58,13 @@ def read_matchup_data(file_path):
 
         Match-up times for sensor 2
 
-        :uR_PRT1: *float*
+        :uR1: *float*
 
-        Random uncertainty for single PRT measurements for sensor 1
+        Random uncertainty for X1, first row
 
-        :uR_PRT2: *float*
+        :uR2: *float*
 
-        Random uncertainty for single PRT measurements for sensor 2
+        Random uncertainty for X2, first row
 
         :scanline_time: *float*
 
@@ -77,10 +83,8 @@ def read_matchup_data(file_path):
     time1 = dataset.variables['time1'][:]
     time2 = dataset.variables['time1'][:]
 
-    uR_PRT1 = None
-    if sensor_1_name != -1:
-        uR_PRT1 = float(dataset.variables['Ur1'][1, 4]*2)
-    uR_PRT2 = float(dataset.variables['Ur2'][1, 4]*2)
+    uR1 = dataset.variables['Ur1'][0, :]
+    uR2 = dataset.variables['Ur2'][0, :]
 
     scanline_time = 8.0/3.0
 
@@ -88,10 +92,10 @@ def read_matchup_data(file_path):
 
     weights = array([0.0625, 0.125, 0.1875, 0.25, 0.1875, 0.125, 0.0625])
 
-    return sensor_1_name, sensor_2_name, time1, time2, uR_PRT1, uR_PRT2, scanline_time, weights
+    return sensor_1_name, sensor_2_name, time1, time2, uR1, uR2, scanline_time, weights
 
 
-def return_w_matrix_variables_MW(time1, time2, scanline_time, uR_PRT1, uR_PRT2, sensor_1_name, weights):
+def return_w_matrix_variables_MW(time1, time2, scanline_time, uR1, uR2, weights, sensor_1_instrument, sensor_2_instrument):
     """
 
     :type time1: numpy.ndarray
@@ -103,11 +107,11 @@ def return_w_matrix_variables_MW(time1, time2, scanline_time, uR_PRT1, uR_PRT2, 
     :type scanline_time: float
     :param scanline_time: time interval between consecutive scanlines
 
-    :type uR_PRT1: float
-    :param uR_PRT1: Random uncertainty for single PRT measurements for sensor 1
+    :type uR1: float
+    :param uR1: Random uncertainty for X1, first row
 
-    :type uR_PRT1: float
-    :param uR_PRT1: Random uncertainty for single PRT measurements for sensor 1
+    :type uR2: float
+    :param uR2: Random uncertainty for X1, first row
 
     :type sensor_1_name: str
     :param sensor_1_name: Sensor ID for match-up sensor 1
@@ -157,42 +161,72 @@ def return_w_matrix_variables_MW(time1, time2, scanline_time, uR_PRT1, uR_PRT2, 
         Mapping from X2 array column index to U
     """
 
-
     # 1. Generate lists of W matrices and uncertainty vectors
 
     # a. Build w and u matrix vectors for Sensor 2
-    w_matrix2, u_matrix2 = generate_rolling_average_w_matrix(time2, scanline_time, uR_PRT2, weights=weights)
+    w_matrix2, u_matrix20 = generate_rolling_average_w_matrix(time2, scanline_time, float(uR2[0]), weights=weights)
     w_matrices = [w_matrix2]
-    u_matrices = [u_matrix2]
+    u_matrix21 = ones(len(u_matrix20)) * uR2[1]
+    u_matrix22 = ones(len(u_matrix20)) * uR2[2]
+
+    u_matrices = [u_matrix20, u_matrix21, u_matrix22]
 
     # b. Build w matrix and uncertainty vectors for Sensor 1 (if not reference)
-    if sensor_1_name != -1:
+    if len(uR1) != 1:
         # a. Compute W data
-        w_matrix1, u_matrix1 = generate_rolling_average_w_matrix(time1, scanline_time, uR_PRT1, weights=weights)
+        w_matrix1, u_matrix10 = generate_rolling_average_w_matrix(time1, scanline_time, float(uR1[0]), weights=weights)
         w_matrices = [w_matrix1, w_matrix2]
-        u_matrices = [u_matrix1, u_matrix2]
+        u_matrix11 = ones(len(u_matrix20)) * uR1[1]
+        u_matrix12 = ones(len(u_matrix20)) * uR1[2]
+
+        u_matrices = [u_matrix10, u_matrix11, u_matrix12, u_matrix20, u_matrix21, u_matrix22]
 
     # 2. Convert W matrices and uncertainty vector to input file variables
     w_matrix_val, w_matrix_row, w_matrix_col, w_matrix_nnz, \
     u_matrix_row_count, u_matrix_val = return_w_matrix_variables(w_matrices, u_matrices)
 
     # 3. Assign type/use matrices
-    w_matrix_use1 = array([0, 0, 1, 1, 1, 1, 1, 0, 0], dtype=int8)
-    w_matrix_use2 = array([0, 0, 2, 2, 2, 2, 2, 0, 0], dtype=int8)
-    u_matrix_use1 = array([0, 0, 1, 1, 1, 1, 1, 0, 0], dtype=int8)
-    u_matrix_use2 = array([0, 0, 2, 2, 2, 2, 2, 0, 0], dtype=int8)
-
-    if sensor_1_name == -1:
+    if (sensor_1_instrument == "ref") and (sensor_2_instrument == "AMSUB"):
         w_matrix_use1 = array([0], dtype=int8)
-        w_matrix_use2 = array([0, 0, 2, 2, 2, 2, 2, 0, 0], dtype=int8)
+        w_matrix_use2 = array([1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0], dtype=int8)
         u_matrix_use1 = array([0], dtype=int8)
-        u_matrix_use2 = array([0, 0, 2, 2, 2, 2, 2, 0, 0], dtype=int8)
+        u_matrix_use2 = array([1, 2, 3, 3, 3, 3, 3, 3, 3, 0, 0], dtype=int8)
+
+    if (sensor_1_instrument == "ref") and (sensor_2_instrument == "MHS"):
+        w_matrix_use1 = array([0], dtype=int8)
+        w_matrix_use2 = array([1, 1, 1, 1, 1, 1, 1, 0, 0], dtype=int8)
+        u_matrix_use1 = array([0], dtype=int8)
+        u_matrix_use2 = array([1, 2, 3, 3, 3, 3, 3, 0, 0], dtype=int8)
+
+    if (sensor_1_instrument == "MHS") and (sensor_2_instrument == "MHS"):
+        w_matrix_use1 = array([1, 1, 1, 1, 1, 1, 1, 0, 0], dtype=int8)
+        w_matrix_use2 = array([2, 2, 2, 2, 2, 2, 2, 0, 0], dtype=int8)
+        u_matrix_use1 = array([1, 2, 3, 3, 3, 3, 3, 0, 0], dtype=int8)
+        u_matrix_use2 = array([4, 5, 6, 6, 6, 6, 6, 0, 0], dtype=int8)
+
+    if (sensor_1_instrument == "AMSUB") and (sensor_2_instrument == "MHS"):
+        w_matrix_use1 = array([1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0], dtype=int8)
+        w_matrix_use2 = array([2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0], dtype=int8)
+        u_matrix_use1 = array([1, 2, 3, 3, 3, 3, 3, 0, 0], dtype=int8)
+        u_matrix_use2 = array([4, 5, 6, 6, 6, 6, 6, 0, 0], dtype=int8)
+
+    if (sensor_1_instrument == "MHS") and (sensor_2_instrument == "AMSUB"):
+        w_matrix_use1 = array([1, 1, 1, 1, 1, 1, 1, 0, 0], dtype=int8)
+        w_matrix_use2 = array([2, 2, 2, 2, 2, 2, 2, 0, 0], dtype=int8)
+        u_matrix_use1 = array([1, 2, 3, 3, 3, 3, 3, 3, 3, 0, 0], dtype=int8)
+        u_matrix_use2 = array([4, 5, 6, 6, 6, 6, 6, 6, 6, 0, 0], dtype=int8)
+
+    if (sensor_1_instrument == "AMSUB") and (sensor_2_instrument == "AMSUB"):
+        w_matrix_use1 = array([1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0], dtype=int8)
+        w_matrix_use2 = array([2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0], dtype=int8)
+        u_matrix_use1 = array([1, 2, 3, 3, 3, 3, 3, 3, 3, 0, 0], dtype=int8)
+        u_matrix_use2 = array([4, 5, 6, 6, 6, 6, 6, 6, 6, 0, 0], dtype=int8)
 
     return w_matrix_val, w_matrix_row, w_matrix_col, w_matrix_nnz,\
             u_matrix_row_count, u_matrix_val, w_matrix_use1, w_matrix_use2, u_matrix_use1, u_matrix_use2
 
 
-def main(input_file_path, output_file_path):
+def run(input_file_path, output_file_path):
     """
     Routine to update MW matchup file to include w variables and match newest spec
 
@@ -205,7 +239,23 @@ def main(input_file_path, output_file_path):
 
     # 1. Read required data to generate W matrices
     print "Reading file:", input_file_path
-    sensor_1_name, sensor_2_name, time1, time2, uR_PRT1, uR_PRT2, scanline_time, weights = read_matchup_data(input_file_path)
+    sensor_1_name, sensor_2_name, time1, time2, uR1, uR2, scanline_time, weights = read_matchup_data(input_file_path)
+
+    if sensor_2_name in MHS_sensors:
+        sensor_2_instrument = "MHS"
+    elif sensor_2_name in AMSUB_sensors:
+        sensor_2_instrument = "AMSUB"
+    else:
+        raise ValueError("Sensor 2 Unknown - "+sensor_2_name)
+
+    if sensor_1_name in MHS_sensors:
+        sensor_1_instrument = "MHS"
+    elif sensor_1_name in AMSUB_sensors:
+        sensor_1_instrument = "AMSUB"
+    elif sensor_1_name in ref_sensors:
+        sensor_1_instrument = "ref"
+    else:
+        raise ValueError("Sensor 1 Unknown - "+sensor_1_name)
 
     # 2. Generate required W matrix variables
     print "Generating W Matrix Variables from data..."
@@ -213,8 +263,8 @@ def main(input_file_path, output_file_path):
     w_matrix_val, w_matrix_row, w_matrix_col,\
         w_matrix_nnz, u_matrix_row_count, u_matrix_val, \
             w_matrix_use1, w_matrix_use2, u_matrix_use1, \
-                u_matrix_use2 = return_w_matrix_variables_MW(time1, time2, scanline_time,
-                                                             uR_PRT1, uR_PRT2, sensor_1_name, weights)
+                u_matrix_use2 = return_w_matrix_variables_MW(time1, time2, scanline_time, uR1, uR2, weights,
+                                                             sensor_1_instrument, sensor_2_instrument)
 
     # 3. Update file to include W matrix variables
     print "Writing to new file:", output_file_path
@@ -226,24 +276,34 @@ def main(input_file_path, output_file_path):
     dataset = Dataset(output_file_path, 'a')
 
     # + uncertainty_type1/2
-    uncertainty_type1 = array([1, 1, 4, 4, 4, 4, 4, 1, 2], dtype=int8)
-    uncertainty_type2 = array([1, 1, 4, 4, 4, 4, 4, 1, 2], dtype=int8)
-    if sensor_1_name == -1:
+    if sensor_1_instrument == "ref":
         uncertainty_type1 = array([1], dtype=int8)
-        uncertainty_type2 = array([1, 1, 4, 4, 4, 4, 4, 1, 2], dtype=int8)
+    elif sensor_1_instrument == "AMSUB":
+        uncertainty_type1 = array([3, 3, 4, 4, 4, 4, 4, 4, 4, 1, 2], dtype=int8)
+    elif sensor_1_instrument == "MHS":
+        uncertainty_type1 = array([3, 3, 4, 4, 4, 4, 4, 1, 2], dtype=int8)
+    if sensor_2_instrument == "AMSUB":
+        uncertainty_type2 = array([3, 3, 4, 4, 4, 4, 4, 4, 4, 1, 2], dtype=int8)
+    elif sensor_2_instrument == "MHS":
+        uncertainty_type2 = array([3, 3, 4, 4, 4, 4, 4, 1, 2], dtype=int8)
 
     dataset.variables['uncertainty_type1'][:] = uncertainty_type1
     dataset.variables['uncertainty_type2'][:] = uncertainty_type2
 
     # + Ur1/2
     Ur2 = dataset.variables['Ur2'][:]
-    Ur2[:, 2:7] = 0
+    if sensor_2_instrument == "AMSUB":
+        Ur2[:, 0:9] = 0
+    elif sensor_2_instrument == "MHS":
+        Ur2[:, 0:7] = 0
     dataset.variables['Ur2'][:] = Ur2
 
-    if sensor_1_name != -1:
-        Ur1 = dataset.variables['Ur1'][:]
-        Ur1[:, 2:7] = 0
-        dataset.variables['Ur1'][:] = Ur1
+    Ur1 = dataset.variables['Ur1'][:]
+    if sensor_1_instrument == "AMSUB":
+        Ur1[:, :9] = 0
+    elif sensor_1_instrument == "MHS":
+        Ur1[:, :7] = 0
+    dataset.variables['Ur1'][:] = Ur1
 
     dataset.close()
 
@@ -259,6 +319,16 @@ def main(input_file_path, output_file_path):
     return 0
 
 
+def main(input_directory, output_directory):
+
+    for fname in listdir(input_directory):
+        run(pjoin(input_directory, fname), pjoin(output_directory, fname))
+
+    return 0
+
+
 if __name__ == "__main__":
-    main(argv[1], argv[2])
+    # main(argv[1], argv[2])
+    main("/home/seh2/data/FIDUCEO/matchups/MW/MW____RCh3_1_RS______",
+         "/home/seh2/data/FIDUCEO/matchups/MW/MW____RCh3_1_RSAS____")
 
