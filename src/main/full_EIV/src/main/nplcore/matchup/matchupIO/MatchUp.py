@@ -298,7 +298,7 @@ class MatchUp(object):
         # Organise list of match-up dataset paths
         if type(paths_matchup) == str:
             if isdir(paths_matchup):
-                paths_matchup = [pjoin(paths_matchup, fname) for fname in listdir(paths_matchup)]
+                paths_matchup = sorted([pjoin(paths_matchup, fname) for fname in listdir(paths_matchup) if fname[-3:] == ".nc"])
             elif isfile(paths_matchup):
                 paths_matchup = [paths_matchup]
             else:
@@ -346,45 +346,24 @@ class MatchUp(object):
         # --------------------------------------------------------------------------------------------------------------
 
         # b. determine data block structure definition indices ---------------------------------------------------------
-
-        # generate required data
-        full_sensor_list = [num for pair in Im for num in pair]  # full list of sensors (ordered by match-up series)
-        num_ref_matchup = full_sensor_list.count(0)              # number of reference-sensor match-up series
-        sensor_list = [sensor for sensor in full_sensor_list if sensor != 0]  # list of sensors (excluding reference)
+        sensor_list = [num for pair in Im for num in pair]  # full list of sensors (ordered by match-up series)
 
         # Create New Indices:
         # > n_sensor - list of sensor number of consecuative data blocks
-        n_sensor = [int(0)] * num_ref_matchup + [int(sensor) for m_i in range(1, max(sensor_ms)+1)
-                                                                 for sensor in sensor_list
-                                                                     if sensor_ms[sensor] >= m_i]
+        n_sensor = [int(s) for m_i in range(1, max(sensor_ms)+1)
+                               for s in sensor_list if sensor_ms[s] >= m_i]
 
         # > n_mu - list of match-up series number of consecuative data blocks
-        # For reference sensors
-        n_mu_refs = [int(i+1) for i, pair in enumerate(Im) if 0 in pair]
-
-        # For series sensors
-        n_mu_sensors = [int(i+1) for m_i in range(1, max(sensor_ms)+1)
-                                     for i, pair in enumerate(Im)
-                                         for sensor in pair
-                                             if (sensor_ms[sensor] >= m_i) and (sensor != 0)]
-
-        # Combine
-        n_mu = n_mu_refs + n_mu_sensors
+        n_mu = [int(i+1) for m_i in range(1, max(sensor_ms)+1)
+                             for i, pair in enumerate(Im)
+                                 for s in pair if sensor_ms[s] >= m_i]
 
         # > n_cov - list of covariate number of consecuative blocks of data
-        # For reference sensors
-        n_cov_refs = [int(1)] * num_ref_matchup
-
         # For series sensors
-        n_cov_sensors = [m_i for m_i in range(1, max(sensor_ms)+1)
-                                 for i, pair in enumerate(Im)
-                                     for sensor in pair
-                                         if (sensor_ms[sensor] >= m_i) and (sensor != 0)]
+        n_cov = [m_i for m_i in range(1, max(sensor_ms)+1)
+                         for s in sensor_list if sensor_ms[s] >= m_i]
 
-        # Combine
-        n_cov = n_cov_refs + n_cov_sensors
-
-        # - N_var - list of total number of variables in consecuative data blocks
+        # > N_var - list of total number of variables in consecuative data blocks
         #          (initially number of match-ups before modification)
         N_var = [Nm[n - 1] for n in n_mu]
 
@@ -606,6 +585,12 @@ class MatchUp(object):
 
                     if variable in dataset.variables.keys():
                         additional_values[i_start:i_end, i_variable] = dataset.variables[variable][:]
+
+                        # Set fill data (value -1e30) to nan
+                        if variable == "nominal_BT2":
+                            pass
+                        additional_values[i_start:i_end, i_variable]\
+                            [additional_values[i_start:i_end, i_variable] == -1e30] = nan
                     else:
                         additional_values[i_start:i_end, i_variable] = nan
 
@@ -1137,7 +1122,6 @@ class MatchUp(object):
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.close()
 
-
     def __getitem__(self, i, j, k):
         return
 
@@ -1237,4 +1221,6 @@ class MatchUp(object):
 
 
 if __name__ == "__main__":
+    from numpy import where, isnan
+    MatchUp("/home/data/satellite/AVHRR/L0/ch4/matchups/AVH11_REAL_4_RSA/m02_n18.nc")
     pass

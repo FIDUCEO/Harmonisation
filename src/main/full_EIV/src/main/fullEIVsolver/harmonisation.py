@@ -17,12 +17,13 @@ from numpy import append, zeros, loadtxt, mean, std, cov, savetxt
 from numpy.random import normal
 from numpy import all as nall
 
-
 '''___Harmonisation Modules___'''
 from config_functions import *
 
+
 main_directory = dirname(dirname(__file__))
 sys.path.append(main_directory)
+from nplcore import MatchUp
 from nplcore import HarmonisationEIV
 from nplcore import HarmonisationResult
 from nplcore import GNAlgo, PCAlgo, Sample2Ind, Transform2NormInd
@@ -56,81 +57,13 @@ class HarmonisationOp:
 
     .. code-block:: python
 
-        H = HarmOp(directory)
-        H.run()
-
-    :Attributes:
-        .. py:attribute:: dataset_paths
-
-            *list:str*
-
-            Paths of matchup series files in matchup dataset directory
-
-        .. py:attribute:: sensor_data_path
-
-            *str*
-
-            Path of sensor data for of matchup sensors
-
-        .. py:attribute:: output_dir
-
-            *str*
-
-            Path of directory to store output data files in
-
-        .. py:attribute:: software
-
-            *str*
-
-            software implementation name
-
-        .. py:attribute:: software_version
-
-            *str*
-
-            software implementation version
-
-        .. py:attribute:: software_tag
-
-            *str*
-
-            software implementation vcs
-
-        .. py:attribute:: job_id
-
-            *str*
-
-            job configuratoin ID
-
-        .. py:attribute:: matchup_dataset
-
-            *str*
-
-            harmonisation dataset set name
-
-        .. py:attribute:: data_reader
-
-            *cls*
-
-            Harmonisation data reader
-
-        .. py:attribute:: hout_path
-
-            *str*
-
-            path to store harmonisation output file
-
-        .. py:attribute:: hres_paths
-
-            *str*
-
-            path to store harmonisation residual files
+        H = HarmOp()
+        H.run(...)
 
     :Methods:
         .. py:method:: run(...):
 
-            This function runs the harmonisation of satellite instrument calibration parameters for group of sensors
-            with a reference sensor from the match-up data located in the input directory
+            Run harmonisation for a given input satellite sensor match-up data set configuration
 
         . py:method:: calculate_parameter_covariance_ij(...):
 
@@ -142,120 +75,19 @@ class HarmonisationOp:
 
     """
 
-    def __init__(self, dataset_paths=None, sensor_data_path=None, output_dir=None, PC_dir=None, GN_dir=None,
-                 software_cfg=None, data_reader=None, hout_path=None, hres_paths=None):
+    def __init__(self):
+        pass
+
+    def run(self, dataset_dir, sensor_data_path, output_dir,
+                  pc_input=None, save_pc=None,
+                  gn_input=None, save_gn=None,
+                  software_cfg=None,
+                  tolPC=TOLPC, tol=TOL, tolA=TOLA, tolB=TOLB, tolU=TOLU,
+                  show=1,
+                  return_covariance=True):
         """
-        Initialise harmonisation algorithm class
-
-        :type dataset_paths: list:str
-        :param dataset_paths: Paths of matchup series files in matchup dataset directory
-
-        :type sensor_data_path: str
-        :param sensor_data_path: Path of sensor data for of matchup sensors
-
-        :type output_dir: str
-        :param output_dir: Path of directory to store output data files in
-
-        :type software_cfg: dict:str
-        :param software_cfg: dictionary of software configuration information
-
-        :type data_reader: cls
-        :param data_reader: Python class to open harmonisation data. If none given default data reader used.
-
-        :type hout_path: str
-        :param hout_path: path of harmonisation output file
-
-        :type hres_paths: str
-        :param hres_paths: path of harmonisation residual files
+        Run harmonisation for a given input satellite sensor match-up data set configuration
         """
-
-        self.dataset_paths = None
-        self.sensor_data_path = None
-        self.output_dir = None
-        self.temp_directory = None
-        self.mc_directory = None
-        self.software = None
-        self.software_version = None
-        self.software_tag = None
-        self.job_id = None
-        self.matchup_dataset = None
-        self.HarmData = None
-        self.hout_path = None
-        self.hres_paths = None
-        self.PC_dir = PC_dir
-        self.GN_dir = GN_dir
-
-        if dataset_paths is not None:
-            self.dataset_paths = dataset_paths
-            self.sensor_data_path = sensor_data_path
-            self.output_dir = output_dir
-            self.temp_directory = pjoin(output_dir, "temp")
-            self.mc_directory = pjoin(output_dir, "mc_trials")
-
-        if software_cfg is not None:
-            self.software = software_cfg['software']
-            self.software_version = software_cfg['version']
-            self.software_tag = software_cfg['tag']
-            self.job_id = software_cfg["job_id"]
-            self.matchup_dataset = software_cfg['matchup_dataset']
-
-        else:
-            self.software = "MM"
-            self.software_version = "V.V"
-            self.software_tag = "TTTTTTT"
-            self.job_id = "CC"
-            self.matchup_dataset = "TEST"
-
-        if data_reader is not None:
-            self.data_reader = data_reader
-
-        else:
-            from nplcore import MatchUp
-            self.data_reader = MatchUp
-
-        if hout_path is not None:
-            self.hout_path = hout_path
-            self.hres_paths = hres_paths
-
-    def run(self, tolPC=TOLPC, tol=TOL, tolA=TOLA, tolB=TOLB, tolU=TOLU, show=False, return_covariance=True):
-        """
-        This function runs the harmonisation of satellite instrument calibration parameters for group of sensors with a
-        reference sensor from the match-up data located in the input directory.
-
-        It first reads the match-up data, computes a pre-conditioned solution with a sample of the data and then runs
-        a Gauss-Newton iteration algorithm to perform the harmonisation.
-
-        :globals:
-            :self.dataDir: *str*
-
-            directory of match-up data
-
-        :return:
-            :a: *numpy.ndarray*
-
-            harmonised sensor calibration parameters
-
-            :Va: *numpy.ndarray*
-
-            covariance matrices for harmonised sensor calibration parameters
-
-        """
-
-        # Initialise
-
-        # 1. Directories
-        dataset_paths = self.dataset_paths
-        sensor_data_path = self.sensor_data_path
-        output_dir = self.output_dir
-        GN_dir = self.GN_dir
-        PC_dir = self.PC_dir
-
-        # 2. Software Info
-        software = self.software
-        software_version = self.software_version
-        software_tag = self.software_tag
-        job_id = self.job_id
-        matchup_dataset = self.matchup_dataset
 
         # Default to save residual data
         res = True
@@ -264,20 +96,8 @@ class HarmonisationOp:
         # 1.	Read Harmonisation Matchup Data
         ################################################################################################################
 
-        print "Match-up Dataset:"
-        for path in dataset_paths:
-            print ">", path
-
-        print "\nSensor Data File:"
-        print "> "+sensor_data_path
-
         print "\nOpening data..."
-        HData = self.data_reader(dataset_paths, sensor_data_path, open_uncertainty=True)
-
-        ################################################################################################################
-        # 2.	Perform harmonisation
-        ################################################################################################################
-
+        HData = MatchUp(dataset_dir, sensor_data_path)
         print "Complete"
 
         print "\nData Info"
@@ -290,22 +110,16 @@ class HarmonisationOp:
         print "Total Sensor State Data Values - ", HData.idx['idx'][-1]
         print "Total Harmonisation Paramaters - ", len(HData.idx['parameter_sensor'])
 
+        ################################################################################################################
+        # 2.	Perform harmonisation
+        ################################################################################################################
+
         print "\nBeginning Harmonisation..."
         Harmonisation = HarmonisationEIV()
-        if return_covariance:
-            save_directory_GNOp = None
-        else:
-            save_directory_GNOp = pjoin(output_dir, "temp")
-
-        if PC_dir is None:
-            a_PC = None
-            S_PC = None
-        else:
-            a_PC = loadtxt(pjoin(PC_dir, "a_PC.txt"))
-            S_PC = loadtxt(pjoin(PC_dir, "S_PC.txt"))
-
-        HarmonisationOutput = Harmonisation.run(HData, a_PC=a_PC, S_PC=S_PC, open_directory_GNOp=GN_dir,
-                                                save_directory_GNOp=save_directory_GNOp)
+        HarmonisationOutput = Harmonisation.run(HData,
+                                                pc_input=pc_input, save_pc=save_pc,
+                                                gn_input=gn_input, save_gn=save_gn,
+                                                show=show)
 
         print "Final Solution:"
         print HarmonisationOutput.parameter
@@ -316,18 +130,20 @@ class HarmonisationOp:
         ################################################################################################################
 
         print 'Writing data to file...'
-
         # Add metadata
         startDate = ""
         endDate = ""
-        HarmonisationOutput.additional_attributes = {"software": software,
-                                                     "software_version": software_version,
-                                                     "software_tag": software_tag,
-                                                     "job_id": job_id,
-                                                     "matchup_dataset": "_".join((matchup_dataset, startDate, endDate))}
+        HarmonisationOutput.additional_attributes = {"software": software_cfg['software'],
+                                                     "software_version": software_cfg['version'],
+                                                     "software_tag": software_cfg['tag'],
+                                                     "job_id": software_cfg["job_id"],
+                                                     "matchup_dataset": "_".join((software_cfg['matchup_dataset'],
+                                                                                  startDate, endDate))}
 
         # Write data
-        fname_output = "_".join(("harm", software, software_version, software_tag, job_id, matchup_dataset)) + ".nc"
+        fname_output = "_".join(("harm", software_cfg['software'], software_cfg['version'],
+                                 software_cfg['tag'], software_cfg["job_id"],
+                                 software_cfg['matchup_dataset'])) + ".nc"
         HarmonisationOutput.save(pjoin(output_dir, fname_output), save_residuals=res)
 
         print "\nOutput Data Written To:"

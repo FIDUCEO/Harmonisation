@@ -263,7 +263,7 @@ class Transform2NormInd:
                 MatchUpData.values[istart:iend] = MatchUpNormInd.values[istart_i:iend_i]*block_unc.uR
                 MatchUpData.values[istart:iend] += MatchUpNormInd.values[isys]*block_unc.uS
 
-            # c. structured correlation - transform from independent  to original variables
+            # c. structured correlation - transform from independent to original variables
             if block_unc.typeID == 3:
 
                 # Retrieve required W matrix and u matrix

@@ -8,6 +8,7 @@ from os.path import basename, dirname
 from os.path import join as pjoin
 import sys
 from sys import argv
+import argparse
 
 '''___Third Party Modules___'''
 from numpy import concatenate
@@ -17,8 +18,7 @@ from config_functions import *
 
 main_directory = dirname(dirname(__file__))
 sys.path.append(main_directory)
-from nplcore import HarmonisationResult
-from nplcore import HarmonisationVis
+from nplcore import MatchUp, HarmonisationResult, HarmonisationVis
 
 '''___Authorship___'''
 __author__ = ["Sam Hunt", "Peter Harris"]
@@ -29,12 +29,34 @@ __maintainer__ = "Sam Hunt"
 __email__ = "sam.hunt@npl.co.uk"
 __status__ = "Development"
 
+
+def parse_cmdline():
+    parser = argparse.ArgumentParser(
+        description="Run harmonisation of match-up dataset",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+
+    parser.add_argument("config_file", action="store",
+                        help="Path of harmonisation configuration file")
+
+    log_options = parser.add_mutually_exclusive_group()
+    log_options.add_argument("--verbose", action="store_true",
+                             help="Option for verbose output")
+
+    log_options.add_argument("--quiet", action="store_true",
+                             help="Option for quiet output")
+
+    parser.add_argument("--version", action="version", version='v%s' % __version__)
+
+    return parser.parse_args()
+
+
 def try_makedirs(directory):
     try:
         makedirs(directory)
     except OSError:
         pass
     return 0
+
 
 class HarmonisationPlottingOp:
     """
@@ -49,11 +71,11 @@ class HarmonisationPlottingOp:
         H.run()
 
     :Attributes:
-        .. py:attribute:: dataset_paths
+        .. py:attribute:: dataset_dir
 
             *list:str*
 
-            Paths of matchup series files in matchup dataset directory
+            Directory of matchup series files
 
         .. py:attribute:: parameter_path
 
@@ -144,8 +166,7 @@ class HarmonisationPlottingOp:
 
     """
 
-    def __init__(self, dataset_paths=None, sensor_data_path=None, output_dir=None,
-                 software_cfg=None, data_reader=None, hout_path=None, hres_paths=None):
+    def __init__(self, dataset_dir, sensor_data_path, output_dir, software_cfg, hout_path, hres_paths):
         """
         Initialise harmonisation algorithm class
 
@@ -161,9 +182,6 @@ class HarmonisationPlottingOp:
         :type software_cfg: dict:str
         :param software_cfg: dictionary of software configuration information
 
-        :type data_reader: cls
-        :param data_reader: Python class to open harmonisation data. If none given default data reader used.
-
         :type hout_path: str
         :param hout_path: path of harmonisation output file
 
@@ -171,7 +189,7 @@ class HarmonisationPlottingOp:
         :param hres_paths: path of harmonisation residual files
         """
 
-        self.dataset_paths = None
+        self.dataset_dir = None
         self.sensor_data_path = None
         self.output_dir = None
         self.plot_dir = None
@@ -184,8 +202,8 @@ class HarmonisationPlottingOp:
         self.hout_path = None
         self.hres_paths = None
 
-        if (dataset_paths is not None) and (sensor_data_path is not None):
-            self.dataset_paths = dataset_paths
+        if (dataset_dir is not None) and (sensor_data_path is not None):
+            self.dataset_dir = dataset_dir
             self.sensor_data_path = sensor_data_path
             self.output_dir = output_dir
             self.plots_dir = pjoin(output_dir, "plots")
@@ -208,13 +226,6 @@ class HarmonisationPlottingOp:
             self.job_id = "CC"
             self.matchup_dataset = "TEST"
 
-        if data_reader is not None:
-            self.data_reader = data_reader
-
-        else:
-            from nplcore import MatchUp
-            self.data_reader = MatchUp
-
         if hout_path is not None:
             self.hout_path = hout_path
             self.hres_paths = hres_paths
@@ -225,7 +236,7 @@ class HarmonisationPlottingOp:
         """
 
         # Initialise
-        dataset_paths = self.dataset_paths
+        dataset_dir = self.dataset_dir
         sensor_data_path = self.sensor_data_path
         plots_dir = self.plots_dir
         hout_path = self.hout_path
@@ -236,8 +247,7 @@ class HarmonisationPlottingOp:
         ################################################################################################################
 
         print"Match-up Dataset:"
-        for path in dataset_paths:
-            print ">", path
+        print ">", dataset_dir
 
         print"\nSensor Data:"
         print ">", sensor_data_path
@@ -248,7 +258,7 @@ class HarmonisationPlottingOp:
             print ">", path
 
         print("\nOpening Files...")
-        MatchUpData = self.data_reader(dataset_paths, sensor_data_path, open_uncertainty=False)
+        MatchUpData = MatchUp(dataset_dir, sensor_data_path, open_uncertainty=False)
         HarmResult = HarmonisationResult(hout_path) # , hres_paths)
 
         ################################################################################################################
@@ -271,7 +281,6 @@ class HarmonisationPlottingOp:
         diagnostic_kres_nom_harm_X_plots_dir = pjoin(diagnostic_kres_nom_harm_plots_dir, "sensor_state_variables")
         diagnostic_kres_nom_harm_x_plots_dir = pjoin(diagnostic_kres_nom_harm_plots_dir, "additional_variables")
 
-
         # Make plot directories
         try_makedirs(overview_plots_dir)
         try_makedirs(diagnostic_plots_dir)
@@ -293,10 +302,10 @@ class HarmonisationPlottingOp:
         kres_ylim = [-kres_max * 1.2, kres_max * 1.2]
 
         # Plot
-        HarmVisOp.plot_kres_nom_nom_scatter(overview_plots_dir, ylim=kres_ylim)
-        HarmVisOp.plot_kres_nom_nom_scatter_monthlymean(overview_plots_dir, ylim=kres_ylim)
-        HarmVisOp.plot_kres_harm_harm_scatter(overview_plots_dir, ylim=kres_ylim)
-        HarmVisOp.plot_kres_harm_harm_scatter_monthlymean(overview_plots_dir, ylim=kres_ylim)
+        HarmVisOp.plot_kres_nom_nom_scatter(overview_plots_dir) #, ylim=kres_ylim)
+        HarmVisOp.plot_kres_nom_nom_scatter_monthlymean(overview_plots_dir) #, ylim=kres_ylim)
+        HarmVisOp.plot_kres_harm_harm_scatter(overview_plots_dir) #, ylim=kres_ylim)
+        HarmVisOp.plot_kres_harm_harm_scatter_monthlymean(overview_plots_dir) #, ylim=kres_ylim)
         HarmVisOp.plot_kres_nom_harm_scatter(overview_plots_dir)
         HarmVisOp.plot_kres_nom_harm_scatter_monthlymean(overview_plots_dir)
 
@@ -305,19 +314,21 @@ class HarmonisationPlottingOp:
         HarmVisOp.plot_L1_harm_v_L2_harm_scatter(overview_plots_dir)
 
         # c. Kres vs. sensor state variables, X
-        HarmVisOp.plot_kres_harm_harm_X_binned_line(diagnostic_kres_harmonised_X_plots_dir, ylim=kres_ylim)
+        HarmVisOp.plot_kres_harm_harm_X_binned_line(diagnostic_kres_harmonised_X_plots_dir)
         HarmVisOp.plot_kres_nom_harm_X_binned_line(diagnostic_kres_nom_harm_X_plots_dir)
-        HarmVisOp.plot_kres_harm_harm_additional_variables_binned_line(diagnostic_kres_harmonised_x_plots_dir, ylim=kres_ylim)
+        HarmVisOp.plot_kres_harm_harm_additional_variables_binned_line(diagnostic_kres_harmonised_x_plots_dir)
         HarmVisOp.plot_kres_nom_harm_additional_variables_binned_line(diagnostic_kres_nom_harm_x_plots_dir)
 
         print "\nPlots written to:", plots_dir
 
 
-def main(job_cfg_fname):
+def main(p):
 
     ################################################################################################################
     # Process configuration data
     ################################################################################################################
+
+    job_cfg_fname = p.config_file
 
     print "Harmonisation Output Plotting \n"
 
@@ -325,21 +336,10 @@ def main(job_cfg_fname):
 
     # 1. Read configuration data
     conf = {}   # dictionary to store data
-
-    # b. Read job config file
     conf['job_id'], conf['matchup_dataset'], dataset_dir, sensor_data_path,\
-        output_dir, data_reader_path, conf['job_text'] = read_job_cfg(job_cfg_fname)
+        output_dir, conf['job_text'] = read_job_cfg(job_cfg_fname)
 
-    # 2. Get matchup data paths from directory
-    dataset_paths = get_dataset_paths(dataset_dir)
-
-    # 3. Import required specified functions
-    if basename(data_reader_path) == "DEFAULT":
-        harm_data_reader = None
-    else:
-        harm_data_reader = import_file(data_reader_path).MatchUp
-
-    # 4. Get harmonisation result paths
+    # 2. Get harmonisation result paths
     hout_path, hres_paths = get_harm_paths(output_dir)
 
     ################################################################################################################
@@ -347,11 +347,10 @@ def main(job_cfg_fname):
     ################################################################################################################
 
     # Initialise object
-    H = HarmonisationPlottingOp(dataset_paths=dataset_paths,
+    H = HarmonisationPlottingOp(dataset_dir=dataset_dir,
                                 sensor_data_path=sensor_data_path,
                                 output_dir=output_dir,
                                 software_cfg=conf,
-                                data_reader=harm_data_reader,
                                 hout_path=hout_path,
                                 hres_paths=hres_paths)
 
@@ -361,5 +360,6 @@ def main(job_cfg_fname):
     return 0
 
 if __name__ == "__main__":
-    main(os.path.abspath(argv[1]))
+    main(parse_cmdline())
+    # main("/home/seh2/processing/fiduceo/harmonisation/FO/EIV_102_11_R_A__AVH11_REAL_4_RSA_/EIV_102_11_R_A__AVH11_REAL_4_RSA_.cfg")
     # main("/home/seh2/src/DeployedProjects/full_EIV/src/test/test_configs/AVHRR_RSIM_3_test_newdata/AVHRR_RSIM_3_test_newdata.cfg")

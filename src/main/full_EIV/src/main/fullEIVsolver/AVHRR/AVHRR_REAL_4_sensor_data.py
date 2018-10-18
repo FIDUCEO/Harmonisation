@@ -37,7 +37,7 @@ for reference_sensor in reference_sensors:
                                      "sensor_model_parameter": [],
                                      "sensor_model_constant": []}
 # 3. Add Harmonisation Sensors
-sensors = ["m02", "n19", "n18", "n17", "n16", "n15", "n14", "n12", "n11"]
+sensors = ["m02", "n19", "n18", "n17", "n16", "n15", "n14", "n12", "n11", "n10", "n09", "n08", "n07"]
 for sensor in sensors:
     sensor_data[sensor] = {"sensor_model": AVHRR_sensor_function,
                            "sensor_model_variables_num": 5,

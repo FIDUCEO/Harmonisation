@@ -607,7 +607,6 @@ class HarmonisationResult:
                 if "Description" in additional_variables[variable].keys():
                     additional_var.Description = additional_variables[variable]['Description']
 
-
         # 6. Close netCDF file
         rootgrp.close()
 
@@ -637,7 +636,7 @@ class HarmonisationResult:
 
         # Residual file path components
         directory, output_fname = split(path)
-        output_fname_noext, output_fname_ext = splitext(path)
+        output_fname_noext, output_fname_ext = splitext(output_fname)
 
         # sensor number, match up number and covariate number per data block as a tuple for indexing
         block_idxs = [(i, j, k) for i, j, k in zip(idx['n_sensor'], idx['n_mu'], idx['n_cov'])]

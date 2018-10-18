@@ -10,6 +10,7 @@ from os.path import join as pjoin
 from copy import deepcopy
 import cPickle
 from time import time
+from numpy.linalg import cholesky
 
 '''___Third Party Modules___'''
 from netCDF4 import Dataset
@@ -24,7 +25,11 @@ harmonisationIO_directory = pjoin(dirname(dirname(dirname(__file__))), "harmonis
 sys.path.append(harmonisationIO_directory)
 from HarmonisationResult import HarmonisationResult
 
-from pc_algo import PCAlgo
+harmonisation_eiv_pc_directory = pjoin(dirname(dirname(__file__)), "harmonisation_eiv_pc")
+sys.path.append(harmonisation_eiv_pc_directory)
+from HarmonisationEIVPC import HarmonisationEIVPC
+
+
 from GN_algo import GNAlgo
 
 '''___Authorship___'''
@@ -66,7 +71,9 @@ class HarmonisationEIV:
     def __init__(self):
         pass
 
-    def run(self, HData, show=True, S_PC=None, a_PC=None, open_directory_GNOp=None, save_directory_GNOp=None):
+    def run(self, HData,
+                  pc_input=None, save_pc=None, gn_input=None, save_gn=None, save_directory_GNOp=None,
+                  show=1):
         """
         Return harmonised parameters and diagnostic data for input harmonisaton match-up data
 
@@ -86,56 +93,62 @@ class HarmonisationEIV:
         ################################################################################################################
         # 1.	Compute Approximate Solution to find Pre-conditioner to Full Problem
         ################################################################################################################
-        sensor_data = HData.sensor_data
+
         return_covariance = True
         if save_directory_GNOp is not None:
             return_covariance = False
 
-        if (S_PC is None) and (a_PC is None):
-            if show:
+        if pc_input is None:
+            if show != 0:
                 print "- Determine approximate solution to find pre-conditioner to full problem..."
 
             t1 = time()
             # a. sample data for preconditioning
             Sample2IndOp = Sample2Ind()
-            HData_sample = Sample2IndOp.run(HData, sf=0.1, show=show)
+            HData_sample = Sample2IndOp.run(HData, sf=0.1, show=(show==2))
 
             HData_sample = Transform2NormIndOp.run(HData_sample)
 
             # b. determine preconditioner solution
             print "Beginning Solver..."
-            PC = PCAlgo(HData_sample)
+            PCOp = HarmonisationEIVPC()
+            preconditioner = PCOp.run(HData_sample)
 
-            a_PC, S_PC = PC.runPC(tol=1e-6)
             del HData_sample
             t2 = time()
             print "t_PC:", str(t2-t1)
 
-        HData.a = a_PC  # set PC output parameters as current parameter estimates
+        else:
+            preconditioner = HarmonisationResult(pc_input)
+
+        HData.a = preconditioner.parameter  # set PC output parameters as current parameter estimates
+
+        if save_pc:
+            preconditioner.save(save_pc, save_residuals=False)
 
         ################################################################################################################
         # 2.	Compute Full Solution using EIV Gauss-Newton Algorithm
         ################################################################################################################
 
-        if show:
+        if show != 0:
             print "Computing full solution..."
 
-        if open_directory_GNOp is None:
-            if show:
+        if gn_input is None:
+            if show != 0:
                 print " - Transforming to Independent Variables..."
             # a. reparameterise input data such that output data are independent quantities
             HData = Transform2NormIndOp.run(HData)
 
             # b. run GN algorithm on modified data
-            GNOp = GNAlgo(HData, S_PC)
+            GNOp = GNAlgo(HData, preconditioner.parameter_covariance_matrix)
         else:
-            if show:
+            if show != 0:
                 print " - Opening Transformed Independent Variables..."
             GNOp = GNAlgo(HData)
-            GNOp.open(open_directory_GNOp)
-            if show:
+            GNOp.open(gn_input)
+            if show != 0:
                 print " - Applying approximate solution to pre-conditioner to full problem..."
-            GNOp.S = S_PC
+            GNOp.S = cholesky(preconditioner.parameter_covariance_matrix)
 
         HarmonisationOutput = HarmonisationResult()
         HarmonisationOutput.parameter_sensors = HData.idx["parameter_sensor"]
@@ -145,7 +158,7 @@ class HarmonisationEIV:
             HarmonisationOutput.cost, HarmonisationOutput.cost_dof, \
                 HarmonisationOutput.cost_p_value, HarmonisationOutput.values_res,\
                     HarmonisationOutput.ks_res, systematic_errors, systematic_error_sensors \
-                        = GNOp.run(show=show, return_covariance=return_covariance)
+                        = GNOp.run(show=(show == 2), return_covariance=return_covariance)
 
         if systematic_errors is not None:
             HarmonisationOutput.additional_variables['systematic_errors'] = {'data': systematic_errors,

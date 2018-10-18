@@ -19,7 +19,7 @@ from time import time
 
 '''___Third Party Modules____'''
 from numpy import zeros, append, ones, dot, outer, hstack, array, eye, inf, asarray, int32, float32, float64, column_stack, count_nonzero, where
-from numpy.linalg import norm, solve
+from numpy.linalg import norm, solve, cholesky
 from scipy.sparse.linalg import LinearOperator
 from math import ceil
 from netCDF4 import Dataset
@@ -150,15 +150,15 @@ class GNAlgo(object):
             Return the product of H (P'*J'*J*P) with a given x
     """
 
-    def __init__(self, HData=None, S=None):
+    def __init__(self, HData=None, V_initial=None):
         """
         Initialise algorithm
 
         :type HData: HarmInputData
         :param HData: Input data to be harmonised
 
-        :type S: numpy.ndarray
-        :param S: Pre-conditioner solution
+        :type V_initial: numpy.ndarray
+        :param V_initial: Parameter covariance matrix estimation (from pre-conditioner)
         """
 
         # Initialise class
@@ -171,10 +171,11 @@ class GNAlgo(object):
 
             # initialise current variable and parameter estimates
             self.xyza = append(self.HData.values, self.HData.a)
+            pass
 
-        if (HData is not None) and (S is not None):
-            self.S = S
-        elif (HData is not None) and (S is None):
+        if (HData is not None) and (V_initial is not None):
+            self.S = cholesky(V_initial)
+        elif (HData is not None) and (V_initial is None):
             self.S = eye(len(self.HData.a))
 
     def run(self, tol=1e-6, tolA=1e-8, tolB=1e8, tolU=1e-8, show=False, return_covariance=True):
@@ -209,6 +210,7 @@ class GNAlgo(object):
         if show:
             print "Initial Parameter Estimates:"
             print self.HData.a
+            print "Determining Parameters..."
 
         # Useful parameters
         N_mu = self.HData.idx['cNm'][-1]              # total match-ups
@@ -286,6 +288,10 @@ class GNAlgo(object):
         # Unpack solution
         a = self.xyza[N_var:]
 
+        if show:
+            print "Determined Parameter Estimates:"
+            print a
+
         ################################################################################################################
         # 2. Uncertainty evaluation
         ################################################################################################################
@@ -295,7 +301,12 @@ class GNAlgo(object):
         if return_covariance:
             if show:
                 print 'Determining uncertainty...'
+
             parameter_covariance_matrix = self.calculate_parameter_covariance_matrix(tolU=tolU, show=show)
+
+            if show:
+                print "Determined Parameter Covariance Matrix:"
+                print parameter_covariance_matrix
 
         ################################################################################################################
         # 3. Prepare Solution
@@ -317,13 +328,6 @@ class GNAlgo(object):
 
         cost_dof = N_var - N_mu - N_a
         cost_p_value = 0
-
-        if show:
-            print "Determined Parameter Estimates:"
-            print a
-
-            print "Determined Parameter Covariance Matrix"
-            print parameter_covariance_matrix
 
         # Return fitted systematic errors
         n_uS = max([0] + [unc_i.uS_i for unc_i in self.HData.unc if (unc_i.typeID == 2) or (unc_i.typeID == 4)])
@@ -511,21 +515,21 @@ class GNAlgo(object):
                                             if p_sensor == sensor], dtype=float32)
 
         # 3. Get sensor state data
-        # sensor_model_variables = self.unconvert_Xs(xyza, unc, idx, original_idx, n_sensor, n_mu)
+        sensor_model_variables = self.unconvert_Xs(xyza, unc, idx, original_idx, n_sensor, n_mu)
 
-        sensor_model_variables = unconvert_Xs(xyza,
-                                              asarray(idx["n_sensor"], dtype=int32),
-                                              asarray(idx["idx"], dtype=int32),
-                                              asarray(original_idx["idx"], dtype=int32),
-                                              asarray(idx["n_cov"], dtype=int32),
-                                              asarray(idx["n_mu"], dtype=int32),
-                                              asarray(idx["N_var"], dtype=int32),
-                                              unc,
-                                              w_matrices,
-                                              u_matrices,
-                                              n_sensor,
-                                              n_mu,
-                                              idx["sensor_ms"][n_sensor])
+        # sensor_model_variables = unconvert_Xs(xyza,
+        #                                       asarray(idx["n_sensor"], dtype=int32),
+        #                                       asarray(idx["idx"], dtype=int32),
+        #                                       asarray(original_idx["idx"], dtype=int32),
+        #                                       asarray(idx["n_cov"], dtype=int32),
+        #                                       asarray(idx["n_mu"], dtype=int32),
+        #                                       asarray(idx["N_var"], dtype=int32),
+        #                                       unc,
+        #                                       w_matrices,
+        #                                       u_matrices,
+        #                                       n_sensor,
+        #                                       n_mu,
+        #                                       idx["sensor_ms"][n_sensor])
 
         # 3. Compute sensor measurand
         measurand, measurand_derivatives = sensor_model[n_sensor](sensor_model_variables,

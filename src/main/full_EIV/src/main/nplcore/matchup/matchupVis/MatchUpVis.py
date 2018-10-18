@@ -61,7 +61,7 @@ class MatchUpVis:
         if self.L1_nom is None:
             if self.MatchUpData is not None:
                 try:
-                    self.L1_nom = self.MatchUpData.getAdditionalData("nominal_measurand1")
+                    self.L1_nom = self.MatchUpData.getAdditionalData("nominal_BT1")
                 except:
                     raise ValueError("Nominal Measurand 1 data not available in Matchup data")
             else:
@@ -72,7 +72,7 @@ class MatchUpVis:
         if self.L2_nom is None:
             if self.MatchUpData is not None:
                 try:
-                    self.L2_nom = self.MatchUpData.getAdditionalData("nominal_measurand2")
+                    self.L2_nom = self.MatchUpData.getAdditionalData("nominal_BT2")
                 except:
                     raise ValueError("Nominal Measurand 2 data not available in Matchup data")
             else:

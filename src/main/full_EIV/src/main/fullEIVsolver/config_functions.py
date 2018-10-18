@@ -118,30 +118,7 @@ def read_job_cfg(filename):
     sensor_data_path = abspath(config.get('DATA', 'sensor_data_path'))
     output_dir = abspath(config.get('DATA', 'output_dir'))
 
-    # Get functions paths
-    data_reader_path = abspath(config.get('FUNCTIONS', 'data_reader_path'))
-
-    return job_id, matchup_dataset, dataset_dir, sensor_data_path, output_dir, data_reader_path, job_text
-
-
-def get_dataset_paths(dataset_dir):
-    """
-    Return list of matchup data files in
-
-    :param dataset_dir: str
-        path of directory containing only matchup data files
-
-    :return:
-        :dataset_paths: list: str
-            Paths of matchup series files in matchup dataset directory
-    """
-
-    dataset_paths = []
-    for f in listdir(dataset_dir):
-        if (isfile(pjoin(dataset_dir, f))) and (f[-3:] == ".nc"):
-            dataset_paths.append(pjoin(dataset_dir, f))
-
-    return sorted(dataset_paths)
+    return job_id, matchup_dataset, dataset_dir, sensor_data_path, output_dir, job_text
 
 
 def get_harm_paths(output_dir):
