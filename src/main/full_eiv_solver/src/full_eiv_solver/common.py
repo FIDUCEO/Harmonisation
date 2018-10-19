@@ -9,6 +9,8 @@ Created on Tues May 9  2017 15:00:00
 
 '''___Python Modules___'''
 import ConfigParser
+import logging
+import argparse
 import importlib
 import os.path
 from os import listdir
@@ -19,45 +21,98 @@ import sys
 '''___Harmonisation Modules___'''
 sys.path.append(dirname(dirname(__file__)))
 
+'''___Constants___'''
+software_short_name = "EV"
 
-def read_software_cfg(filename):
+
+def parse_cmdline():
+    parser = argparse.ArgumentParser(
+        description="Run harmonisation of match-up dataset",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+
+    parser.add_argument("config_file", action="store",
+                        help="Path of harmonisation configuration file")
+
+    parser.add_argument("--mode", action="store", choices=["normal", "setup_pc", "setup_trans2ind"], default="normal",
+                        help="Mode to run harmonisation solver in")
+
+    parser.add_argument("--no_covariance", action="store_true",
+                        help="Option to not compute covariance matrix of harmonised calibration parameters")
+
+    parser.add_argument("--pc_input",
+                        help="Path pre-computed harmonisation output file for dataset, to be used as "
+                             "preconditioner for this run")
+
+    parser.add_argument("--save_pc", action="store",
+                        help="Path to save preconditioner generated in (or used by if opened from elsewhere) "
+                             "the harmonisation processing to")
+
+    parser.add_argument("--gn_input",
+                        help="Path pre-computed Gauss Newton solver state to start harmonisation processing at")
+
+    parser.add_argument("--save_gn", action="store",
+                        help="Path to write Gauss Newton solver state to at end of the harmonisation processing")
+
+    log_options = parser.add_mutually_exclusive_group()
+    log_options.add_argument("--verbose", action="store_true",
+                             help="Option for verbose output")
+
+    log_options.add_argument("--quiet", action="store_true",
+                             help="Option for quiet output")
+
+    parser.add_argument("--log", action="store", type=str,
+                        help="Log file to write to. Leave out for stdout.")
+
+    parser.add_argument("--version", action="version", version='v%s' % __version__)
+
+    return parser.parse_args()
+
+def configure_logging(fname=None, verbose=False, quiet=False):
     """
-    Return data from harmonisation software configuration file
+    Configure logger
 
-    :type filename: str
-    :param filename: path of software configuration file
-
-    :return:
-        :software: *str*
-
-        Software implementation abbreviation, i.e.:
-        FO - FastOpt
-        EV - NPL Errors in Variables
-        OM - NPL ODR+MC Approach
-
-        :version: *str*
-
-        Version number of software (format V.V)
-
-        :tag: *str*
-
-        VCS tag for software implementation (format TTTTTTT)
+    :param fname: str
+    :param fname: path to directory to write log file to (None for not to write file)
     """
 
-    # First take string of whole configuration file
-    with open(filename) as f:
-        software_text = f.read()
+    logger = logging.getLogger(__name__)
+    logger.setLevel(logging.DEBUG)
 
-    # Open file
-    config = ConfigParser.RawConfigParser()
-    config.read(filename)
+    if verbose:
+        logger.setLevel(logging.DEBUG)
+    elif quiet:
+        logger.setLevel(logging.WARNING)
+    else:
+        logger.setLevel(logging.INFO)
 
-    # Get naming info
-    software = config.get('DEFAULT', 'software')
-    software_version = config.get('DEFAULT', 'software_version')
-    software_tag = config.get('DEFAULT', 'software_tag')
+    # File logging
+    if fname is not None:
+        file_formatter = logging.Formatter('%(asctime)s : %(levelname)s : %(message)s')
+        file_handler = logging.FileHandler(fname)
 
-    return software, software_version, software_tag, software_text
+        if quiet:
+            file_handler.setLevel(logging.INFO)
+        else:
+            file_handler.setLevel(logging.DEBUG)
+
+        file_handler.setFormatter(file_formatter)
+        logger.addHandler(file_handler)
+
+    # Stream logging
+    stream_formatter = logging.Formatter('%(message)s')
+    stream_handler = logging.StreamHandler(sys.stdout)
+    stream_handler.setFormatter(stream_formatter)
+
+    if verbose:
+        stream_handler.setLevel(logging.DEBUG)
+    elif quiet:
+        stream_handler.setLevel(logging.DEBUG)
+    else:
+        stream_handler.setLevel(logging.INFO)
+
+    logger.addHandler(stream_handler)
+
+    return logger
 
 
 def read_job_cfg(filename):
@@ -166,8 +221,5 @@ def import_file(path):
     return mod
 
 if __name__ == "__main__":
+    pass
 
-    def main():
-        return 0
-
-    main()
