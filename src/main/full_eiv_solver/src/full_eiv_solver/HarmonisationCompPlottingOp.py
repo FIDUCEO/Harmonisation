@@ -1,5 +1,5 @@
 """
-Harmonsation Output Plotting Implementation
+Harmonsation Comparison Output Plotting Implementation
 """
 
 '''___Python Modules___'''
@@ -199,52 +199,6 @@ class HarmonisationComparisonPlottingOp:
         print "\nPlots written to:", plots_dir
 
 
-def main(job_cfg_fname):
-
-    ################################################################################################################
-    # Process configuration data
-    ################################################################################################################
-
-    print "Harmonisation Output Plotting \n"
-
-    print "Reading Job Config:", job_cfg_fname, "\n"
-
-    # 1. Read configuration data
-    conf = {}   # dictionary to store data
-
-    # b. Read job config file
-    conf['job_id'], conf['matchup_dataset'], dataset_dir, sensor_data_path,\
-        output_dir, data_reader_path, conf['job_text'] = read_job_cfg(job_cfg_fname)
-
-    # 2. Get matchup data paths from directory
-    dataset_paths = get_dataset_paths(dataset_dir)
-
-    # 3. Import required specified functions
-    if basename(data_reader_path) == "DEFAULT":
-        harm_data_reader = None
-    else:
-        harm_data_reader = import_file(data_reader_path).MatchUp
-
-    # 4. Get harmonisation result paths
-    hout_path, hres_paths = get_harm_paths(output_dir)
-
-    ################################################################################################################
-    # Run harmonisation
-    ################################################################################################################
-
-    # Initialise object
-    H = HarmonisationComparisonPlottingOp(dataset_paths=dataset_paths,
-                                          sensor_data_path=sensor_data_path,
-                                          output_dir=output_dir,
-                                          data_reader=harm_data_reader,
-                                          hout_path=hout_path,
-                                          hres_paths=hres_paths)
-
-    # Run algorithm
-    H.run()
-
-    return 0
-
 if __name__ == "__main__":
-    main(os.path.abspath(argv[1]))
-    # main("/home/seh2/src/DeployedProjects/full_EIV/src/test/test_configs/AVHRR_RSIM_3_test_newdata/AVHRR_RSIM_3_test_newdata.cfg")
+    pass
+
