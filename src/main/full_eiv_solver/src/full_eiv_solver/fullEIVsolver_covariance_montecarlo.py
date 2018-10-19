@@ -14,7 +14,7 @@ from netCDF4 import Dataset
 
 '''___Harmonisation Modules___'''
 from common import *
-from harmonisation import HarmonisationOp
+from HarmonisationOp import HarmonisationOp
 
 main_directory = dirname(dirname(__file__))
 sys.path.append(main_directory)

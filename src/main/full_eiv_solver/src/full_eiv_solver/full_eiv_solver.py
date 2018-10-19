@@ -15,7 +15,7 @@ from os import makedirs
 '''___Harmonisation Modules___'''
 from version import version, tag
 from common import *
-from harmonisation import HarmonisationOp
+from HarmonisationOp import HarmonisationOp
 
 '''___Authorship___'''
 __author__ = ["Sam Hunt", "Peter Harris"]

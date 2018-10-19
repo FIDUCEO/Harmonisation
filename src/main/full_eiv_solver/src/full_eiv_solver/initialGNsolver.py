@@ -14,7 +14,7 @@ from sys import argv
 
 '''___Harmonisation Modules___'''
 from common import *
-from harmonisation import HarmonisationOp
+from HarmonisationOp import HarmonisationOp
 
 '''___Authorship___'''
 __author__ = ["Sam Hunt", "Peter Harris"]
