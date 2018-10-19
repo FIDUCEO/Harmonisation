@@ -23,10 +23,10 @@ from common import *
 
 main_directory = dirname(dirname(__file__))
 sys.path.append(main_directory)
-from nplcore import MatchUp
-from nplcore import HarmonisationEIV
-from nplcore import HarmonisationResult
-from nplcore import GNAlgo, PCAlgo, Sample2Ind, Transform2NormInd
+from core import MatchUp
+from core import HarmonisationEIV
+from core import HarmonisationResult
+from core import GNAlgo, PCAlgo, Sample2Ind, Transform2NormInd
 
 '''___Authorship___'''
 __author__ = ["Sam Hunt", "Peter Harris"]

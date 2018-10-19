@@ -17,8 +17,8 @@ from common import *
 
 main_directory = dirname(dirname(__file__))
 sys.path.append(main_directory)
-from nplcore import HarmonisationResult
-from nplcore import HarmonisationVis
+from core import HarmonisationResult
+from core import HarmonisationVis
 
 '''___Authorship___'''
 __author__ = ["Sam Hunt", "Peter Harris"]

@@ -18,8 +18,8 @@ from HarmonisationOp import HarmonisationOp
 
 main_directory = dirname(dirname(__file__))
 sys.path.append(main_directory)
-from nplcore import GNAlgo
-from nplcore import HarmonisationResult
+from core import GNAlgo
+from core import HarmonisationResult
 
 '''___Authorship___'''
 __author__ = ["Sam Hunt", "Peter Harris"]

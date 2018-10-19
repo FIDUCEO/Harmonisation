@@ -16,7 +16,7 @@ from common import *
 
 main_directory = dirname(dirname(__file__))
 sys.path.append(main_directory)
-from nplcore import MatchUpVis
+from core import MatchUpVis
 
 '''___Authorship___'''
 __author__ = ["Sam Hunt"]
