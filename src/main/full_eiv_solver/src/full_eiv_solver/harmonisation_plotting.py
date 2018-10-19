@@ -14,7 +14,7 @@ import argparse
 from numpy import concatenate
 
 '''___Harmonisation Modules___'''
-from config_functions import *
+from common import *
 
 main_directory = dirname(dirname(__file__))
 sys.path.append(main_directory)

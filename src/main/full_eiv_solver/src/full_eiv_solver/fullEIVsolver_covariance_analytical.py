@@ -16,7 +16,7 @@ from numpy import append, array, savetxt, zeros, loadtxt
 from netCDF4 import Dataset
 
 '''___Harmonisation Modules___'''
-from config_functions import *
+from common import *
 from harmonisation import HarmonisationOp
 
 '''___Authorship___'''

@@ -15,7 +15,7 @@ import logging
 '''___Third Party Modules___'''
 
 '''___Harmonisation Modules___'''
-from config_functions import *
+from common import *
 from harmonisation import HarmonisationOp
 
 '''___Authorship___'''

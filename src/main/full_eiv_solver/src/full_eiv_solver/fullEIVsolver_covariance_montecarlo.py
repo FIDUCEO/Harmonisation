@@ -13,7 +13,7 @@ from numpy.random import normal
 from netCDF4 import Dataset
 
 '''___Harmonisation Modules___'''
-from config_functions import *
+from common import *
 from harmonisation import HarmonisationOp
 
 main_directory = dirname(dirname(__file__))

@@ -18,7 +18,7 @@ from numpy.random import normal
 from numpy import all as nall
 
 '''___Harmonisation Modules___'''
-from config_functions import *
+from common import *
 
 
 main_directory = dirname(dirname(__file__))
