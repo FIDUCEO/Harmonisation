@@ -4,6 +4,7 @@ Harmonsation Output Plotting Implementation
 
 '''___Python Modules___'''
 from os import makedirs
+from os.path import dirname
 
 '''___Third Party Modules___'''
 from numpy import concatenate

@@ -1,10 +1,5 @@
 """
-Functions to read harmonisation job configuration files
-
-Created on Tues May 9  2017 15:00:00
-
-@author: Peter Harris, NPL\MM
-@author: Sam Hunt, NPL\ENV
+Full EIV main script common functions
 """
 
 '''___Python Modules___'''
@@ -14,44 +9,83 @@ import argparse
 import importlib
 import os.path
 from os import listdir
-from os.path import isfile, abspath, split, dirname
+from os.path import isfile, abspath, split, splitext
 from os.path import join as pjoin
 import sys
 
-'''___Harmonisation Modules___'''
-sys.path.append(dirname(dirname(__file__)))
+'''___EIV Modules___'''
+from version import version, tag
+from sensor_data.SensorDataFactory import SensorDataFactory
+
+'''___Authorship___'''
+__author__ = ["Sam Hunt", "Peter Harris"]
+__created__ = "09/01/2017"
+__credits__ = ["Jon Mittaz"]
+__version__ = version
+__tag__ = tag
+__maintainer__ = "Sam Hunt"
+__email__ = "sam.hunt@npl.co.uk"
+__status__ = "Development"
 
 '''___Constants___'''
 software_short_name = "EV"
 
 
-def parse_cmdline():
+class ListSensors(argparse.Action):
+    def __init__(self, option_strings, dest=argparse.SUPPRESS, default=argparse.SUPPRESS,
+                 help="List names of available sensor data and exit."):
+        super(ListSensors, self).__init__(option_strings=option_strings, dest=dest, default=default, nargs=0, help=help)
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        for s in SensorDataFactory().get_names():
+            print s
+        parser.exit()
+
+
+def parse_cmdline(solver_options=True):
     parser = argparse.ArgumentParser(
-        description="Run harmonisation of match-up dataset",
+        description="Run Full Errors-in-Variables Solver for input dataset",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
-    parser.add_argument("config_file", action="store",
-                        help="Path of harmonisation configuration file")
+    job_help_msg = "Path of job file. Either define this or -i, -s and -o arguments"
+    if solver_options:
+        job_help_msg = "Path of job file. Either define this or -i, -s and -o arguments "\
+                       "(optional --pc_input, --save_pc, --gn_input, --save_gn)."
 
-    parser.add_argument("--mode", action="store", choices=["normal", "setup_pc", "setup_trans2ind"], default="normal",
-                        help="Mode to run harmonisation solver in")
+    parser.add_argument("-j", "--job_file", action="store", help=job_help_msg)
 
-    parser.add_argument("--no_covariance", action="store_true",
-                        help="Option to not compute covariance matrix of harmonised calibration parameters")
+    parser.add_argument("-i", "--input_directory", action="store",
+                        help="Path of input dataset directory.")
 
-    parser.add_argument("--pc_input",
-                        help="Path pre-computed harmonisation output file for dataset, to be used as "
-                             "preconditioner for this run")
+    parser.add_argument("-s", "--sensor_data", action="store",
+                        help="Sensor data (choose from list given by --list_sensors option)")
 
-    parser.add_argument("--save_pc", action="store",
-                        help="Path to save preconditioner generated in (or used by if opened from elsewhere) "
-                             "the harmonisation processing to")
+    parser.add_argument("-o", "--output_directory", action="store",
+                        help="Path of output dataset directory.")
 
-    parser.add_argument("--gn_input",
-                        help="Path pre-computed Gauss Newton solver state to start harmonisation processing at")
+    if solver_options:
+        parser.add_argument("--pc_input",
+                            help="Path of pre-computed harmonisation output file for dataset, to be used as "
+                                "preconditioner for this run")
 
-    parser.add_argument("--save_gn", action="store",
-                        help="Path to write Gauss Newton solver state to at end of the harmonisation processing")
+        parser.add_argument("--save_pc", action="store",
+                            help="Path to save preconditioner generated in (or used by if opened from elsewhere) "
+                                 "the harmonisation processing to")
+
+        parser.add_argument("--gn_input",
+                            help="Path pre-computed Gauss Newton solver state to start harmonisaion processing at")
+
+        parser.add_argument("--save_gn", action="store",
+                            help="Path to write Gauss Newton solver state to at end of the harmonisation processing")
+
+        parser.add_argument("--mode", action="store",
+                            choices=["normal", "setup_pc", "setup_trans2ind"], default="normal",
+                            help="Mode to run harmonisation solver in")
+
+        parser.add_argument("--no_covariance", action="store_true",
+                            help="Option to not compute covariance matrix of harmonised calibration parameters")
+
+    parser.add_argument("--list_sensors", action=ListSensors)
 
     log_options = parser.add_mutually_exclusive_group()
     log_options.add_argument("--verbose", action="store_true",
@@ -65,7 +99,29 @@ def parse_cmdline():
 
     parser.add_argument("--version", action="version", version='v%s' % __version__)
 
-    return parser.parse_args()
+    if solver_options:
+        mutually_exclusive_msg = "--job_file and --input_directory|--sensor_data|--output_directory|--save_pc|" \
+                                 "--pc_input|--gn_input|--save_gn are mutually exclusive"
+        args = parser.parse_args()
+        if args.job_file and (args.input_directory or args.sensor_data or args.output_directory
+                              or args.save_pc or args.pc_input or args.gn_input or args.save_gn):
+            print(mutually_exclusive_msg)
+            sys.exit(2)
+
+    else:
+        args = parser.parse_args()
+        mutually_exclusive_msg = "--job_file and --input_directory|--sensor_data|--output_directory"
+
+        if args.job_file and (args.input_directory or args.sensor_data or args.output_directory):
+            print(mutually_exclusive_msg)
+            sys.exit(2)
+
+    if not args.job_file and not (args.input_directory and args.sensor_data and args.output_directory):
+        print("If --job_file not defined --input_directory & --sensor_data & --output_directory required")
+        sys.exit(2)
+
+    return args
+
 
 def configure_logging(fname=None, verbose=False, quiet=False):
     """

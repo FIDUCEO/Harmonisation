@@ -12,10 +12,11 @@ from os import makedirs
 
 '''___Third Party Modules___'''
 
-'''___Harmonisation Modules___'''
+'''___EIV Modules___'''
 from version import version, tag
 from common import *
 from HarmonisationOp import HarmonisationOp
+from sensor_data.SensorDataFactory import SensorDataFactory
 
 '''___Authorship___'''
 __author__ = ["Sam Hunt", "Peter Harris"]
@@ -61,7 +62,12 @@ def main(parsed_cmdline):
 
     # b. Read job config file
     conf['job_id'], conf['matchup_dataset'], dataset_dir,\
-        sensor_data_path, output_dir, conf['job_text'] = read_job_cfg(job_cfg_fname)
+        sensor_data, output_dir, conf['job_text'] = read_job_cfg(job_cfg_fname)
+
+    sensor_data_factory = SensorDataFactory()
+    if not sensor_data in sensor_data_factory.get_names():
+        raise NameError("Invalid sensor_data name, try --list_sensor_data option to see valid names")
+    sensor_data_dict = SensorDataFactory().get_sensor_data(sensor_data)
 
     # 4. Make output directory if it doesn't exist
     try:
@@ -80,13 +86,13 @@ def main(parsed_cmdline):
     # Run harmonisation
     ################################################################################################################
 
-    print "Match-up Dataset Directory:", dataset_dir
-    print "Sensor Data File:", sensor_data_path
+    print("Match-up Dataset Directory:", dataset_dir)
+    print("Sensor Data File:", sensor_data_path)
 
     # Run algorithm
     H = HarmonisationOp()
     H.run(dataset_dir=dataset_dir,
-          sensor_data_path=sensor_data_path,
+          sensor_data=sensor_data_dict,
           output_dir=output_dir,
           pc_input=parsed_cmdline.pc_input,
           save_pc=parsed_cmdline.save_pc,

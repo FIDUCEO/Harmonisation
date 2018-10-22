@@ -129,7 +129,7 @@ class MatchUp(object):
             Produce match-up file W matrix variable arrays from lists of W and U matrices data.
     """
 
-    def __init__(self, paths_matchup_data=None, path_sensor_data=None,
+    def __init__(self, paths_matchup_data=None, sensor_data=None, path_sensor_data=None,
                  open_uncertainty=True, open_additional_values=True):
         """
         Initialise match-up data object, opening match-up data from file if specified
@@ -189,8 +189,8 @@ class MatchUp(object):
                                                                open_uncertainty=open_uncertainty,
                                                                open_additional_values=open_additional_values)
 
-        if path_sensor_data is not None:
-            self.sensor_data = self._open_sensor_data(path_sensor_data)
+        if sensor_data is not None:
+            self.sensor_data = sensor_data
 
         if (paths_matchup_data is not None) and (path_sensor_data is not None):
             self.a, sensor_model_parameter_sensor, \

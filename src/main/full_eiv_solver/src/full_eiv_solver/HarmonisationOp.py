@@ -1,5 +1,5 @@
 """
-Main Operator of NPL Harmonsation Implementation
+Main Operator of NPL Harmonisation Implementation
 """
 
 '''___Python Modules___'''
@@ -78,7 +78,7 @@ class HarmonisationOp:
     def __init__(self):
         pass
 
-    def run(self, dataset_dir, sensor_data_path, output_dir,
+    def run(self, dataset_dir, sensor_data, output_dir,
                   pc_input=None, save_pc=None,
                   gn_input=None, save_gn=None,
                   software_cfg=None,
@@ -97,7 +97,7 @@ class HarmonisationOp:
         ################################################################################################################
 
         print "\nOpening data..."
-        HData = MatchUp(dataset_dir, sensor_data_path)
+        HData = MatchUp(dataset_dir, sensor_data)
         print "Complete"
 
         print "\nData Info"

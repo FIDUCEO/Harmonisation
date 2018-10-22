@@ -4,7 +4,7 @@
 Command line tool for generating harmonisation result diagnostic plots
 
 For usage try:
-python full_eiv_solver.py --help
+python harm_plot.py --help
 """
 
 '''___Python Modules___'''
@@ -17,25 +17,7 @@ from common import *
 from HarmonisationPlottingOp import HarmonisationPlottingOp
 
 
-def parse_cmdline():
-    parser = argparse.ArgumentParser(
-        description="Run harmonisation of match-up dataset",
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-
-    parser.add_argument("config_file", action="store",
-                        help="Path of harmonisation configuration file")
-
-    log_options = parser.add_mutually_exclusive_group()
-    log_options.add_argument("--verbose", action="store_true",
-                             help="Option for verbose output")
-
-    log_options.add_argument("--quiet", action="store_true",
-                             help="Option for quiet output")
-
-    parser.add_argument("--version", action="version", version='v%s' % __version__)
-
-    return parser.parse_args()
-
+parsed_cmdline = parse_cmdline(solver_options=False)
 
 def try_makedirs(directory):
     try:
@@ -43,7 +25,6 @@ def try_makedirs(directory):
     except OSError:
         pass
     return 0
-
 
 def main(p):
 
@@ -82,3 +63,5 @@ def main(p):
 
     return 0
 
+if __name__ == "__main__":
+    main(parsed_cmdline)
