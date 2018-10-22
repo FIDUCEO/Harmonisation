@@ -18,10 +18,10 @@ sys.path.append(matchupToolbox_directory)
 from utils.matchup_maths import evaluate_K, evaluate_adjusted_measurand, evaluate_measurand
 
 above_nplcore_directory = dirname(dirname(dirname(dirname(dirname(dirname(__file__))))))
-from nplcore.utils.stats import time_average, bin
-from nplcore.utils.plots import plot_scatter, plot_2dhist, plot_density
-from nplcore.matchup.matchupVis.MatchUpVis import MatchUpVis
-from nplcore.matchup.matchupProcessing.simulate_matchup.SimulateMatchUp import SimulateMatchUp
+from core.utils.stats import time_average, bin
+from core.utils.plots import plot_scatter, plot_2dhist, plot_density
+from core.matchup.matchupVis.MatchUpVis import MatchUpVis
+from core.matchup.matchupProcessing.simulate_matchup.SimulateMatchUp import SimulateMatchUp
 
 '''___Authorship___'''
 __author__ = ["Sam Hunt"]

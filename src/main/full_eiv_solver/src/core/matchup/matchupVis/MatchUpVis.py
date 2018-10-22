@@ -13,8 +13,8 @@ from numpy import isnan, sort, arange, sort
 from numpy.random import rand
 
 above_nplcore_directory = dirname(dirname(dirname(dirname(__file__))))
-from nplcore.utils.plots import plot_scatter, plot_density
-from nplcore.utils.stats import time_average, bin
+from core.utils.plots import plot_scatter, plot_density
+from core.utils.stats import time_average, bin
 
 '''___Authorship___'''
 __author__ = ["Sam Hunt"]
