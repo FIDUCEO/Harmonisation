@@ -18,7 +18,8 @@ sys.path.append(matchupToolbox_directory)
 from utils.matchup_maths import evaluate_K, evaluate_adjusted_measurand, evaluate_measurand
 
 above_nplcore_directory = dirname(dirname(dirname(dirname(dirname(dirname(__file__))))))
-from core.utils.stats import time_average, bin
+sys.path.append(above_nplcore_directory)
+
 from core.utils.plots import plot_scatter, plot_2dhist, plot_density
 from core.matchup.matchupVis.MatchUpVis import MatchUpVis
 from core.matchup.matchupProcessing.simulate_matchup.SimulateMatchUp import SimulateMatchUp
@@ -30,6 +31,7 @@ __version__ = "0.0"
 __maintainer__ = "Sam Hunt"
 __email__ = "sam.hunt@npl.co.uk"
 __status__ = "Development"
+
 
 class HarmonisationVis(MatchUpVis):
 

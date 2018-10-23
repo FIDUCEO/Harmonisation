@@ -323,6 +323,7 @@ class MatchUpVis:
 
             # Initialise data lists
             averages = []
+            stds = []
             Xaverages = []
 
             # Plot per match-up series
@@ -342,24 +343,25 @@ class MatchUpVis:
                     X = MatchUpData.getVariableData(cov, sensor_2_name, mu)
 
                     # Bin data by match-up series limits
-                    averages_i, Xaverages_i = bin(Y[i1:i2], X, bins=50, X_range=[min(X), max(X)])
+                    averages_i, stds_i, Xaverages_i = bin(Y[i1:i2], X, bins=50, X_range=[min(X), max(X)])
 
                     # Plot match-up series
                     fname_i = pjoin(directory, fname+"." + cov_name + "_" + sensor_2_name + "_binned." + mu_fn + ".pdf")
                     plot_scatter(fname_i, averages_i[~isnan(averages_i)], Xaverages_i[~isnan(averages_i)],
                                  xlbl=cov_label+" - "+sensor_2_name, ylbl=title+" ("+matchup_labels[i]+")",
-                                 title="", yerr=None, xerr=None, txt=None,
+                                 title="", yerr=stds_i, xerr=None, txt=None,
                                  line='-', legend=None, solid_ylines=[0], ylim=ylim)
 
                     # Bin data by full limits
-                    averages_i, Xaverages_i = bin(Y[i1:i2], X, bins=50, X_range=[Xmin, Xmax])
+                    averages_i, stds_i, Xaverages_i = bin(Y[i1:i2], X, bins=50, X_range=[Xmin, Xmax])
                     averages.append(averages_i[~isnan(averages_i)])
+                    stds.append(stds_i[~isnan(averages_i)])
                     Xaverages.append(Xaverages_i[~isnan(averages_i)])
 
             # Plot X for all match-up series
             plot_scatter(pjoin(directory, fname + "." + cov_name + "_sensor_2_binned.pdf"), averages, Xaverages,
                          xlbl=cov_label + " - Sensor 2", ylbl=title, title="",
-                         yerr=None, xerr=None, txt=None, line='-', legend=matchup_labels, legend_loc="outside",
+                         yerr=stds, xerr=None, txt=None, line='-', legend=matchup_labels, legend_loc="outside",
                          solid_ylines=[0], fig_size=(12, 8), ylim=ylim)
 
     def plot_Y_x_binned_line(self, directory, Y, x, x_name, x_label, title, fname, ylim=None, mus=None):
@@ -402,6 +404,7 @@ class MatchUpVis:
 
         # b. Initialise data lists
         averages = []
+        stds = []
         averages_x = []
 
         if mus is None:
@@ -419,24 +422,25 @@ class MatchUpVis:
             # Bin by x for match-up series (match-up series data range)
             x_i = x[i1:i2]
             x_i_range = [min(x_i), max(x_i)]
-            averages_i, averages_x_i = bin(Y[i1:i2], x_i, bins=50, X_range=x_i_range)
+            averages_i, stds_i, averages_x_i = bin(Y[i1:i2], x_i, bins=50, X_range=x_i_range)
 
             # Plot match-up series data
             fname_i = pjoin(directory, fname + "." + x_name + "_" + sensor_2_name + "_binned." + mu_fn + ".pdf")
             plot_scatter(fname_i, averages_i[~isnan(averages_i)], averages_x_i[~isnan(averages_i)],
                          xlbl=x_label + " - " + sensor_2_name, ylbl=title + " (" + matchup_labels[i] + ")",
-                         title="", yerr=None, xerr=None, txt=None,
+                         title="", yerr=stds_i, xerr=None, txt=None,
                          line='-', legend=None, solid_ylines=[0], ylim=ylim)
 
             # Bin by x for match-up series (all data range)
-            averages_i, averages_x_i = bin(Y[i1:i2], x_i, bins=50, X_range=[xmin, xmax])
+            averages_i, stds_i, averages_x_i = bin(Y[i1:i2], x_i, bins=50, X_range=[xmin, xmax])
             averages.append(averages_i[~isnan(averages_i)])
+            stds.append(stds_i[~isnan(averages_i)])
             averages_x.append(averages_x_i[~isnan(averages_i)])
 
         # 3. Plot all match-up series together
         plot_scatter(pjoin(directory, fname + "." + x_name + "_sensor_2_binned.pdf"), averages, averages_x,
                      xlbl=x_label + " - Sensor 2", ylbl=title, title="",
-                     yerr=None, xerr=None, txt=None, line='-', legend=matchup_labels, legend_loc="outside",
+                     yerr=stds, xerr=None, txt=None, line='-', legend=matchup_labels, legend_loc="outside",
                      solid_ylines=[0], fig_size=(12,8), ylim=ylim)
 
         return 0

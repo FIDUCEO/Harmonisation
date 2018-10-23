@@ -14,7 +14,7 @@ from os.path import join as pjoin
 import sys
 
 '''___EIV Modules___'''
-from version import version, tag
+from ..version import version, tag
 from sensor_data.SensorDataFactory import SensorDataFactory
 
 '''___Authorship___'''

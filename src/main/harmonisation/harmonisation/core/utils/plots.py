@@ -8,7 +8,7 @@ from scipy.stats import kde
 from datetime import datetime
 from numpy import array
 import matplotlib
-from mpl_toolkits.basemap import Basemap
+#from mpl_toolkits.basemap import Basemap
 matplotlib.rcParams['mathtext.fontset'] = 'custom'
 matplotlib.rcParams['mathtext.rm'] = 'Bitstream Vera Sans'
 matplotlib.rcParams['mathtext.it'] = 'Bitstream Vera Sans:italic'
@@ -377,23 +377,23 @@ def plot_density(path, y, x, bins, xlbl, ylbl, title, txt=None, *args, **kwargs)
     plt.show()
 
 
-def plot_map_density(path, lat, lon, bins, title):
-    fig = plt.figure()
-    ax = fig.add_axes([0.05, 0.05, 0.9, 0.9])
-
-    m = Basemap(projection='kav7', lon_0=0, lat_0=0)
-    m.drawcoastlines()
-
-    # draw parallels.
-    m.drawparallels(np.arange(-90., 99., 30.))
-    m.drawmeridians(np.arange(-180., 180., 60.))
-
-    k = kde.gaussian_kde([lon, lat])
-    loni, lati = np.mgrid[lon.min():lon.max():bins * 1j, lat.min():lat.max():bins * 1j]
-    zi = k(np.vstack([loni.flatten(), lati.flatten()]))
-    im = m.pcolormesh(loni, lati, zi.reshape(loni.shape), shading="Flat", cmap="BuGn", latlon=True)
-    cb = m.colorbar(im, "bottom", size="5%", pad="2%")
-    ax.set_title(title)
-
-    plt.savefig(path)
-    return 0
+# def plot_map_density(path, lat, lon, bins, title):
+#     fig = plt.figure()
+#     ax = fig.add_axes([0.05, 0.05, 0.9, 0.9])
+#
+#     m = Basemap(projection='kav7', lon_0=0, lat_0=0)
+#     m.drawcoastlines()
+#
+#     # draw parallels.
+#     m.drawparallels(np.arange(-90., 99., 30.))
+#     m.drawmeridians(np.arange(-180., 180., 60.))
+#
+#     k = kde.gaussian_kde([lon, lat])
+#     loni, lati = np.mgrid[lon.min():lon.max():bins * 1j, lat.min():lat.max():bins * 1j]
+#     zi = k(np.vstack([loni.flatten(), lati.flatten()]))
+#     im = m.pcolormesh(loni, lati, zi.reshape(loni.shape), shading="Flat", cmap="BuGn", latlon=True)
+#     cb = m.colorbar(im, "bottom", size="5%", pad="2%")
+#     ax.set_title(title)
+#
+#     plt.savefig(path)
+#     return 0

@@ -13,3 +13,4 @@ from matchup.matchupToolbox.utils.matchup_maths import evaluate_measurand, evalu
 from matchup.matchupToolbox.harmonisation.harmonisationVis.HarmonisationVis import HarmonisationVis
 from matchup.matchupVis.MatchUpVis import MatchUpVis
 from utils.stats import time_average
+from utils.plots import plot_2dhist, plot_density, plot_scatter

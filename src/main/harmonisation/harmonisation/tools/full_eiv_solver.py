@@ -13,7 +13,7 @@ from os import makedirs
 '''___Third Party Modules___'''
 
 '''___EIV Modules___'''
-from version import version, tag
+from ..version import version, tag
 from common import *
 from HarmonisationOp import HarmonisationOp
 from sensor_data.SensorDataFactory import SensorDataFactory
@@ -87,7 +87,7 @@ def main(parsed_cmdline):
     ################################################################################################################
 
     print("Match-up Dataset Directory:", dataset_dir)
-    print("Sensor Data File:", sensor_data_path)
+    print("Sensor Data File:", sensor_data)
 
     # Run algorithm
     H = HarmonisationOp()

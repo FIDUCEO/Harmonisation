@@ -56,6 +56,7 @@ def bin(Y, X, bins=20, X_range=None):
         X_range = [min(X), max(X)]
 
     averageY = np.zeros(bins)
+    stdY = np.zeros(bins)
     bin_ranges = [X_range[0] + i*(X_range[1]-X_range[0])/bins for i in range(bins+1)]
     bins = np.asarray([(bin_max+bin_min)/2 for bin_min, bin_max in zip(bin_ranges[:-1], bin_ranges[1:])])
 
@@ -66,13 +67,15 @@ def bin(Y, X, bins=20, X_range=None):
 
         try:
             averageY_i = np.average(vals)
+            stdY_i = np.std(vals)
         except:
             averageY_i = np.nan
+            stdY_i = np.nan
 
         averageY[i] = averageY_i
+        stdY[i] = stdY_i
 
-    return averageY, bins
-
+    return averageY, stdY, bins
 if __name__ == "__main__":
     pass
 
