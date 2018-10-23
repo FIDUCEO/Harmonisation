@@ -1,5 +1,5 @@
-# Error-in-Variables Solver
-Software for solving large, non-linear regression problems
+# FIDUCEO Harmonisation Software
+Software for solving large, non-linear errors-in-variables regression problems
 
 ## Dependencies
 
