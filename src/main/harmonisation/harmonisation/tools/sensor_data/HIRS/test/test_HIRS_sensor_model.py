@@ -10,7 +10,7 @@ from os.path import dirname
 '''___Third-Party Modules___'''
 from numpy import array
 
-'''___NPL Modules___'''
+'''___harmonisation Modules___'''
 sys.path.append(dirname(dirname(__file__)))
 
 '''___Authorship___'''

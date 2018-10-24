@@ -9,7 +9,7 @@ import unittest
 from numpy import array, append
 from scipy.sparse import csr_matrix
 
-'''___NPL Modules___'''
+'''___harmonisation Modules___'''
 from harmonisation import MatchUp, SimulateMatchUp
 
 

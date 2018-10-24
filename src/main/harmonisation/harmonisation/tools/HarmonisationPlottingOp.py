@@ -2,7 +2,7 @@
 Harmonsation Output Plotting Implementation
 """
 
-'''___Python Modules___'''
+'''___Built-In Modules___'''
 from os import makedirs
 
 '''___Third Party Modules___'''

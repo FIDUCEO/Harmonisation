@@ -2,7 +2,7 @@
 Sensor Measurement function for MW instruments aboard MHS and AMSU
 """
 
-'''___Python Modules___'''
+'''___Built-In Modules___'''
 
 '''___Third Party Modules___'''
 from numpy import array, zeros, cos, exp, float32

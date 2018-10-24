@@ -2,7 +2,7 @@
 Sensor Measurement functions for HIRS
 """
 
-'''___Python Modules___'''
+'''___Built-In Modules___'''
 
 '''___Third Party Modules___'''
 from numpy import vstack, ones, dot, column_stack, exp

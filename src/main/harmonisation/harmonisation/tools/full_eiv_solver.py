@@ -7,7 +7,7 @@ For usage try:
 python full_eiv_solver.py --help
 """
 
-'''___Python Modules___'''
+'''___Built-In Modules___'''
 from os import makedirs
 
 '''___Third Party Modules___'''

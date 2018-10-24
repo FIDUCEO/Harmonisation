@@ -8,7 +8,7 @@ import unittest
 '''___Third-Party Modules___'''
 from numpy import array, vstack, ones, dot, column_stack, eye
 
-'''___NPL Modules___'''
+'''___harmonisation Modules___'''
 from harmonisation import MatchUp, Uncertainty, evaluate_measurand, evaluate_adjusted_measurand, evaluate_K
 
 

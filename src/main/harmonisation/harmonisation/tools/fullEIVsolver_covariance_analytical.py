@@ -2,7 +2,7 @@
 Compute covariance matrix for completed full EIV harmonisation run
 """
 
-'''___Python Modules___'''
+'''___Built-In Modules___'''
 from os import makedirs
 from os.path import basename, dirname
 from os.path import join as pjoin

@@ -9,7 +9,7 @@ from datetime import datetime as dt
 '''___Third-Party Modules___'''
 from numpy import array, nan, isnan
 
-'''___NPL Modules___'''
+'''___harmonisation Modules___'''
 from harmonisation.core.utils.stats import time_average
 
 

@@ -2,7 +2,7 @@
 Harmonsation Output Plotting Implementation
 """
 
-'''___Python Modules___'''
+'''___Built-In Modules___'''
 from os import makedirs
 from os.path import basename, dirname
 from sys import argv

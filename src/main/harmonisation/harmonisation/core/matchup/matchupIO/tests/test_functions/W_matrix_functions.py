@@ -3,7 +3,7 @@ Functions convert N scipy.sparse.csr_matrix object W matrices into corresponding
 and attach them to files
 """
 
-'''___Python Modules___'''
+'''___Built-In Modules___'''
 from numpy import zeros
 
 '''___Third Party Modules___'''

@@ -9,7 +9,7 @@ from copy import deepcopy
 '''___Third-Party Modules___'''
 from numpy import zeros, bool_, float32
 
-'''___NPL Modules___'''
+'''___harmonisation Modules___'''
 from harmonisation import MatchUp
 
 

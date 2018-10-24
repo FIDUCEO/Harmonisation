@@ -2,7 +2,7 @@
 Compute covariance matrix for completed full EIV harmonisation run by Monte Carlo
 """
 
-'''___Python Modules___'''
+'''___Built-In Modules___'''
 from os import makedirs
 from os.path import basename
 from sys import argv

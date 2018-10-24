@@ -2,7 +2,7 @@
 Full EIV main script common functions
 """
 
-'''___Python Modules___'''
+'''___Built-In Modules___'''
 import ConfigParser
 import logging
 import argparse

@@ -2,7 +2,7 @@
 Main Operator of FIDUCEO Harmonisation Implementation
 """
 
-'''___Python Modules___'''
+'''___Built-In Modules___'''
 from glob import glob
 from copy import deepcopy
 from os import makedirs

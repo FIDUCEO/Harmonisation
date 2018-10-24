@@ -2,7 +2,7 @@
 Contains the functionality to run the NPL Full EIV harmonisation method
 """
 
-'''___Python Modules___'''
+'''___Built-In Modules___'''
 from copy import deepcopy
 from time import time
 from numpy.linalg import cholesky

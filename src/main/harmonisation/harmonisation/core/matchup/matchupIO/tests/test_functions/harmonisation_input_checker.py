@@ -5,7 +5,7 @@ Usage:
 python harmonisation_input_checker.py path/to/matchup/file.nc
 """
 
-'''___Python Modules___'''
+'''___Built-In Modules___'''
 import sys
 
 '''___Third Party Modules___'''

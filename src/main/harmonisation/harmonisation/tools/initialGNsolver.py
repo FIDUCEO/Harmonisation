@@ -5,7 +5,7 @@ Usage:
 python fullEIVsolver.py /path/to/job.cfg
 """
 
-'''___Python Modules___'''
+'''___Built-In Modules___'''
 from os import makedirs
 from os.path import basename
 from sys import argv

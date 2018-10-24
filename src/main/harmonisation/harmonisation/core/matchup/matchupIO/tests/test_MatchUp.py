@@ -16,7 +16,7 @@ from random import random
 from numpy import array, ndarray, savetxt
 from scipy.sparse import csr_matrix
 
-'''___NPL Modules___'''
+'''___harmonisation Modules___'''
 from test_functions.W_matrix_functions import write_input_file, return_w_matrix_variables, append_W_to_input_file
 from harmonisation import MatchUp, Uncertainty
 

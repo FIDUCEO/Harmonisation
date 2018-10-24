@@ -2,12 +2,12 @@
 Factory for sensor data
 """
 
-'''___Python Modules___'''
+'''___Built-In Modules___'''
 from collections import OrderedDict
 
 '''___Third Party Modules___'''
 
-'''___EIV Modules___'''
+'''___harmonisation Modules___'''
 from AVHRR.AVHRR_11um_3_rescaled_sensor_data import AVHRR11um3Rescaled
 from AVHRR.AVHRR_12um_3_rescaled_sensor_data import AVHRR12um3Rescaled
 from AVHRR.AVHRR_37um_2_rescaled_sensor_data import AVHRR37um2Rescaled
