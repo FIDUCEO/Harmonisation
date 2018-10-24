@@ -1,32 +1,25 @@
 """
-Main Operator of NPL Harmonisation Implementation
+Main Operator of FIDUCEO Harmonisation Implementation
 """
 
 '''___Python Modules___'''
 from glob import glob
 from copy import deepcopy
 from os import makedirs
-from os.path import basename, dirname
-from os.path import join as pjoin
-import sys
-from sys import argv
 
 '''___Third Party Modules___'''
-from numpy import array_equal
 from numpy import append, zeros, loadtxt, mean, std, cov, savetxt
 from numpy.random import normal
 from numpy import all as nall
 
-'''___Harmonisation Modules___'''
+'''___harmonisation Modules___'''
 from common import *
+from harmonisation import MatchUp, HarmonisationEIV, HarmonisationResult, Sample2Ind, Transform2NormInd
+from harmonisation.core.matchup.matchupToolbox.harmonisation.\
+    harmonisationProcessing.harmonisation_eiv.GN_algo import GNAlgo
+from harmonisation.core.matchup.matchupToolbox.harmonisation.\
+    harmonisationProcessing.harmonisation_eiv_pc.pc_algo import PCAlgo
 
-
-main_directory = dirname(dirname(__file__))
-sys.path.append(main_directory)
-from core import MatchUp
-from core import HarmonisationEIV
-from core import HarmonisationResult
-from core import GNAlgo, PCAlgo, Sample2Ind, Transform2NormInd
 
 '''___Authorship___'''
 __author__ = ["Sam Hunt", "Peter Harris"]

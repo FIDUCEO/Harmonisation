@@ -12,9 +12,19 @@ from os import makedirs
 
 '''___Third Party Modules___'''
 
-'''___Harmonisation Modules___'''
+'''___harmonisation Modules___'''
 from common import *
 from HarmonisationPlottingOp import HarmonisationPlottingOp
+
+
+'''___Authorship___'''
+__author__ = ["Sam Hunt", "Peter Harris"]
+__created__ = "20/10/2018"
+__credits__ = ["Jon Mittaz"]
+__version__ = "0.0"
+__maintainer__ = "Sam Hunt"
+__email__ = "sam.hunt@npl.co.uk"
+__status__ = "Development"
 
 
 parsed_cmdline = parse_cmdline(solver_options=False)

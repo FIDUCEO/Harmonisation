@@ -12,11 +12,12 @@ from os import makedirs
 
 '''___Third Party Modules___'''
 
-'''___EIV Modules___'''
+'''___harmonisation Modules___'''
 from ..version import version, tag
 from common import *
 from HarmonisationOp import HarmonisationOp
 from sensor_data.SensorDataFactory import SensorDataFactory
+
 
 '''___Authorship___'''
 __author__ = ["Sam Hunt", "Peter Harris"]

@@ -3,19 +3,15 @@ Contains the functionality to run the NPL Full EIV harmonisation method precondi
 """
 
 '''___Python Modules___'''
-import sys
-from os.path import dirname
-from os.path import join as pjoin
 from copy import deepcopy
 
 '''___Third Party Modules___'''
 
 
-'''___Harmonisation Modules___'''
-harmonisationIO_directory = pjoin(dirname(dirname(dirname(__file__))), "harmonisationIO")
-sys.path.append(harmonisationIO_directory)
-from HarmonisationResult import HarmonisationResult
+'''___harmonisation Modules___'''
+from harmonisation import HarmonisationResult
 from pc_algo import PCAlgo
+
 
 '''___Authorship___'''
 __author__ = ["Sam Hunt", "Peter Harris"]

@@ -3,34 +3,16 @@ Contains the functionality to run the NPL Full EIV harmonisation method
 """
 
 '''___Python Modules___'''
-import sys
-from os.path import dirname
-from os import makedirs
-from os.path import join as pjoin
 from copy import deepcopy
-import cPickle
 from time import time
 from numpy.linalg import cholesky
 
 '''___Third Party Modules___'''
-from netCDF4 import Dataset
 
-'''___Harmonisation Modules___'''
-matchupProcessing_directory = pjoin(dirname(dirname(dirname(dirname(dirname(__file__))))), "matchupProcessing")
-sys.path.append(matchupProcessing_directory)
-from sample2ind.Sample2Ind import Sample2Ind
-from transform2normind.Transform2NormInd import Transform2NormInd
-
-harmonisationIO_directory = pjoin(dirname(dirname(dirname(__file__))), "harmonisationIO")
-sys.path.append(harmonisationIO_directory)
-from HarmonisationResult import HarmonisationResult
-
-harmonisation_eiv_pc_directory = pjoin(dirname(dirname(__file__)), "harmonisation_eiv_pc")
-sys.path.append(harmonisation_eiv_pc_directory)
-from HarmonisationEIVPC import HarmonisationEIVPC
-
-
+'''___harmonisation Modules___'''
+from harmonisation import Sample2Ind, Transform2NormInd, HarmonisationResult, HarmonisationEIVPC
 from GN_algo import GNAlgo
+
 
 '''___Authorship___'''
 __author__ = ["Sam Hunt", "Peter Harris"]

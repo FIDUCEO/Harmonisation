@@ -15,7 +15,8 @@ ctypedef np.int32_t DTYPEi_t
 ctypedef np.float32_t DTYPEf_t
 ctypedef np.float64_t DTYPEd_t
 
-'''___NPL Modules___'''
+'''___harmonisation Modules___'''
+
 
 '''___Authorship___'''
 __author__ = ["Sam Hunt", "Peter Harris", "Jon Mittaz"]

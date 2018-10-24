@@ -6,7 +6,7 @@ HIRS Channel 12 sensor data
 
 '''___Third Party Modules____'''
 
-'''___EIV Modules___'''
+'''___harmonisation Modules___'''
 from HIRS_config_functions import return_sensor_data
 
 
@@ -18,6 +18,7 @@ __version__ = "0.0"
 __maintainer__ = "Sam Hunt"
 __email__ = "sam.hunt@npl.co.uk"
 __status__ = "Development"
+
 
 '''___Constant___'''
 channel_num = 12

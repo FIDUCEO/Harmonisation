@@ -7,7 +7,8 @@ Sensor Measurement functions for HIRS
 '''___Third Party Modules___'''
 from numpy import vstack, ones, dot, column_stack, exp
 
-'''___Harmonisation Modules___'''
+'''___harmonisation Modules___'''
+
 
 '''___Authorship___'''
 __author__ = ["Sam Hunt"]

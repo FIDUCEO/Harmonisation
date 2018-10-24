@@ -3,26 +3,17 @@ Module containing harmonisation result plotting functions
 """
 
 '''___Python Modules____'''
-import sys
-from os.path import dirname
 from os.path import join as pjoin
-import matplotlib
 from copy import deepcopy
-# Force matplotlib to not use any Xwindows backend.
-matplotlib.use('Agg')
-from numpy import isnan, sort, arange, sort
-from numpy.random import rand
 
-matchupToolbox_directory = pjoin(dirname(dirname(dirname(dirname(__file__)))), "matchupToolbox")
-sys.path.append(matchupToolbox_directory)
-from utils.matchup_maths import evaluate_K, evaluate_adjusted_measurand, evaluate_measurand
+'''__Third Party Modules___'''
+import matplotlib
+matplotlib.use('Agg')  # Force matplotlib to not use any Xwindows backend.
 
-above_nplcore_directory = dirname(dirname(dirname(dirname(dirname(dirname(__file__))))))
-sys.path.append(above_nplcore_directory)
+'''___harmonisation Modules___'''
+from harmonisation import evaluate_K, evaluate_adjusted_measurand, evaluate_measurand, SimulateMatchUp, MatchUpVis
+from harmonisation.core.utils.plots import plot_scatter, plot_2dhist, plot_density
 
-from core.utils.plots import plot_scatter, plot_2dhist, plot_density
-from core.matchup.matchupVis.MatchUpVis import MatchUpVis
-from core.matchup.matchupProcessing.simulate_matchup.SimulateMatchUp import SimulateMatchUp
 
 '''___Authorship___'''
 __author__ = ["Sam Hunt"]

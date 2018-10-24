@@ -16,8 +16,9 @@ from numpy import array, zeros, loadtxt, append, vstack, arange, asarray, cumsum
 from scipy.sparse import csr_matrix
 from netCDF4 import Dataset
 
-'''___EOPy Modules___'''
+'''___harmonisation Modules___'''
 from Uncertainty import Uncertainty
+
 
 '''___Authorship___'''
 __author__ = ["Sam Hunt", "Peter Harris"]

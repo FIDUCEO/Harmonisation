@@ -12,14 +12,12 @@ from numpy import append, zeros, loadtxt
 from numpy.random import normal
 from netCDF4 import Dataset
 
-'''___Harmonisation Modules___'''
+'''___harmonisation Modules___'''
 from common import *
 from HarmonisationOp import HarmonisationOp
-
-main_directory = dirname(dirname(__file__))
-sys.path.append(main_directory)
-from core import GNAlgo
-from core import HarmonisationResult
+from harmonisation import HarmonisationResult
+from harmonisation.core.matchup.matchupToolbox.harmonisation.\
+    harmonisationProcessing.harmonisation_eiv.GN_algo import GNAlgo
 
 '''___Authorship___'''
 __author__ = ["Sam Hunt", "Peter Harris"]

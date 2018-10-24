@@ -13,9 +13,10 @@ from os.path import isfile, abspath, split, splitext
 from os.path import join as pjoin
 import sys
 
-'''___EIV Modules___'''
+'''___harmonisation Modules___'''
 from ..version import version, tag
 from sensor_data.SensorDataFactory import SensorDataFactory
+
 
 '''___Authorship___'''
 __author__ = ["Sam Hunt", "Peter Harris"]

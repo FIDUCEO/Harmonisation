@@ -5,17 +5,13 @@ uncertainties of unity
 
 '''___Built-In Modules___'''
 from copy import deepcopy
-import sys
-from os.path import dirname
-from os.path import join as pjoin
 
 '''___Third-Party Modules___'''
 from numpy import zeros, linspace, float32
 
-'''___NPL Modules___'''
-matchupIO_directory = pjoin(dirname(dirname(dirname(__file__))), "matchupIO")
-sys.path.append(matchupIO_directory)
-from MatchUp import MatchUp
+'''___harmonisation Modules___'''
+from harmonisation import MatchUp
+
 
 '''___Authorship___'''
 __author__ = ["Sam Hunt", "Peter Harris"]

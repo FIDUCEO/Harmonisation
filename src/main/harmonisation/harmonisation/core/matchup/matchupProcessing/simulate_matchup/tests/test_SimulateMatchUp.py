@@ -1,25 +1,17 @@
 """
-Tests for Transform2NormInd
+Tests for SimulateMatchUp
 """
 
 '''___Built-In Modules___'''
 import unittest
-from os.path import dirname
-from os.path import join as pjoin
-import sys
 
 '''___Third-Party Modules___'''
 from numpy import array, append
 from scipy.sparse import csr_matrix
 
 '''___NPL Modules___'''
-transform2normind_directory = dirname(dirname(__file__))
-sys.path.append(transform2normind_directory)
-from SimulateMatchUp import SimulateMatchUp
+from harmonisation import MatchUp, SimulateMatchUp
 
-matchupIO_directory = pjoin(dirname(dirname(dirname(dirname(__file__)))), "matchupIO")
-sys.path.append(matchupIO_directory)
-from MatchUp import MatchUp
 
 '''___Authorship___'''
 __author__ = "Sam Hunt"

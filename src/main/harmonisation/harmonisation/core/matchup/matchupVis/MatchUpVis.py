@@ -6,15 +6,17 @@ Module containing harmonisation result plotting functions
 import sys
 from os.path import dirname
 from os.path import join as pjoin
+
+'''___Third Party Modules___'''
 import matplotlib
 # Force matplotlib to not use any Xwindows backend.
 matplotlib.use('Agg')
 from numpy import isnan, sort, arange, sort
 from numpy.random import rand
 
-above_nplcore_directory = dirname(dirname(dirname(dirname(__file__))))
-from core.utils.plots import plot_scatter, plot_density
-from core.utils.stats import time_average, bin
+'''___harmonisation Modules___'''
+from harmonisation.core.utils.plots import plot_scatter, plot_density
+from harmonisation.core.utils.stats import time_average, bin
 
 '''___Authorship___'''
 __author__ = ["Sam Hunt"]

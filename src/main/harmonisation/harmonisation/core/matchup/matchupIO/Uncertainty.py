@@ -6,7 +6,8 @@ Uncertainty Class - Class to hold data uncertainty information
 
 '''___Third-Party Modules___'''
 
-'''___EOPy Modules___'''
+'''___harmonisation Modules___'''
+
 
 '''___Authorship___'''
 __author__ = ["Sam Hunt", "Peter Harris"]

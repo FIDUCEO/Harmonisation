@@ -3,24 +3,20 @@ Implements the algorithm to calculate the pre-conditioner solution of the full a
 """
 
 '''___Python Modules____'''
-import os.path
 from math import ceil
 from copy import deepcopy
-import sys
-from os.path import join as pjoin
-from os.path import dirname
 
 '''___Third Party Modules___'''
-from numpy import loadtxt, append, eye, dot, zeros, ones, outer, diag, set_printoptions, nan, float32, asarray, count_nonzero, arange, int32
+from numpy import append, eye, dot, zeros, ones, outer, diag, set_printoptions, nan, float32, asarray, int32
 from numpy.linalg import norm, cholesky, solve, lstsq
 from scipy.linalg import qr
 from scipy.optimize import least_squares
 set_printoptions(threshold=nan)
 
 '''___Harmonisation Modules___'''
-harmonisation_eiv_directory = pjoin(dirname(dirname(__file__)), "harmonisation_eiv")
-sys.path.append(harmonisation_eiv_directory)
-from GN_algo import GNAlgo
+from harmonisation.core.matchup.matchupToolbox.harmonisation.\
+    harmonisationProcessing.harmonisation_eiv.GN_algo import GNAlgo
+
 
 '''___Authorship___'''
 __author__ = ["Sam Hunt", "Peter Harris"]

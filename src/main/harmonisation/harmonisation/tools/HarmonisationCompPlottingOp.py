@@ -12,13 +12,10 @@ from sys import argv
 '''___Third Party Modules___'''
 from numpy import concatenate
 
-'''___Harmonisation Modules___'''
+'''___harmonisation Modules___'''
 from common import *
+from harmonisation import HarmonisationResult, HarmonisationVis
 
-main_directory = dirname(dirname(__file__))
-sys.path.append(main_directory)
-from core import HarmonisationResult
-from core import HarmonisationVis
 
 '''___Authorship___'''
 __author__ = ["Sam Hunt", "Peter Harris"]
@@ -28,6 +25,7 @@ __version__ = "0.0"
 __maintainer__ = "Sam Hunt"
 __email__ = "sam.hunt@npl.co.uk"
 __status__ = "Development"
+
 
 def try_makedirs(directory):
     try:

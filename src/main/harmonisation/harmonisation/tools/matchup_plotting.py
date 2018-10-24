@@ -5,18 +5,13 @@ Harmonsation Output Plotting Implementation
 '''___Python Modules___'''
 from os import makedirs
 from os.path import basename, dirname
-from os.path import join as pjoin
-import sys
 from sys import argv
 
 '''___Third Party Modules___'''
 
 '''___Harmonisation Modules___'''
 from common import *
-
-main_directory = dirname(dirname(__file__))
-sys.path.append(main_directory)
-from core import MatchUpVis
+from harmonisation import MatchUpVis
 
 '''___Authorship___'''
 __author__ = ["Sam Hunt"]

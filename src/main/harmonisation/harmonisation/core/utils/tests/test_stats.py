@@ -4,18 +4,14 @@ Test of stats module functions
 
 '''___Built-In Modules___'''
 import unittest
-from os.path import dirname
-from os.path import join as pjoin
-import sys
 from datetime import datetime as dt
 
 '''___Third-Party Modules___'''
 from numpy import array, nan, isnan
 
 '''___NPL Modules___'''
-util_directory = dirname(dirname(__file__))
-sys.path.append(util_directory)
-from stats import time_average
+from harmonisation.core.utils.stats import time_average
+
 
 '''___Authorship___'''
 __author__ = "Sam Hunt"

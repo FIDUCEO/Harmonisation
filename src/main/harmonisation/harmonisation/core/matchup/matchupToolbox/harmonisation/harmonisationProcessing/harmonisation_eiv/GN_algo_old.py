@@ -16,7 +16,8 @@ from numpy.linalg import norm, solve
 from scipy.sparse.linalg import LinearOperator
 from math import ceil
 
-'''___Harmonisation Modules___'''
+'''___harmonisation Modules___'''
+
 
 '''___Authorship___'''
 __author__ = ["Sam Hunt", "Peter Harris"]

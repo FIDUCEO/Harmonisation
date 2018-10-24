@@ -9,9 +9,10 @@ from os.path import join as pjoin
 
 '''___Third Party Modules____'''
 
-'''___NPL Modules___'''
+'''___harmonisation Modules___'''
 from HIRS_sensor_models import sensor_model_3 as HIRS_sensor_function
 from HIRS_sensor_models import sensor_model_ref as reference_sensor_function
+
 
 '''___Authorship___'''
 __author__ = ["Sam Hunt"]

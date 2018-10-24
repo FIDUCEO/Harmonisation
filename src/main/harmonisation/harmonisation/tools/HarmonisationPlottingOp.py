@@ -4,17 +4,14 @@ Harmonsation Output Plotting Implementation
 
 '''___Python Modules___'''
 from os import makedirs
-from os.path import dirname
 
 '''___Third Party Modules___'''
 from numpy import concatenate
 
 '''___Harmonisation Modules___'''
 from common import *
+from harmonisation import MatchUp, HarmonisationResult, HarmonisationVis
 
-main_directory = dirname(dirname(__file__))
-sys.path.append(main_directory)
-from core import MatchUp, HarmonisationResult, HarmonisationVis
 
 '''___Authorship___'''
 __author__ = ["Sam Hunt", "Peter Harris"]

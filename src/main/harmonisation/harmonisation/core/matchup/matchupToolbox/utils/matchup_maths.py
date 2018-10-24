@@ -7,7 +7,8 @@ Module containing functions to evaluate MatchUp data
 '''___Third Party Modules___'''
 from numpy import zeros, asarray, float32, float64, array, outer, diag
 
-'''___Harmonisation Modules___'''
+'''___harmonisation Modules___'''
+
 
 '''___Authorship___'''
 __author__ = "Sam Hunt"

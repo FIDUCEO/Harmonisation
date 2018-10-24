@@ -17,12 +17,9 @@ from numpy import array, ndarray, savetxt
 from scipy.sparse import csr_matrix
 
 '''___NPL Modules___'''
-sys.path.append("test_functions")
-from W_matrix_functions import write_input_file, return_w_matrix_variables, append_W_to_input_file
+from test_functions.W_matrix_functions import write_input_file, return_w_matrix_variables, append_W_to_input_file
+from harmonisation import MatchUp, Uncertainty
 
-sys.path.append(dirname(dirname(__file__)))
-from CorrelForm import CorrelForm
-from MatchUp import MatchUp
 
 '''___Authorship___'''
 __author__ = "Sam Hunt"
@@ -35,6 +32,7 @@ __status__ = "Development"
 
 # Constant
 temp_data_directory = pjoin(getcwd(), "temp")
+
 
 class TestMatchUp(unittest.TestCase):
     def test_openMatchUpData_multi_r__(self):
@@ -198,21 +196,21 @@ class TestMatchUp(unittest.TestCase):
                                  30.2, 20.4, 28.2, 50.7, 45.6,
                                  29.2, 37.4, 28.2, 50.7,
                                  28.2, 32.4, 22.2, 53.7, ])
-        unc_expected = [CorrelForm("r", array([1.6, 1.5, 1.5, 1.3, 1.5])),
-                        CorrelForm("r", array([3.1, 3.2, 3.2, 3.1, 3.0])),
-                        CorrelForm("r", array([3.3, 3.4, 3.1, 3.2])),
-                        CorrelForm("r", array([2.1, 2.2, 2.2, 2.1])),
-                        CorrelForm("r", array([5.0, 4.7, 5.1, 5.2, 5.3])),
-                        CorrelForm("r", array([4.2, 4.3, 4.4, 4.3])),
-                        CorrelForm("r", array([4.0, 3.7, 4.4, 4.7])),
-                        CorrelForm("r", array([2.2, 1.7, 2.0, 4.3, 2.6])),
-                        CorrelForm("r", array([2.3, 1.2, 2.3, 4.4])),
-                        CorrelForm("r", array([3.2, 2.7, 3.0, 5.3]))]
+        unc_expected = [Uncertainty("r", array([1.6, 1.5, 1.5, 1.3, 1.5])),
+                        Uncertainty("r", array([3.1, 3.2, 3.2, 3.1, 3.0])),
+                        Uncertainty("r", array([3.3, 3.4, 3.1, 3.2])),
+                        Uncertainty("r", array([2.1, 2.2, 2.2, 2.1])),
+                        Uncertainty("r", array([5.0, 4.7, 5.1, 5.2, 5.3])),
+                        Uncertainty("r", array([4.2, 4.3, 4.4, 4.3])),
+                        Uncertainty("r", array([4.0, 3.7, 4.4, 4.7])),
+                        Uncertainty("r", array([2.2, 1.7, 2.0, 4.3, 2.6])),
+                        Uncertainty("r", array([2.3, 1.2, 2.3, 4.4])),
+                        Uncertainty("r", array([3.2, 2.7, 3.0, 5.3]))]
         w_matrices_expected = []
         u_matrices_expected = []
         ks_expected = array([1.2, 1.7, 1.3, 1.4, 1.3, 3.2, 3.7, 3.3, 3.4])
-        unck_expected = [CorrelForm("r", array([0.25, 0.25, 0.25, 0.25, 0.25])),
-                         CorrelForm("r", array([0.2644, 0.2644, 0.2644, 0.2644]))]
+        unck_expected = [Uncertainty("r", array([0.25, 0.25, 0.25, 0.25, 0.25])),
+                         Uncertainty("r", array([0.2644, 0.2644, 0.2644, 0.2644]))]
         time1_expected = array([dt(1970, 1, 1, 1, 0, 1),
                                 dt(1970, 1, 1, 1, 0, 2),
                                 dt(1970, 1, 1, 1, 0, 3),
@@ -461,21 +459,21 @@ class TestMatchUp(unittest.TestCase):
                                  30.2, 20.4, 28.2, 50.7, 45.6,
                                  29.2, 37.4, 28.2, 50.7,
                                  28.2, 32.4, 22.2, 53.7, ])
-        unc_expected = [CorrelForm("r", array([1.6, 1.5, 1.5, 1.3, 1.5])),
-                        CorrelForm("r", array([3.1, 3.2, 3.2, 3.1, 3.0])),
-                        CorrelForm("r", array([3.3, 3.4, 3.1, 3.2])),
-                        CorrelForm("r", array([2.1, 2.2, 2.2, 2.1])),
-                        CorrelForm("rs", (array([5.0, 4.7, 5.1, 5.2, 5.3]), 1.0)),
-                        CorrelForm("rs", (array([4.2, 4.3, 4.4, 4.3]), 1.0)),
-                        CorrelForm("rs", (array([4.0, 3.7, 4.4, 4.7]), 2.0)),
-                        CorrelForm("r", array([2.2, 1.7, 2.0, 4.3, 2.6])),
-                        CorrelForm("r", array([2.3, 1.2, 2.3, 4.4])),
-                        CorrelForm("r", array([3.2, 2.7, 3.0, 5.3]))]
+        unc_expected = [Uncertainty("r", array([1.6, 1.5, 1.5, 1.3, 1.5])),
+                        Uncertainty("r", array([3.1, 3.2, 3.2, 3.1, 3.0])),
+                        Uncertainty("r", array([3.3, 3.4, 3.1, 3.2])),
+                        Uncertainty("r", array([2.1, 2.2, 2.2, 2.1])),
+                        Uncertainty("rs", (array([5.0, 4.7, 5.1, 5.2, 5.3]), 1.0)),
+                        Uncertainty("rs", (array([4.2, 4.3, 4.4, 4.3]), 1.0)),
+                        Uncertainty("rs", (array([4.0, 3.7, 4.4, 4.7]), 2.0)),
+                        Uncertainty("r", array([2.2, 1.7, 2.0, 4.3, 2.6])),
+                        Uncertainty("r", array([2.3, 1.2, 2.3, 4.4])),
+                        Uncertainty("r", array([3.2, 2.7, 3.0, 5.3]))]
         w_matrices_expected = []
         u_matrices_expected = []
         ks_expected = array([1.2, 1.7, 1.3, 1.4, 1.3, 3.2, 3.7, 3.3, 3.4])
-        unck_expected = [CorrelForm("r", array([0.25, 0.25, 0.25, 0.25, 0.25])),
-                         CorrelForm("r", array([0.2644, 0.2644, 0.2644, 0.2644]))]
+        unck_expected = [Uncertainty("r", array([0.25, 0.25, 0.25, 0.25, 0.25])),
+                         Uncertainty("r", array([0.2644, 0.2644, 0.2644, 0.2644]))]
         time1_expected = array([dt(1970, 1, 1, 1, 0, 1),
                                 dt(1970, 1, 1, 1, 0, 2),
                                 dt(1970, 1, 1, 1, 0, 3),
@@ -778,23 +776,23 @@ class TestMatchUp(unittest.TestCase):
                                  30.2, 20.4, 28.2, 50.7, 45.6,
                                  29.2, 37.4, 28.2, 50.7,
                                  28.2, 32.4, 22.2, 53.7, ])
-        unc_expected = [CorrelForm("r", array([1.6, 1.5, 1.5, 1.3, 1.5])),
-                        CorrelForm("r", array([3.1, 3.2, 3.2, 3.1, 3.0])),
-                        CorrelForm("r", array([3.3, 3.4, 3.1, 3.2])),
-                        CorrelForm("r", array([2.1, 2.2, 2.2, 2.1])),
-                        CorrelForm("rs", (array([5.0, 4.7, 5.1, 5.2, 5.3]), 1.0)),
-                        CorrelForm("rs", (array([4.2, 4.3, 4.4, 4.3]), 1.0)),
-                        CorrelForm("rs", (array([4.0, 3.7, 4.4, 4.7]), 2.0)),
-                        CorrelForm("ave", (0, 0)),
-                        CorrelForm("ave", (1, 1)),
-                        CorrelForm("ave", (2, 2))]
+        unc_expected = [Uncertainty("r", array([1.6, 1.5, 1.5, 1.3, 1.5])),
+                        Uncertainty("r", array([3.1, 3.2, 3.2, 3.1, 3.0])),
+                        Uncertainty("r", array([3.3, 3.4, 3.1, 3.2])),
+                        Uncertainty("r", array([2.1, 2.2, 2.2, 2.1])),
+                        Uncertainty("rs", (array([5.0, 4.7, 5.1, 5.2, 5.3]), 1.0)),
+                        Uncertainty("rs", (array([4.2, 4.3, 4.4, 4.3]), 1.0)),
+                        Uncertainty("rs", (array([4.0, 3.7, 4.4, 4.7]), 2.0)),
+                        Uncertainty("ave", (0, 0)),
+                        Uncertainty("ave", (1, 1)),
+                        Uncertainty("ave", (2, 2))]
         w_matrices_expected = [w2_matchup1, w12_matchup2]
         u_matrices_expected = [u_matrix2_matchup1,
                                         u_matrix1_matchup2,
                                         u_matrix2_matchup2]
         ks_expected = array([1.2, 1.7, 1.3, 1.4, 1.3, 3.2, 3.7, 3.3, 3.4])
-        unck_expected = [CorrelForm("r", array([0.25, 0.25, 0.25, 0.25, 0.25])),
-                         CorrelForm("r", array([0.2644, 0.2644, 0.2644, 0.2644]))]
+        unck_expected = [Uncertainty("r", array([0.25, 0.25, 0.25, 0.25, 0.25])),
+                         Uncertainty("r", array([0.2644, 0.2644, 0.2644, 0.2644]))]
         time1_expected = array([dt(1970, 1, 1, 1, 0, 1),
                                 dt(1970, 1, 1, 1, 0, 2),
                                 dt(1970, 1, 1, 1, 0, 3),
@@ -1115,16 +1113,16 @@ class TestMatchUp(unittest.TestCase):
                                  30.2, 20.4, 28.2, 50.7, 45.6,
                                  29.2, 37.4, 28.2, 50.7,
                                  28.2, 32.4, 22.2, 53.7, ])
-        unc_expected = [CorrelForm("r", array([1.6, 1.5, 1.5, 1.3, 1.5])),
-                        CorrelForm("r", array([3.1, 3.2, 3.2, 3.1, 3.0])),
-                        CorrelForm("r", array([3.3, 3.4, 3.1, 3.2])),
-                        CorrelForm("r", array([2.1, 2.2, 2.2, 2.1])),
-                        CorrelForm("ave", (0, 0)),
-                        CorrelForm("ave", (0, 1)),
-                        CorrelForm("ave", (1, 2)),
-                        CorrelForm("ave", (1, 3)),
-                        CorrelForm("ave", (2, 4)),
-                        CorrelForm("ave", (2, 5))]
+        unc_expected = [Uncertainty("r", array([1.6, 1.5, 1.5, 1.3, 1.5])),
+                        Uncertainty("r", array([3.1, 3.2, 3.2, 3.1, 3.0])),
+                        Uncertainty("r", array([3.3, 3.4, 3.1, 3.2])),
+                        Uncertainty("r", array([2.1, 2.2, 2.2, 2.1])),
+                        Uncertainty("ave", (0, 0)),
+                        Uncertainty("ave", (0, 1)),
+                        Uncertainty("ave", (1, 2)),
+                        Uncertainty("ave", (1, 3)),
+                        Uncertainty("ave", (2, 4)),
+                        Uncertainty("ave", (2, 5))]
         w_matrices_expected = [w2_matchup1, w1_matchup2, w2_matchup2]
         u_matrices_expected = [u_matrix2_matchup1,
                                         u_matrix1_matchup2,
@@ -1132,8 +1130,8 @@ class TestMatchUp(unittest.TestCase):
                                         u_matrix3_matchup2,
                                         u_matrix4_matchup2]
         ks_expected = array([1.2, 1.7, 1.3, 1.4, 1.3, 3.2, 3.7, 3.3, 3.4])
-        unck_expected = [CorrelForm("r", array([0.25, 0.25, 0.25, 0.25, 0.25])),
-                         CorrelForm("r", array([0.2644, 0.2644, 0.2644, 0.2644]))]
+        unck_expected = [Uncertainty("r", array([0.25, 0.25, 0.25, 0.25, 0.25])),
+                         Uncertainty("r", array([0.2644, 0.2644, 0.2644, 0.2644]))]
         time1_expected = array([dt(1970, 1, 1, 1, 0, 1),
                                 dt(1970, 1, 1, 1, 0, 2),
                                 dt(1970, 1, 1, 1, 0, 3),
@@ -1391,21 +1389,21 @@ class TestMatchUp(unittest.TestCase):
                                  30.2, 20.4, 28.2, 50.7, 45.6,
                                  29.2, 37.4, 28.2, 50.7,
                                  28.2, 32.4, 22.2, 53.7, ])
-        unc_expected = [CorrelForm("r", array([1.6, 1.5, 1.5, 1.3, 1.5])),
-                        CorrelForm("r", array([3.1, 3.2, 3.2, 3.1, 3.0])),
-                        CorrelForm("r", array([3.3, 3.4, 3.1, 3.2])),
-                        CorrelForm("r", array([2.1, 2.2, 2.2, 2.1])),
-                        CorrelForm("r", array([5.0, 4.7, 5.1, 5.2, 5.3])),
-                        CorrelForm("r", array([4.2, 4.3, 4.4, 4.3])),
-                        CorrelForm("r", array([4.0, 3.7, 4.4, 4.7])),
-                        CorrelForm("r", array([2.2, 1.7, 2.0, 4.3, 2.6])),
-                        CorrelForm("r", array([2.3, 1.2, 2.3, 4.4])),
-                        CorrelForm("r", array([3.2, 2.7, 3.0, 5.3]))]
+        unc_expected = [Uncertainty("r", array([1.6, 1.5, 1.5, 1.3, 1.5])),
+                        Uncertainty("r", array([3.1, 3.2, 3.2, 3.1, 3.0])),
+                        Uncertainty("r", array([3.3, 3.4, 3.1, 3.2])),
+                        Uncertainty("r", array([2.1, 2.2, 2.2, 2.1])),
+                        Uncertainty("r", array([5.0, 4.7, 5.1, 5.2, 5.3])),
+                        Uncertainty("r", array([4.2, 4.3, 4.4, 4.3])),
+                        Uncertainty("r", array([4.0, 3.7, 4.4, 4.7])),
+                        Uncertainty("r", array([2.2, 1.7, 2.0, 4.3, 2.6])),
+                        Uncertainty("r", array([2.3, 1.2, 2.3, 4.4])),
+                        Uncertainty("r", array([3.2, 2.7, 3.0, 5.3]))]
         w_matrices_expected = []
         u_matrices_expected = []
         ks_expected = array([1.2, 1.7, 1.3, 1.4, 1.3, 3.2, 3.7, 3.3, 3.4])
-        unck_expected = [CorrelForm("r", array([0.25, 0.25, 0.25, 0.25, 0.25])),
-                         CorrelForm("r", array([0.2644, 0.2644, 0.2644, 0.2644]))]
+        unck_expected = [Uncertainty("r", array([0.25, 0.25, 0.25, 0.25, 0.25])),
+                         Uncertainty("r", array([0.2644, 0.2644, 0.2644, 0.2644]))]
         time1_expected = None
         time2_expected = None
         idx_expected = {"Nm": [5, 4],
@@ -1639,21 +1637,21 @@ class TestMatchUp(unittest.TestCase):
                                  30.2, 20.4, 28.2, 50.7, 45.6,
                                  29.2, 37.4, 28.2, 50.7,
                                  28.2, 32.4, 22.2, 53.7, ])
-        unc_expected = [CorrelForm("r", array([1.6, 1.5, 1.5, 1.3, 1.5])),
-                        CorrelForm("r", array([3.1, 3.2, 3.2, 3.1, 3.0])),
-                        CorrelForm("r", array([3.3, 3.4, 3.1, 3.2])),
-                        CorrelForm("r", array([2.1, 2.2, 2.2, 2.1])),
-                        CorrelForm("rs", (array([5.0, 4.7, 5.1, 5.2, 5.3]), 1.0)),
-                        CorrelForm("rs", (array([4.2, 4.3, 4.4, 4.3]), 1.0)),
-                        CorrelForm("rs", (array([4.0, 3.7, 4.4, 4.7]), 2.0)),
-                        CorrelForm("r", array([2.2, 1.7, 2.0, 4.3, 2.6])),
-                        CorrelForm("r", array([2.3, 1.2, 2.3, 4.4])),
-                        CorrelForm("r", array([3.2, 2.7, 3.0, 5.3]))]
+        unc_expected = [Uncertainty("r", array([1.6, 1.5, 1.5, 1.3, 1.5])),
+                        Uncertainty("r", array([3.1, 3.2, 3.2, 3.1, 3.0])),
+                        Uncertainty("r", array([3.3, 3.4, 3.1, 3.2])),
+                        Uncertainty("r", array([2.1, 2.2, 2.2, 2.1])),
+                        Uncertainty("rs", (array([5.0, 4.7, 5.1, 5.2, 5.3]), 1.0)),
+                        Uncertainty("rs", (array([4.2, 4.3, 4.4, 4.3]), 1.0)),
+                        Uncertainty("rs", (array([4.0, 3.7, 4.4, 4.7]), 2.0)),
+                        Uncertainty("r", array([2.2, 1.7, 2.0, 4.3, 2.6])),
+                        Uncertainty("r", array([2.3, 1.2, 2.3, 4.4])),
+                        Uncertainty("r", array([3.2, 2.7, 3.0, 5.3]))]
         w_matrices_expected = []
         u_matrices_expected = []
         ks_expected = array([1.2, 1.7, 1.3, 1.4, 1.3, 3.2, 3.7, 3.3, 3.4])
-        unck_expected = [CorrelForm("r", array([0.25, 0.25, 0.25, 0.25, 0.25])),
-                         CorrelForm("r", array([0.2644, 0.2644, 0.2644, 0.2644]))]
+        unck_expected = [Uncertainty("r", array([0.25, 0.25, 0.25, 0.25, 0.25])),
+                         Uncertainty("r", array([0.2644, 0.2644, 0.2644, 0.2644]))]
         time1_expected = None
         time2_expected = None
         idx_expected = {"Nm": [5, 4],
@@ -1941,23 +1939,23 @@ class TestMatchUp(unittest.TestCase):
                                  30.2, 20.4, 28.2, 50.7, 45.6,
                                  29.2, 37.4, 28.2, 50.7,
                                  28.2, 32.4, 22.2, 53.7, ])
-        unc_expected = [CorrelForm("r", array([1.6, 1.5, 1.5, 1.3, 1.5])),
-                        CorrelForm("r", array([3.1, 3.2, 3.2, 3.1, 3.0])),
-                        CorrelForm("r", array([3.3, 3.4, 3.1, 3.2])),
-                        CorrelForm("r", array([2.1, 2.2, 2.2, 2.1])),
-                        CorrelForm("rs", (array([5.0, 4.7, 5.1, 5.2, 5.3]), 1.0)),
-                        CorrelForm("rs", (array([4.2, 4.3, 4.4, 4.3]), 1.0)),
-                        CorrelForm("rs", (array([4.0, 3.7, 4.4, 4.7]), 2.0)),
-                        CorrelForm("ave", (0, 0)),
-                        CorrelForm("ave", (1, 1)),
-                        CorrelForm("ave", (2, 2))]
+        unc_expected = [Uncertainty("r", array([1.6, 1.5, 1.5, 1.3, 1.5])),
+                        Uncertainty("r", array([3.1, 3.2, 3.2, 3.1, 3.0])),
+                        Uncertainty("r", array([3.3, 3.4, 3.1, 3.2])),
+                        Uncertainty("r", array([2.1, 2.2, 2.2, 2.1])),
+                        Uncertainty("rs", (array([5.0, 4.7, 5.1, 5.2, 5.3]), 1.0)),
+                        Uncertainty("rs", (array([4.2, 4.3, 4.4, 4.3]), 1.0)),
+                        Uncertainty("rs", (array([4.0, 3.7, 4.4, 4.7]), 2.0)),
+                        Uncertainty("ave", (0, 0)),
+                        Uncertainty("ave", (1, 1)),
+                        Uncertainty("ave", (2, 2))]
         w_matrices_expected = [w2_matchup1, w12_matchup2]
         u_matrices_expected = [u_matrix2_matchup1,
                                         u_matrix1_matchup2,
                                         u_matrix2_matchup2]
         ks_expected = array([1.2, 1.7, 1.3, 1.4, 1.3, 3.2, 3.7, 3.3, 3.4])
-        unck_expected = [CorrelForm("r", array([0.25, 0.25, 0.25, 0.25, 0.25])),
-                         CorrelForm("r", array([0.2644, 0.2644, 0.2644, 0.2644]))]
+        unck_expected = [Uncertainty("r", array([0.25, 0.25, 0.25, 0.25, 0.25])),
+                         Uncertainty("r", array([0.2644, 0.2644, 0.2644, 0.2644]))]
         time1_expected = array([dt(1970, 1, 1, 1, 0, 1),
                                 dt(1970, 1, 1, 1, 0, 2),
                                 dt(1970, 1, 1, 1, 0, 3),

@@ -15,9 +15,10 @@ from shutil import rmtree
 from numpy import append, array, savetxt, zeros, loadtxt
 from netCDF4 import Dataset
 
-'''___Harmonisation Modules___'''
+'''___harmonisation Modules___'''
 from common import *
 from HarmonisationOp import HarmonisationOp
+
 
 '''___Authorship___'''
 __author__ = ["Sam Hunt", "Peter Harris"]

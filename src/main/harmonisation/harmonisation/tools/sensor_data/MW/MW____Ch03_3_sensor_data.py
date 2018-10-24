@@ -7,10 +7,11 @@ from collections import OrderedDict
 
 '''___Third Party Modules____'''
 
-'''___NPL Modules___'''
+'''___harmonisation Modules___'''
 from MW_sensor_models import sensor_model_3 as MW_sensor_function
 from MW_sensor_models import sensor_model_ref as reference_sensor_function
 from MW_consts import W_AMSUB_T, W_MHS_T, const_AMSUB_3, const_MHS_3, antenna_corr_AMSUB_3, antenna_corr_MHS_3
+
 
 '''___Authorship___'''
 __author__ = ["Sam Hunt"]

@@ -15,7 +15,6 @@ from os.path import join as pjoin
 from copy import deepcopy
 from multiprocessing import Pool
 import cPickle
-from time import time
 
 '''___Third Party Modules____'''
 from numpy import zeros, append, ones, dot, outer, hstack, array, eye, inf, asarray, int32, float32, float64, column_stack, count_nonzero, where
@@ -26,20 +25,10 @@ from netCDF4 import Dataset
 from pykrylov_lsmr import LSMRFramework
 from pykrylov_minres import Minres
 
-'''___NPL Modules___'''
+'''___harmonisation Modules___'''
 from cython_lib_GN_algo import unconvert_Xs
+from harmonisation import MatchUp, Transform2NormInd, evaluate_measurand, evaluate_adjusted_measurand, evaluate_K
 
-matchupIO_directory = pjoin(dirname(dirname(dirname(dirname(dirname(__file__))))), "matchupIO")
-sys.path.append(matchupIO_directory)
-from MatchUp import MatchUp
-
-matchupProcessing_directory = pjoin(dirname(dirname(dirname(dirname(dirname(__file__))))), "matchupProcessing")
-sys.path.append(matchupProcessing_directory)
-from transform2normind.Transform2NormInd import Transform2NormInd
-
-matchupToolbox_directory = pjoin(dirname(dirname(dirname(dirname(dirname(__file__))))), "matchupToolbox")
-sys.path.append(matchupToolbox_directory)
-from utils.matchup_maths import evaluate_measurand, evaluate_adjusted_measurand, evaluate_K
 
 '''___Authorship___'''
 __author__ = ["Sam Hunt", "Peter Harris"]

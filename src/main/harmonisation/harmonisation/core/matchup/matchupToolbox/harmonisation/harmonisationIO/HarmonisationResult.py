@@ -8,9 +8,10 @@ from os.path import join as pjoin
 
 '''___Third-Party Modules___'''
 from netCDF4 import Dataset, stringtochar, chartostring
-from numpy import zeros, ndarray, array_str, asarray
+from numpy import zeros, asarray
 
-'''___NPL Modules___'''
+'''___harmonisation Modules___'''
+
 
 '''___Authorship___'''
 __author__ = ["Sam Hunt", "Peter Harris"]

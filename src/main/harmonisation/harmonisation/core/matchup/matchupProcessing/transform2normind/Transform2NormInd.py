@@ -1,22 +1,17 @@
 """
-Transform2NormInd Class - Processor to transform a MatchUp data object to set of variables with indpendent errors and
+Transform2NormInd Class - Processor to transform a MatchUp data object to set of variables with independent errors and
 uncertainties of unity
 """
 
 '''___Built-In Modules___'''
 from copy import deepcopy
-import sys
-from os.path import dirname
-from os.path import join as pjoin
 
 '''___Third-Party Modules___'''
-from numpy import zeros, bool_, float32, where
-from scipy.sparse.linalg import lsqr
+from numpy import zeros, bool_, float32
 
 '''___NPL Modules___'''
-matchupIO_directory = pjoin(dirname(dirname(dirname(__file__))), "matchupIO")
-sys.path.append(matchupIO_directory)
-from MatchUp import MatchUp
+from harmonisation import MatchUp
+
 
 '''___Authorship___'''
 __author__ = ["Sam Hunt", "Peter Harris"]

@@ -4,22 +4,13 @@ Test of matchup_maths module functions
 
 '''___Built-In Modules___'''
 import unittest
-from os.path import dirname
-from os.path import join as pjoin
-import sys
 
 '''___Third-Party Modules___'''
 from numpy import array, vstack, ones, dot, column_stack, eye
 
 '''___NPL Modules___'''
-util_directory = dirname(dirname(__file__))
-sys.path.append(util_directory)
-from matchup_maths import evaluate_measurand, evaluate_adjusted_measurand, evaluate_K
+from harmonisation import MatchUp, Uncertainty, evaluate_measurand, evaluate_adjusted_measurand, evaluate_K
 
-matchupIO_directory = pjoin(dirname(dirname(dirname(dirname(__file__)))), "matchupIO")
-sys.path.append(matchupIO_directory)
-from Uncertainty import Uncertainty
-from MatchUp import MatchUp
 
 '''___Authorship___'''
 __author__ = "Sam Hunt"

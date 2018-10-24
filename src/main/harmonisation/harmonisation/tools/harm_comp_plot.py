@@ -14,9 +14,10 @@ from sys import argv
 
 '''___Third Party Modules___'''
 
-'''___Harmonisation Modules___'''
+'''___harmonisation Modules___'''
 from common import *
 from HarmonisationCompPlottingOp import HarmonisationComparisonPlottingOp
+
 
 '''___Authorship___'''
 __author__ = ["Sam Hunt", "Peter Harris"]

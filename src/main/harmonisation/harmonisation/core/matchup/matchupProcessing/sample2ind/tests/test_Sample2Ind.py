@@ -4,23 +4,14 @@ Test of Sample2Ind
 
 '''___Built-In Modules___'''
 import unittest
-from os.path import dirname
-from os.path import join as pjoin
-import sys
 
 '''___Third-Party Modules___'''
 from numpy import array, ndarray
 from scipy.sparse import csr_matrix
 
-'''___NPL Modules___'''
-sample2ind_directory = dirname(dirname(__file__))
-sys.path.append(sample2ind_directory)
-from Sample2Ind import Sample2Ind
+'''___harmonisation Modules___'''
+from harmonisation import MatchUp, Uncertainty, Sample2Ind
 
-matchupIO_directory = pjoin(dirname(dirname(dirname(dirname(__file__)))), "matchupIO")
-sys.path.append(matchupIO_directory)
-from Uncertainty import Uncertainty
-from MatchUp import MatchUp
 
 '''___Authorship___'''
 __author__ = "Sam Hunt"

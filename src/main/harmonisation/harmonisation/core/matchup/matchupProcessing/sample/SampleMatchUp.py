@@ -5,19 +5,14 @@ Sample2Ind Class - Processor to sample a MatchUp data object such that the sampl
 '''___Built-In Modules___'''
 from random import sample
 from copy import deepcopy
-from os.path import dirname
-from os.path import join as pjoin
-import sys
 
 '''___Third-Party Modules___'''
-from numpy import zeros, arange, asarray, bool_
+from numpy import zeros, arange
 from numpy import sum as npsum
 
-'''___NPL Modules___'''
-matchupIO_directory = pjoin(dirname(dirname(dirname(__file__))), "matchupIO")
-sys.path.append(matchupIO_directory)
-from MatchUp import MatchUp
-from CorrelForm import CorrelForm
+'''___harmonisation Modules___'''
+from harmonisation import MatchUp, Uncertainty
+
 
 '''___Authorship___'''
 __author__ = ["Sam Hunt", "Peter Harris"]
@@ -154,7 +149,7 @@ class SampleMatchUp:
                 # - now simplified to random error correlation by sampling choice
 
                 # Initialise uncertainty data array
-                MatchUpSample.unc[i] = CorrelForm("r", zeros(len(s_idx)))
+                MatchUpSample.unc[i] = Uncertainty("r", zeros(len(s_idx)))
 
                 # Retrieve required W matrix and uncertainty vector and hence determine new random uncertainties
                 w = MatchUpData.w_matrices[block_unc.w_i]
@@ -166,7 +161,7 @@ class SampleMatchUp:
 
             else:
                 # If block error correlation form random or random and systematic simplify to random and sample
-                MatchUpSample.unc[i] = CorrelForm("r", deepcopy(block_unc.uR[s_idx]))
+                MatchUpSample.unc[i] = Uncertainty("r", deepcopy(block_unc.uR[s_idx]))
         # --------------------------------------------------------------------------------------------------------------
 
         # d. sample k --------------------------------------------------------------------------------------------------
@@ -187,7 +182,7 @@ class SampleMatchUp:
             MatchUpSample.ks[istart_s:iend_s] = MatchUpData.ks[istart:iend][s_idx]
 
             # ii. Sample uncertainties
-            MatchUpSample.unck[i] = CorrelForm("r", deepcopy(mu_unck.uR[s_idx]))
+            MatchUpSample.unck[i] = Uncertainty("r", deepcopy(mu_unck.uR[s_idx]))
         # --------------------------------------------------------------------------------------------------------------
 
         # d. sample times ----------------------------------------------------------------------------------------------

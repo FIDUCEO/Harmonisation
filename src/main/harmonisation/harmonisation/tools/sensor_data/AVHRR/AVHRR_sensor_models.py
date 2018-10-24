@@ -7,7 +7,8 @@ AVHRR sensor models
 '''___Third Party Modules____'''
 from numpy import vstack, ones, dot, column_stack
 
-'''___NPL Modules___'''
+'''___harmonisation Modules___'''
+
 
 '''___Authorship___'''
 __author__ = ["Sam Hunt", "Peter Harris", "Jon Mittaz"]

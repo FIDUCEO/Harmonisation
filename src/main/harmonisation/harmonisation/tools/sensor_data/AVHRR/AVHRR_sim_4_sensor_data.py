@@ -7,9 +7,10 @@ from collections import OrderedDict
 
 '''___Third Party Modules____'''
 
-'''___EIV Modules___'''
+'''___harmonisation Modules___'''
 from AVHRR_sensor_models import sensor_model_4 as AVHRR_sensor_function
 from AVHRR_sensor_models import sensor_model_ref as reference_sensor_function
+
 
 '''___Authorship___'''
 __author__ = ["Sam Hunt"]

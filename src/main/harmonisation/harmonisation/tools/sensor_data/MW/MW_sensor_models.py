@@ -8,7 +8,8 @@ Sensor Measurement function for MW instruments aboard MHS and AMSU
 from numpy import array, zeros, cos, exp, float32
 from math import pi
 
-'''___Harmonisation Modules___'''
+'''___harmonisation Modules___'''
+
 
 '''___Authorship___'''
 __author__ = ["Sam Hunt"]

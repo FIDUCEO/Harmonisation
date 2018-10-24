@@ -5,27 +5,21 @@ Sample2Ind Class - Processor to sample a MatchUp data object such that the sampl
 '''___Built-In Modules___'''
 import numpy
 import pyximport
-pyximport.install(setup_args={"include_dirs":numpy.get_include()},
+pyximport.install(setup_args={"include_dirs": numpy.get_include()},
                   reload_support=True)
 
 from random import sample
 from copy import deepcopy
-from os.path import dirname
-from os.path import join as pjoin
-import sys
 from datetime import datetime
 
 '''___Third-Party Modules___'''
 from numpy import zeros, arange, asarray, bool_, int32
-from time import time
 from numpy import sum as npsum
 
-'''___NPL Modules___'''
-matchupIO_directory = pjoin(dirname(dirname(dirname(__file__))), "matchupIO")
-sys.path.append(matchupIO_directory)
+'''___harmonisation Modules___'''
 from cython_lib_sample2ind import get_sample_idxs
-from MatchUp import MatchUp
-from Uncertainty import Uncertainty
+from harmonisation import MatchUp, Uncertainty
+
 
 '''___Authorship___'''
 __author__ = ["Sam Hunt", "Peter Harris"]
