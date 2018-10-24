@@ -4,6 +4,7 @@ from os import path
 from io import open
 from setuptools.extension import Extension
 from Cython.Build import cythonize
+import numpy as np
 
 extensions = [
     Extension(
@@ -38,6 +39,7 @@ setup(name='harmonisation',
       keywords="FIDUCEO FCDR harmonisation metrology climate",
       packages=find_packages(exclude=['contrib', 'docs', 'tests', 'lsf']),
       ext_modules=cythonize(extensions),
+      include_dirs=[np.get_include()],
       package_data={"": ["*.dat"]},
       install_requires=['numpy>=1.11.0', 'netCDF4>=1.1.0', 'scipy>=0.19', 'matplotlib>=2.2.2'],
       entry_points={
