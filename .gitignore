@@ -1,5 +1,9 @@
-src/main/full_EIV/src/test
-src/main/harmonisation_diagnostics/src/test
-*.pyc
 .idea
 .svn
+
+*.egg-info
+
+*.pyc
+*.pyd
+*.c
+build/
