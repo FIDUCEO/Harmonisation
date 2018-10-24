@@ -3,10 +3,13 @@ Software for solving large, non-linear errors-in-variables regression problems
 
 ## Dependencies
 
-* `numpy`
-* `scipy`
-* `netCDF4`
-* `matplotlib`
+Before installing with pip the `Cython` and `numpy` modules must be installed to ensure the cython code can compiled during the install. Install these with pip as:
+
+`$ pip install Cython`
+
+`$ pip install numpy` 
+
+All other Python-based dependencies should be installed automatically.
 
 ## Installation
 
