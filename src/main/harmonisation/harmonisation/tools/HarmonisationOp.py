@@ -13,6 +13,7 @@ from numpy.random import normal
 from numpy import all as nall
 
 '''___harmonisation Modules___'''
+from harmonisation.version import __version__, __tag__
 from common import *
 from harmonisation import MatchUp, HarmonisationEIV, HarmonisationResult, Sample2Ind, Transform2NormInd
 from harmonisation.core.matchup.matchupToolbox.harmonisation.\
@@ -25,7 +26,6 @@ from harmonisation.core.matchup.matchupToolbox.harmonisation.\
 __author__ = ["Sam Hunt", "Peter Harris"]
 __created__ = "09/01/2017"
 __credits__ = ["Arta Dillo", "Jon Mittaz"]
-__version__ = "0.0"
 __maintainer__ = "Sam Hunt"
 __email__ = "sam.hunt@npl.co.uk"
 __status__ = "Development"

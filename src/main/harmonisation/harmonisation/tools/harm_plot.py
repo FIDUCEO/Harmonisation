@@ -13,6 +13,7 @@ from os import makedirs
 '''___Third Party Modules___'''
 
 '''___harmonisation Modules___'''
+from harmonisation.version import __version__, __tag__
 from common import *
 from HarmonisationPlottingOp import HarmonisationPlottingOp
 
@@ -21,7 +22,6 @@ from HarmonisationPlottingOp import HarmonisationPlottingOp
 __author__ = ["Sam Hunt", "Peter Harris"]
 __created__ = "20/10/2018"
 __credits__ = ["Jon Mittaz"]
-__version__ = "0.0"
 __maintainer__ = "Sam Hunt"
 __email__ = "sam.hunt@npl.co.uk"
 __status__ = "Development"
@@ -29,12 +29,14 @@ __status__ = "Development"
 
 parsed_cmdline = parse_cmdline(solver_options=False)
 
+
 def try_makedirs(directory):
     try:
         makedirs(directory)
     except OSError:
         pass
     return 0
+
 
 def main(p):
 

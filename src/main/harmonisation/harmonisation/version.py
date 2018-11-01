@@ -1,2 +1,2 @@
-version = "v0.0"
-tag = ""
+__version__ = "v0.0"
+__tag__ = ""

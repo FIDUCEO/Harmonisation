@@ -4,15 +4,11 @@ Harmonsation Comparison Output Plotting Implementation
 
 '''___Built-In Modules___'''
 from os import makedirs
-from os.path import basename, dirname
-from os.path import join as pjoin
-import sys
-from sys import argv
 
 '''___Third Party Modules___'''
-from numpy import concatenate
 
 '''___harmonisation Modules___'''
+from harmonisation.version import __version__, __tag__
 from common import *
 from harmonisation import HarmonisationResult, HarmonisationVis
 
@@ -21,7 +17,6 @@ from harmonisation import HarmonisationResult, HarmonisationVis
 __author__ = ["Sam Hunt", "Peter Harris"]
 __created__ = "12/12/2017"
 __credits__ = ["Jon Mittaz"]
-__version__ = "0.0"
 __maintainer__ = "Sam Hunt"
 __email__ = "sam.hunt@npl.co.uk"
 __status__ = "Development"

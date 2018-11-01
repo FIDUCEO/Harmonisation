@@ -7,7 +7,7 @@ Before installing with pip the `Cython` and `numpy` modules must be installed to
 
 `$ pip install Cython`
 
-`$ pip install numpy` 
+`$ pip install numpy`
 
 All other Python-based dependencies should be installed automatically.
 

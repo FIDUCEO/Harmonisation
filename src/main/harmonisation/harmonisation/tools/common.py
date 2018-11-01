@@ -9,24 +9,23 @@ import argparse
 import importlib
 import os.path
 from os import listdir
-from os.path import isfile, abspath, split, splitext
+from os.path import isfile, abspath, split
 from os.path import join as pjoin
 import sys
 
 '''___harmonisation Modules___'''
-from ..version import version, tag
-from sensor_data.SensorDataFactory import SensorDataFactory
+from harmonisation.version import __version__, __tag__
+from harmonisation.sensor_data.SensorDataFactory import SensorDataFactory
 
 
 '''___Authorship___'''
 __author__ = ["Sam Hunt", "Peter Harris"]
 __created__ = "09/01/2017"
 __credits__ = ["Jon Mittaz"]
-__version__ = version
-__tag__ = tag
 __maintainer__ = "Sam Hunt"
 __email__ = "sam.hunt@npl.co.uk"
 __status__ = "Development"
+
 
 '''___Constants___'''
 software_short_name = "EV"

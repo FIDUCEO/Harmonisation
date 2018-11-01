@@ -13,24 +13,20 @@ from os import makedirs
 '''___Third Party Modules___'''
 
 '''___harmonisation Modules___'''
-from ..version import version, tag
+from harmonisation.version import __version__, __tag__
 from common import *
 from HarmonisationOp import HarmonisationOp
-from sensor_data.SensorDataFactory import SensorDataFactory
+from harmonisation.sensor_data.SensorDataFactory import SensorDataFactory
 
 
 '''___Authorship___'''
 __author__ = ["Sam Hunt", "Peter Harris"]
 __created__ = "09/01/2017"
 __credits__ = ["Jon Mittaz"]
-__version__ = version
-__tag__ = tag
 __maintainer__ = "Sam Hunt"
 __email__ = "sam.hunt@npl.co.uk"
 __status__ = "Development"
 
-parsed_cmdline = parse_cmdline()
-logger = configure_logging(parsed_cmdline.log, parsed_cmdline.verbose, parsed_cmdline.quiet)
 
 '''___Constants___'''
 
@@ -40,6 +36,10 @@ TOL = 1e-6      # Gauss-Newton algorithm convergence tolerance
 TOLA = 1e-8     # Gauss-Newton algorithm LSMR tolerance tolA
 TOLB = 1e8      # Gauss-Newton algorithm LSMR tolerance tolB
 TOLU = 1e-8     # Gauss-Newton algorithm Minres rtol
+
+
+parsed_cmdline = parse_cmdline()
+logger = configure_logging(parsed_cmdline.log, parsed_cmdline.verbose, parsed_cmdline.quiet)
 
 preamble = "\nErrors-in-Variables Sensor Harmonisation"
 

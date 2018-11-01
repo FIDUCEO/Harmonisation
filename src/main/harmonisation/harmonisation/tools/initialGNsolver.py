@@ -13,6 +13,7 @@ from sys import argv
 '''___Third Party Modules___'''
 
 '''___harmonisation Modules___'''
+from harmonisation.version import __version__, __tag__
 from common import *
 from HarmonisationOp import HarmonisationOp
 
@@ -21,7 +22,6 @@ from HarmonisationOp import HarmonisationOp
 __author__ = ["Sam Hunt", "Peter Harris"]
 __created__ = "09/01/2017"
 __credits__ = ["Arta Dillo", "Jon Mittaz"]
-__version__ = "0.0"
 __maintainer__ = "Sam Hunt"
 __email__ = "sam.hunt@npl.co.uk"
 __status__ = "Development"

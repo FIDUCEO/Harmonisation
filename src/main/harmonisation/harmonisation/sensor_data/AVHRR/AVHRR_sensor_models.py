@@ -248,7 +248,7 @@ def sensor_model_37_3(sensor_model_variables, sensor_model_parameter, sensor_mod
     m = len(Cs)
 
     # Evaluate radiance using sensor model
-    Ja = vstack((ones(m), Rict * (Cs - Ce) / (Cs - Cict), T-285.0)).T
+    Ja = vstack((ones(m), Rict * (Cs - Ce) / (Cs - Cict), T)).T
     at = [sensor_model_parameter[0], 0.98514 + sensor_model_parameter[1], sensor_model_parameter[2]]
     R = dot(Ja, at)
 
@@ -359,7 +359,7 @@ def sensor_model_4_scaled(sensor_model_variables, sensor_model_parameter, sensor
     m = len(Cs)
 
     # Evaluate radiance using sensor model
-    Ja = vstack((ones(m), Rict * (Cs - Ce) / (Cs - Cict), (Cict - Ce) * (Cs - Ce), T)).T
+    Ja = vstack((ones(m), Rict * (Cs - Ce) / (Cs - Cict), (Cict - Ce) * (Cs - Ce), T-285.0)).T
     at = [sensor_model_parameter[0], 0.98514 + sensor_model_parameter[1]/1000.0,
           sensor_model_parameter[2]/1000.0/1000.0, sensor_model_parameter[3]/1000.0]
     R = dot(Ja, at)

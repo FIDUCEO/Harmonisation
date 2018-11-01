@@ -8,22 +8,21 @@ from os.path import basename
 from sys import argv
 
 '''___Third Party Modules___'''
-from numpy import append, zeros, loadtxt
-from numpy.random import normal
 from netCDF4 import Dataset
 
 '''___harmonisation Modules___'''
+from harmonisation.version import __version__, __tag__
 from common import *
 from HarmonisationOp import HarmonisationOp
 from harmonisation import HarmonisationResult
 from harmonisation.core.matchup.matchupToolbox.harmonisation.\
     harmonisationProcessing.harmonisation_eiv.GN_algo import GNAlgo
 
+
 '''___Authorship___'''
 __author__ = ["Sam Hunt", "Peter Harris"]
 __created__ = "09/01/2017"
 __credits__ = ["Jon Mittaz"]
-__version__ = "0.0"
 __maintainer__ = "Sam Hunt"
 __email__ = "sam.hunt@npl.co.uk"
 __status__ = "Development"
