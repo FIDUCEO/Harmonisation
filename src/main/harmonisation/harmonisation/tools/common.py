@@ -8,10 +8,11 @@ import logging
 import argparse
 import importlib
 import os.path
-from os import listdir
+from os import listdir, makedirs
 from os.path import isfile, abspath, split
 from os.path import join as pjoin
 import sys
+import errno
 
 '''___harmonisation Modules___'''
 from harmonisation.version import __version__, __tag__
@@ -279,3 +280,10 @@ def import_file(path):
 if __name__ == "__main__":
     pass
 
+
+def try_makedirs(path):
+    try:
+        os.makedirs(path)
+    except OSError as exception:
+        if exception.errno != errno.EEXIST:
+            raise

@@ -3,7 +3,6 @@ Harmonsation Output Plotting Implementation
 """
 
 '''___Built-In Modules___'''
-from os import makedirs
 
 '''___Third Party Modules___'''
 from numpy import concatenate

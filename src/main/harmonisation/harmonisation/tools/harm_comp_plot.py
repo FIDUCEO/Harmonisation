@@ -29,14 +29,6 @@ __email__ = "sam.hunt@npl.co.uk"
 __status__ = "Development"
 
 
-def try_makedirs(directory):
-    try:
-        makedirs(directory)
-    except OSError:
-        pass
-    return 0
-
-
 def main(job_cfg_fname):
 
     ################################################################################################################

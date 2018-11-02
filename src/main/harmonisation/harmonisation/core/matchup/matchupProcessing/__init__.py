@@ -1,3 +1,0 @@
-from sample2ind.Sample2Ind import Sample2Ind
-from transform2normind.Transform2NormInd import Transform2NormInd
-from simulate_matchup.SimulateMatchUp import SimulateMatchUp

@@ -1,1 +1,0 @@
-from HarmonisationResult import HarmonisationResult
