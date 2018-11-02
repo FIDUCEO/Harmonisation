@@ -21,6 +21,8 @@ from HarmonisationPlottingOp import HarmonisationPlottingOp
 '''___Authorship___'''
 __author__ = ["Sam Hunt", "Peter Harris"]
 __created__ = "20/10/2018"
+__version__ = __version__
+__tag__ = __tag__
 __credits__ = ["Jon Mittaz"]
 __maintainer__ = "Sam Hunt"
 __email__ = "sam.hunt@npl.co.uk"
@@ -38,13 +40,13 @@ def try_makedirs(directory):
     return 0
 
 
-def main(p):
+def main():
 
     ################################################################################################################
     # Process configuration data
     ################################################################################################################
 
-    job_cfg_fname = p.config_file
+    job_cfg_fname = parsed_cmdline.config_file
 
     print "Harmonisation Output Plotting \n"
 
@@ -76,4 +78,4 @@ def main(p):
     return 0
 
 if __name__ == "__main__":
-    main(parsed_cmdline)
+    main()

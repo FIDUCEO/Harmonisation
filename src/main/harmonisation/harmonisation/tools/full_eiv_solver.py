@@ -22,6 +22,8 @@ from harmonisation.sensor_data.SensorDataFactory import SensorDataFactory
 '''___Authorship___'''
 __author__ = ["Sam Hunt", "Peter Harris"]
 __created__ = "09/01/2017"
+__version__ = __version__
+__tag__ = __tag__
 __credits__ = ["Jon Mittaz"]
 __maintainer__ = "Sam Hunt"
 __email__ = "sam.hunt@npl.co.uk"
@@ -44,7 +46,7 @@ logger = configure_logging(parsed_cmdline.log, parsed_cmdline.verbose, parsed_cm
 preamble = "\nErrors-in-Variables Sensor Harmonisation"
 
 
-def main(parsed_cmdline):
+def main():
 
     job_cfg_fname = parsed_cmdline.config_file
 
@@ -107,4 +109,4 @@ def main(parsed_cmdline):
     return 0
 
 if __name__ == "__main__":
-    main(parsed_cmdline)
+    main()
