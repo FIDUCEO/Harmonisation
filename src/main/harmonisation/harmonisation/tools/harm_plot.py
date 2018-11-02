@@ -46,7 +46,7 @@ def main():
     # Process configuration data
     ################################################################################################################
 
-    job_cfg_fname = parsed_cmdline.config_file
+    job_cfg_fname = parsed_cmdline.job_file
 
     print "Harmonisation Output Plotting \n"
 

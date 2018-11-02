@@ -48,7 +48,7 @@ preamble = "\nErrors-in-Variables Sensor Harmonisation"
 
 def main():
 
-    job_cfg_fname = parsed_cmdline.config_file
+    job_cfg_fname = parsed_cmdline.job_file
 
     ####################################################################################################################
     # Process configuration data
