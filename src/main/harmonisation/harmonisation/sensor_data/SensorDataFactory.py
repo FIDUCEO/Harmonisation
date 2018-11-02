@@ -42,6 +42,7 @@ from HIRS.HIRS__Ch17_3_sensor_data import HIRSCh17_3
 from HIRS.HIRS__Ch18_3_sensor_data import HIRSCh18_3
 from HIRS.HIRS__Ch19_3_sensor_data import HIRSCh19_3
 from MW.MW____Ch03_3_sensor_data import MWCh03_3
+from test_sim.test_sim import TestSim
 
 
 '''___Authorship___'''
@@ -87,7 +88,8 @@ class SensorDataFactory:
                                          (HIRSCh17_3().name, HIRSCh17_3()),
                                          (HIRSCh18_3().name, HIRSCh18_3()),
                                          (HIRSCh19_3().name, HIRSCh19_3()),
-                                         (MWCh03_3().name, MWCh03_3())])
+                                         (MWCh03_3().name, MWCh03_3()),
+                                         (TestSim().name, TestSim())])
 
     def get_names(self):
         return self.sensors_data.keys()
