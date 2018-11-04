@@ -1,22 +1,18 @@
-#!/opt/anaconda2/bin/python2.7
-
 """
 Command line tool for Error-in-Variables Harmonisation Implementation
 
 For usage try:
-python full_eiv_solver.py --help
+$ full_eiv_solver --help
 """
 
 '''___Built-In Modules___'''
-from os import makedirs
 
 '''___Third Party Modules___'''
 
 '''___harmonisation Modules___'''
-from harmonisation.version import __version__, __tag__
+from harmonisation.version import __version__, __tag__, _short_name_
 from common import *
 from HarmonisationOp import HarmonisationOp
-from harmonisation.sensor_data.SensorDataFactory import SensorDataFactory
 
 
 '''___Authorship___'''
@@ -48,63 +44,32 @@ preamble = "\nErrors-in-Variables Sensor Harmonisation"
 
 def main():
 
-    job_cfg_fname = parsed_cmdline.job_file
-
-    ####################################################################################################################
-    # Process configuration data
-    ####################################################################################################################
-
     logger.info(preamble)
-    logger.info("\nReading Configuration Data: "+parsed_cmdline.config_file)
 
-    # 1. Read configuration data
-    conf = {}
+    dataset_dir, sensor_data, output_dir, pc_input, save_pc, gn_input, save_gn, show = read_parsed_cmdline(parsed_cmdline)
 
-    #  a. Read software config file
-    conf['software'], conf['version'], conf['tag'] = software_short_name, __version__, __tag__
+    logger.info("Match-up Dataset Directory: " + dataset_dir)
+    logger.info("Harmonisation Result Directory: " + output_dir)
 
-    # b. Read job config file
-    conf['job_id'], conf['matchup_dataset'], dataset_dir,\
-        sensor_data, output_dir, conf['job_text'] = read_job_cfg(job_cfg_fname)
+    conf = {"software": _short_name_, "version": __version__, "tag": __tag__}
 
-    sensor_data_factory = SensorDataFactory()
-    if not sensor_data in sensor_data_factory.get_names():
-        raise NameError("Invalid sensor_data name, try --list_sensor_data option to see valid names")
-    sensor_data_dict = SensorDataFactory().get_sensor_data(sensor_data)
+    # Initialise harmonisation operator
+    harm_op = HarmonisationOp()
 
-    # 4. Make output directory if it doesn't exist
-    try:
-        makedirs(output_dir)
-    except OSError:
-        pass
+    # Run harmonisation operator
+    harm_op.run(dataset_dir=dataset_dir,
+                sensor_data=sensor_data,
+                output_dir=output_dir,
+                pc_input=pc_input,
+                save_pc=save_pc,
+                gn_input=gn_input,
+                save_gn=save_gn,
+                software_cfg=conf,
+                tolPC=TOLPC, tol=TOL, tolA=TOLA, tolB=TOLB, tolU=TOLU,
+                show=show,
+                return_covariance=(not parsed_cmdline.no_covariance))
 
-    # Logging options
-    show = 1
-    if parsed_cmdline.quiet:
-        show = 0
-    elif parsed_cmdline.verbose:
-        show = 2
-
-    ################################################################################################################
-    # Run harmonisation
-    ################################################################################################################
-
-    print("Match-up Dataset Directory:", dataset_dir)
-    print("Sensor Data File:", sensor_data)
-
-    # Run algorithm
-    H = HarmonisationOp()
-    H.run(dataset_dir=dataset_dir,
-          sensor_data=sensor_data_dict,
-          output_dir=output_dir,
-          pc_input=parsed_cmdline.pc_input,
-          save_pc=parsed_cmdline.save_pc,
-          gn_input=parsed_cmdline.gn_input,
-          save_gn=parsed_cmdline.save_gn,
-          software_cfg=conf,
-          tolPC=TOLPC, tol=TOL, tolA=TOLA, tolB=TOLB, tolU=TOLU,
-          show=show,
-          return_covariance=(not parsed_cmdline.no_covariance))
+    logger.info("Complete")
 
     return 0
 

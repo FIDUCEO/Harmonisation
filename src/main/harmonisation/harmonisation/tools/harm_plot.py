@@ -1,19 +1,16 @@
-#!/opt/anaconda2/bin/python2.7
-
 """
 Command line tool for generating harmonisation result diagnostic plots
 
 For usage try:
-python harm_plot.py --help
+$ harm_plot --help
 """
 
 '''___Built-In Modules___'''
-from os import makedirs
 
 '''___Third Party Modules___'''
 
 '''___harmonisation Modules___'''
-from harmonisation.version import __version__, __tag__
+from harmonisation.version import _short_name_, __version__, __tag__
 from common import *
 from HarmonisationPlottingOp import HarmonisationPlottingOp
 
@@ -30,50 +27,32 @@ __status__ = "Development"
 
 
 parsed_cmdline = parse_cmdline(solver_options=False)
+logger = configure_logging(parsed_cmdline.log, parsed_cmdline.verbose, parsed_cmdline.quiet)
 
-
-def try_makedirs(directory):
-    try:
-        makedirs(directory)
-    except OSError:
-        pass
-    return 0
+preamble = "\nErrors-in-Variables Sensor Harmonisation Result Plotting"
 
 
 def main():
 
-    ################################################################################################################
-    # Process configuration data
-    ################################################################################################################
+    logger.info(preamble)
 
-    job_cfg_fname = parsed_cmdline.job_file
+    dataset_dir, sensor_data, output_dir, show = read_parsed_cmdline(parsed_cmdline, solver_options=False)
 
-    print "Harmonisation Output Plotting \n"
+    logger.info("Match-up Dataset Directory: "+dataset_dir)
+    logger.info("Harmonisation Result Directory: "+output_dir)
 
-    print "Reading Job Config:", job_cfg_fname, "\n"
+    conf = {}
 
-    # 1. Read configuration data
-    conf = {}   # dictionary to store data
-    conf['job_id'], conf['matchup_dataset'], dataset_dir, sensor_data_path,\
-        output_dir, conf['job_text'] = read_job_cfg(job_cfg_fname)
+    # Initialise plotting operator
+    harmp_plot_op = HarmonisationPlottingOp(dataset_dir=dataset_dir,
+                                            sensor_data=sensor_data,
+                                            output_dir=output_dir,
+                                            software_cfg=conf)
 
-    # 2. Get harmonisation result paths
-    hout_path, hres_paths = get_harm_paths(output_dir)
+    # Run plotting operator
+    harm_plot_op.run()
 
-    ################################################################################################################
-    # Run harmonisation
-    ################################################################################################################
-
-    # Initialise object
-    H = HarmonisationPlottingOp(dataset_dir=dataset_dir,
-                                sensor_data_path=sensor_data_path,
-                                output_dir=output_dir,
-                                software_cfg=conf,
-                                hout_path=hout_path,
-                                hres_paths=hres_paths)
-
-    # Run algorithm
-    H.run()
+    logger.info("Complete")
 
     return 0
 

@@ -1,16 +1,11 @@
-#!/opt/anaconda2/bin/python2.7
-
 """
 Command line tool for generating harmonisation result comparison plots
 
 For usage try:
-python harm_comp_plot.py --help
+$ harm_comp_plot --help
 """
 
 '''___Built-In Modules___'''
-from os import makedirs
-from os.path import basename
-from sys import argv
 
 '''___Third Party Modules___'''
 
@@ -23,57 +18,40 @@ from HarmonisationCompPlottingOp import HarmonisationComparisonPlottingOp
 '''___Authorship___'''
 __author__ = ["Sam Hunt", "Peter Harris"]
 __created__ = "12/12/2017"
+__version__ = __version__
+__tag__ = __tag__
 __credits__ = ["Jon Mittaz"]
 __maintainer__ = "Sam Hunt"
 __email__ = "sam.hunt@npl.co.uk"
 __status__ = "Development"
 
 
-def main(job_cfg_fname):
+parsed_cmdline = parse_cmdline(solver_options=False)
+logger = configure_logging(parsed_cmdline.log, parsed_cmdline.verbose, parsed_cmdline.quiet)
 
-    ################################################################################################################
-    # Process configuration data
-    ################################################################################################################
+preamble = "\nErrors-in-Variables Sensor Harmonisation Result Comparison Plotting"
 
-    print "Harmonisation Output Plotting \n"
 
-    print "Reading Job Config:", job_cfg_fname, "\n"
+def main():
 
-    # 1. Read configuration data
-    conf = {}   # dictionary to store data
+    logger.info(preamble)
 
-    # b. Read job config file
-    conf['job_id'], conf['matchup_dataset'], dataset_dir, sensor_data_path,\
-        output_dir, data_reader_path, conf['job_text'] = read_job_cfg(job_cfg_fname)
+    dataset_dir, sensor_data, output_dir, show = read_parsed_cmdline(parsed_cmdline, solver_options=False)
 
-    # 2. Get matchup data paths from directory
-    dataset_paths = get_dataset_paths(dataset_dir)
+    logger.info("Match-up Dataset Directory: "+dataset_dir)
+    logger.info("Harmonisation Result Directory: "+output_dir)
 
-    # 3. Import required specified functions
-    if basename(data_reader_path) == "DEFAULT":
-        harm_data_reader = None
-    else:
-        harm_data_reader = import_file(data_reader_path).MatchUp
-
-    # 4. Get harmonisation result paths
-    hout_path, hres_paths = get_harm_paths(output_dir)
-
-    ################################################################################################################
-    # Run harmonisation
-    ################################################################################################################
+    conf = {}
 
     # Initialise object
-    H = HarmonisationComparisonPlottingOp(dataset_paths=dataset_paths,
-                                          sensor_data_path=sensor_data_path,
-                                          output_dir=output_dir,
-                                          data_reader=harm_data_reader,
-                                          hout_path=hout_path,
-                                          hres_paths=hres_paths)
+    harm_comp_op = HarmonisationComparisonPlottingOp(dataset_paths=dataset_dir,
+                                                     sensor_data_path=sensor_data,
+                                                     output_dir=output_dir)
 
     # Run algorithm
-    H.run()
+    harm_comp_op.run()
 
     return 0
 
 if __name__ == "__main__":
-    main(os.path.abspath(argv[1]))
+    main()

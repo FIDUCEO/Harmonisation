@@ -1,5 +1,5 @@
 """
-Harmonsation Output Plotting Implementation
+Harmonsation Output Plotting
 """
 
 '''___Built-In Modules___'''
@@ -16,6 +16,8 @@ from harmonisation import MatchUp, HarmonisationResult, HarmonisationVis
 '''___Authorship___'''
 __author__ = ["Sam Hunt", "Peter Harris"]
 __created__ = "12/12/2017"
+__version__ = __version__
+__tag__ = __tag__
 __credits__ = ["Jon Mittaz"]
 __maintainer__ = "Sam Hunt"
 __email__ = "sam.hunt@npl.co.uk"
@@ -24,14 +26,13 @@ __status__ = "Development"
 
 class HarmonisationPlottingOp:
     """
-    This class runs the harmonisation process of Peter Harris for satellite sensor match-up data contained in the
-    input directory
+    Class to run harmonisation result plotting routine
 
     Sample Code:
 
     .. code-block:: python
 
-        H = HarmOp(directory)
+        H = HarmOp(dataset_dir, sensor_data, output_dir, software_cfg)
         H.run()
 
     :Attributes:
@@ -39,122 +40,53 @@ class HarmonisationPlottingOp:
 
             *list:str*
 
-            Directory of matchup series files
+            Match-up dataset directory
 
-        .. py:attribute:: parameter_path
+        .. py:attribute:: sensor_data
 
-            *str*
+            *dict*
 
-            Path of parameters to be used as starting point for solver
+            Sensor data dictionary
 
         .. py:attribute:: output_dir
 
             *str*
 
-            Path of directory to store output data files in
+            Harmonisation output directory path
 
-        .. py:attribute:: sensor_model
+        .. py:attribute:: software_cfg
 
-            *func*
+            *dict*
 
-            Python function to calculate radiance and derivatives given input sensor state data
+            Software configuration directory
 
-        .. py:attribute:: adjustment_model
-
-            *func*
-
-            Python function to calculate spectral adjustment factor between two sensors, k, and derivatives given the
-            two sensor radiances
-
-        .. py:attribute:: software
-
-            *str*
-
-            software implementation name
-
-        .. py:attribute:: software_version
-
-            *str*
-
-            software implementation version
-
-        .. py:attribute:: software_tag
-
-            *str*
-
-            software implementation vcs
-
-        .. py:attribute:: job_id
-
-            *str*
-
-            job configuratoin ID
-
-        .. py:attribute:: matchup_dataset
-
-            *str*
-
-            harmonisation dataset set name
-
-        .. py:attribute:: data_reader
-
-            *cls*
-
-            Harmonisation data reader
-
-        .. py:attribute:: hout_path
-
-            *str*
-
-            path to store harmonisation output file
-
-        .. py:attribute:: hres_paths
-
-            *str*
-
-            path to store harmonisation residual files
 
     :Methods:
         .. py:method:: run(...):
 
-            This function runs the harmonisation of satellite instrument calibration parameters for group of sensors
-            with a reference sensor from the match-up data located in the input directory
-
-        . py:method:: calculate_parameter_covariance_ij(...):
-
-            Return element of harmonisation output parameter covariance matrix
-
-        .. py:method:: combine_parameter_covariance_ij(...):
-
-            Combine parameter covariance elements to form full matrix and save to file
+            Run dataset plotting
 
     """
 
-    def __init__(self, dataset_dir, sensor_data_path, output_dir, software_cfg, hout_path, hres_paths):
+    def __init__(self, dataset_dir, sensor_data, output_dir, software_cfg):
         """
         Initialise harmonisation algorithm class
 
-        :type dataset_paths: list:str
-        :param dataset_paths: Paths of matchup series files in matchup dataset directory
+        :type dataset_dir: list
+        :param dataset_dir: Match-up dataset directory
 
-        :type sensor_data_path: str
-        :param sensor_data_path: Path of sensor data for of matchup sensors
+        :type sensor_data: dict
+        :param sensor_data: Sensor data dictionary
 
         :type output_dir: str
-        :param output_dir: Path of directory to store output data files in
+        :param output_dir: Harmonisation output directory path
 
-        :type software_cfg: dict:str
-        :param software_cfg: dictionary of software configuration information
-
-        :type hout_path: str
-        :param hout_path: path of harmonisation output file
-
-        :type hres_paths: str
-        :param hres_paths: path of harmonisation residual files
+        :type software_cfg: dict
+        :param software_cfg: Software configuration directory
         """
 
         self.dataset_dir = None
-        self.sensor_data_path = None
+        self.sensor_data = None
         self.output_dir = None
         self.plot_dir = None
         self.software = None
@@ -163,12 +95,10 @@ class HarmonisationPlottingOp:
         self.job_id = None
         self.matchup_dataset = None
         self.HarmData = None
-        self.hout_path = None
-        self.hres_paths = None
 
-        if (dataset_dir is not None) and (sensor_data_path is not None):
+        if (dataset_dir is not None) and (sensor_data is not None):
             self.dataset_dir = dataset_dir
-            self.sensor_data_path = sensor_data_path
+            self.sensor_data = sensor_data
             self.output_dir = output_dir
             self.plots_dir = pjoin(output_dir, "plots")
             try:
@@ -190,10 +120,6 @@ class HarmonisationPlottingOp:
             self.job_id = "CC"
             self.matchup_dataset = "TEST"
 
-        if hout_path is not None:
-            self.hout_path = hout_path
-            self.hres_paths = hres_paths
-
     def run(self):
         """
         Generates plots for dataset specified by paths defined object attributes
@@ -201,10 +127,9 @@ class HarmonisationPlottingOp:
 
         # Initialise
         dataset_dir = self.dataset_dir
-        sensor_data_path = self.sensor_data_path
+        sensor_data = self.sensor_data
+        output_dir = self.output_dir
         plots_dir = self.plots_dir
-        hout_path = self.hout_path
-        hres_paths = self.hres_paths
 
         ################################################################################################################
         # 1.	Read Match-up Data and Harmonisation Result Data
@@ -214,16 +139,11 @@ class HarmonisationPlottingOp:
         print ">", dataset_dir
 
         print"\nSensor Data:"
-        print ">", sensor_data_path
-
-        print "\nHarmonisation Output Data:"
-        print ">", hout_path
-        for path in hres_paths:
-            print ">", path
+        #print ">", sensor_data_path
 
         print("\nOpening Files...")
-        MatchUpData = MatchUp(dataset_dir, sensor_data_path, open_uncertainty=False)
-        HarmResult = HarmonisationResult(hout_path) # , hres_paths)
+        MatchUpData = MatchUp(dataset_dir, sensor_data, open_uncertainty=False)
+        HarmResult = HarmonisationResult(output_dir, open_residual=False)
 
         ################################################################################################################
         # 2.	Make plots

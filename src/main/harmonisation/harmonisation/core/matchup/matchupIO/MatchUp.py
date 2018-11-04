@@ -193,7 +193,7 @@ class MatchUp(object):
         if sensor_data is not None:
             self.sensor_data = sensor_data
 
-        if (paths_matchup_data is not None) and (path_sensor_data is not None):
+        if (paths_matchup_data is not None) and (sensor_data is not None):
             self.a, sensor_model_parameter_sensor, \
                 self.sensor_model_constant, sensor_model_constant_sensor, \
                     self.sensor_model, self.adjustment_model = self._extract_matchup_sensor_data()

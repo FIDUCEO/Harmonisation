@@ -67,7 +67,7 @@ def parse_cmdline(solver_options=True):
     if solver_options:
         parser.add_argument("--pc_input",
                             help="Path of pre-computed harmonisation output file for dataset, to be used as "
-                                "preconditioner for this run")
+                                 "preconditioner for this run")
 
         parser.add_argument("--save_pc", action="store",
                             help="Path to save preconditioner generated in (or used by if opened from elsewhere) "
@@ -172,7 +172,32 @@ def configure_logging(fname=None, verbose=False, quiet=False):
     return logger
 
 
-def read_job_cfg(filename):
+def read_parsed_cmdline(parsed_cmdline, solver_options=True):
+
+    if parsed_cmdline.quiet is not None:
+        show = 0
+    elif parsed_cmdline.verbose is not None:
+        show = 2
+    else:
+        show = 1
+
+    if parsed_cmdline.job_file is not None:
+        dataset_dir, sensor_data, output_dir, pc_input, save_pc, gn_input, save_gn = read_job_file(parsed_cmdline.job_file)
+        return dataset_dir, sensor_data, output_dir, pc_input, save_pc, gn_input, save_gn, show
+    else:
+        dataset_dir = parsed_cmdline.input_directory
+        sensor_data = SensorDataFactory().get_sensor_data(parsed_cmdline.sensor_data)
+        output_dir = parsed_cmdline.output_directory
+        if solver_options:
+            pc_input = parsed_cmdline.pc_input
+            save_pc = parsed_cmdline.save_pc
+            gn_input = parsed_cmdline.gn_input
+            save_gn = parsed_cmdline.save_gn
+            return dataset_dir, sensor_data, output_dir, pc_input, save_pc, gn_input, save_gn, show
+        return dataset_dir, sensor_data, output_dir, show
+
+
+def read_job_file(filename):
     """
     Return data from harmonisation job configuration file
 
@@ -222,15 +247,19 @@ def read_job_cfg(filename):
     config.read(filename)
 
     # Get naming info
-    job_id = config.get('DEFAULT', 'job_id')
-    matchup_dataset = config.get('DEFAULT', 'matchup_dataset')
+    # job_id = config.get('harmonisation', 'job_id')
+    # matchup_dataset = config.get('DEFAULT', 'matchup_dataset')
 
     # Get data directories and paths
-    dataset_dir = abspath(config.get('DATA', 'dataset_dir'))
-    sensor_data_path = abspath(config.get('DATA', 'sensor_data_path'))
-    output_dir = abspath(config.get('DATA', 'output_dir'))
+    dataset_dir = abspath(config.get('harmonisation', 'dataset_dir'))
+    sensor_data = SensorDataFactory().get_sensor_data(config.get('harmonisation', 'sensor_data'))
+    output_dir = abspath(config.get('harmonisation', 'output_dir'))
+    pc_input = None
+    save_pc = None
+    gn_input = None
+    save_gn = None
 
-    return job_id, matchup_dataset, dataset_dir, sensor_data_path, output_dir, job_text
+    return dataset_dir, sensor_data, output_dir, pc_input, save_pc, gn_input, save_gn
 
 
 def get_harm_paths(output_dir):
