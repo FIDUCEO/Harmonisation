@@ -12,7 +12,7 @@ import sys
 from importlib import import_module
 
 '''___Third-Party Modules___'''
-from numpy import array, zeros, loadtxt, append, vstack, arange, asarray, cumsum, int32, ones, nan, float32
+from numpy import array, zeros, append, asarray, cumsum, int32, ones, nan, float32
 from scipy.sparse import csr_matrix
 from netCDF4 import Dataset
 
@@ -130,8 +130,7 @@ class MatchUp(object):
             Produce match-up file W matrix variable arrays from lists of W and U matrices data.
     """
 
-    def __init__(self, paths_matchup_data=None, sensor_data=None, path_sensor_data=None,
-                 open_uncertainty=True, open_additional_values=True):
+    def __init__(self, paths_matchup_data=None, sensor_data=None, open_uncertainty=True, open_additional_values=True):
         """
         Initialise match-up data object, opening match-up data from file if specified
 
@@ -139,8 +138,8 @@ class MatchUp(object):
         :param paths_matchup: paths of match-up file to open. If one file string of path, if multiple files provide list
         of strings of path
 
-        :type path_sensor_data: str
-        :param path_sensor_data: path of sensor data file
+        :type sensor_data: str
+        :param sensor_data: sensor data
 
         :type open_uncertainty: bool
         :param open_uncertainty: Switch to determine whether or not to open uncertainty data
@@ -290,33 +289,12 @@ class MatchUp(object):
         # Each covariate (+ks) in each match-up has its own uncertainty values and type, create a list to contain this
         # information for the consecuative blocks in the values data array.
 
+        # Open datasets
+        datasets = self.open_nc_datasets(paths_matchup)
+
         ################################################################################################################
         # 1. Define 1D Data Structure
         ################################################################################################################
-
-        # Open datasets
-
-        # Organise list of match-up dataset paths
-        if type(paths_matchup) == str:
-            if isdir(paths_matchup):
-                paths_matchup = sorted([pjoin(paths_matchup, fname) for fname in listdir(paths_matchup) if fname[-3:] == ".nc"])
-            elif isfile(paths_matchup):
-                paths_matchup = [paths_matchup]
-            else:
-                return None
-
-        if type(paths_matchup) == list:
-            if all(isfile(path) for path in paths_matchup):
-                pass
-            elif all(isdir(path) for path in paths_matchup):
-                dirs_matchup = paths_matchup
-                paths_matchup = []
-                for dir_matchup in dirs_matchup:
-                    paths_matchup += [pjoin(dir_matchup, fname) for fname in listdir(dir_matchup)]
-            else:
-                return None
-
-        datasets = [Dataset(path, 'r') for path in paths_matchup]
 
         # Obtaining lists of indices to describe data structure
 
@@ -610,6 +588,42 @@ class MatchUp(object):
 
         return values, unc, w_matrices, u_matrices, ks, unck, time1, time2, across_track_index1, across_track_index2,\
                along_track_index1, along_track_index2, additional_values, idx
+
+    def open_nc_datasets(self, paths_matchup):
+        """
+
+        :param paths_matchup: str/list
+        :param paths_matchup: matchup file paths, may be:
+
+        * string of path of single file
+        * string of path of directory containing files
+        * list of file paths
+        * list of paths of directories containing files
+
+        :return:
+        """
+        # Determine file paths of match-up files
+        if type(paths_matchup) == str:
+            if isdir(paths_matchup):
+                paths_matchup = sorted([pjoin(paths_matchup, fname)
+                                        for fname in listdir(paths_matchup) if fname[-3:] == ".nc"])
+            elif isfile(paths_matchup):
+                paths_matchup = [paths_matchup]
+            else:
+                return None
+
+        elif type(paths_matchup) == list:
+            if all(isfile(path) for path in paths_matchup):
+                pass
+            elif all(isdir(path) for path in paths_matchup):
+                dirs_matchup = paths_matchup
+                paths_matchup = []
+                for dir_matchup in dirs_matchup:
+                    paths_matchup += [pjoin(dir_matchup, fname) for fname in listdir(dir_matchup)]
+            else:
+                return None
+
+        return [Dataset(path, 'r') for path in paths_matchup]
 
     def _open_sensor_data(self, path_sensor_data):
         """
