@@ -1,25 +1,20 @@
 """
-Test of MatchUpData Class
+Test of MatchUp Class
 """
 
 '''___Built-In Modules___'''
 import unittest
 from os.path import join as pjoin
-from os import makedirs, getcwd
-from os.path import dirname, exists, abspath, isdir
-import sys
-from shutil import rmtree
-from datetime import datetime as dt
-from random import random
+from os import getcwd
+from os.path import dirname, abspath
+from datetime import datetime
 
 '''___Third-Party Modules___'''
-from numpy import array, ndarray, savetxt
-from scipy.sparse import csr_matrix
+from numpy.ma import MaskedArray
+from numpy import ndarray, nan, isnan
 from netCDF4 import Dataset
 
 '''___harmonisation Modules___'''
-from test_functions.W_matrix_functions import write_input_file, return_w_matrix_variables, append_W_to_input_file
-from harmonisation import Uncertainty
 
 
 '''___Authorship___'''
@@ -36,12 +31,92 @@ temp_data_directory = pjoin(getcwd(), "temp")
 DATASET_PATHS = [abspath("../../../../../data/simulated_matchup/0_1.nc"),
                  abspath("../../../../../data/simulated_matchup/1_2.nc"),
                  abspath("../../../../../data/simulated_matchup/2_3.nc")]
+IDX_SINGLE = {"Nm": [10000],
+              "cNm": [0, 10000],
+              "sensors": ["0", "1"],
+              "Im": [[0, 1]],
+              "sensor_ms": [1, 4],
+              "n_sensor": [0, 1, 1, 1, 1],
+              "n_mu": [1, 1, 1, 1, 1],
+              "n_cov": [1, 1, 2, 3, 4],
+              "N_var": [10000, 10000, 10000, 10000, 10000],
+              "idx": [0, 10000, 20000, 30000, 40000, 50000]}
+IDX_SINGLE_ADDITIONAL_VALUES = {"Nm": [10000],
+                                "cNm": [0, 10000],
+                                "sensors": ["0", "1"],
+                                "Im": [[0, 1]],
+                                "sensor_ms": [1, 4],
+                                "n_sensor": [0, 1, 1, 1, 1],
+                                "n_mu": [1, 1, 1, 1, 1],
+                                "n_cov": [1, 1, 2, 3, 4],
+                                "N_var": [10000, 10000, 10000, 10000, 10000],
+                                "idx": [0, 10000, 20000, 30000, 40000, 50000],
+                                "additional_values_name": ["nominal_measurand1", "nominal_measurand2",
+                                                           "extra_variable"]}
+IDX_MULTI = {"Nm": [10000, 10000, 10000],
+             "cNm": [0, 10000, 20000, 30000],
+             "sensors": ["0", "1", "2", "3"],
+             "sensor_ms": [1, 4, 4, 4],
+             "Im": [[0, 1], [1, 2], [2, 3]],
+             "n_sensor": [0, 1, 1, 2, 2, 3, 1, 1, 2, 2, 3, 1, 1, 2, 2, 3, 1, 1, 2, 2, 3],
+             "n_mu": [1, 1, 2, 2, 3, 3, 1, 2, 2, 3, 3, 1, 2, 2, 3, 3, 1, 2, 2, 3, 3],
+             "n_cov": [1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4],
+             "N_var": [10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000,
+                       10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000],
+             "idx": [0, 10000, 20000, 30000, 40000, 50000, 60000, 70000, 80000, 90000, 100000, 110000, 120000, 130000,
+                      140000, 150000, 160000, 170000, 180000, 190000, 200000, 210000]}
+IDX_MULTI_ADDITIONAL_VALUES = {"Nm": [10000, 10000, 10000],
+                               "cNm": [0, 10000, 20000, 30000],
+                               "sensors": ["0", "1", "2", "3"],
+                               "sensor_ms": [1, 4, 4, 4],
+                               "Im": [[0, 1], [1, 2], [2, 3]],
+                               "n_sensor": [0, 1, 1, 2, 2, 3, 1, 1, 2, 2, 3, 1, 1, 2, 2, 3, 1, 1, 2, 2, 3],
+                               "n_mu": [1, 1, 2, 2, 3, 3, 1, 2, 2, 3, 3, 1, 2, 2, 3, 3, 1, 2, 2, 3, 3],
+                               "n_cov": [1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4],
+                               "N_var": [10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000,
+                                         10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000],
+                               "idx": [0, 10000, 20000, 30000, 40000, 50000, 60000, 70000, 80000, 90000, 100000, 110000,
+                                       120000, 130000, 140000, 150000, 160000, 170000, 180000, 190000, 200000, 210000],
+                               "additional_values_name": ["nominal_measurand1", "nominal_measurand2", "extra_variable"]}
+TEST_UNC_TYPEID = [1, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2]
+TEST_UNC_UR = [0.0750426832, None, None, None, None, None, None, None, None, None, None,
+           0.251087305, 0.251087305, 0.251087305, 0.251087305, 0.251087305,
+           0.122101448, 0.122101448, 0.122101448, 0.122101448, 0.122101448]
+TEST_UNC_W_I = [None, 0, 1, 1, 2, 2, 0, 1, 1, 2, 2, None, None, None, None, None, None, None, None, None]
+TEST_UNC_U_I = [None, 0, 1, 1, 2, 2, 0, 1, 1, 2, 2, None, None, None, None, None, None, None, None, None]
+TEST_UNC_US = [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+           0.204141772, 0.204141772, 0.204141772, 0.204141772, 0.204141772]
+TEST_UNC_US_I = [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+             1, 1, 2, 2, 3]
+
+TEST_VALUES_BLOCK_FIRSTS = [40.052811, 951.55823, 1002.58868, 990.082462, 992.032639, 986.811812, 457.918812,
+                            456.004804, 442.620179, 441.242585, 415.619208, 737.723959, 761.736216, 790.987766,
+                            760.634506, 790.361844, 102.412389, 103.398928, 89.9778417, 112.579682, 102.499891]
+
+TEST_KS_MU_FIRSTS = [5.18839393, -12.7125831, -12.2558266]
+
+TEST_UNCK_TYPEID = [1, 1, 1]
+TEST_UNCK_UR = [0.351025364, 0.351025364, 0.351025364]
+
+TEST_ADDITIONAL_VALUES_BLOCK_FIRSTS = [[0, 45.5201530456543, 40.0528106689453],
+                                       [nan, 34.1658058166504, 46.7008666992188],
+                                       [0, 36.2559852600098, 48.6974601745605]]
+
+TEST_ACROSS_TRACK_INDEX_FIRSTS = [1, nan, 1]
+TEST_TIME_FIRSTS = [datetime(1970, 1, 1, 0, 0), datetime(1970, 1, 1, 2, 46, 40), datetime(1970, 1, 1, 5, 33, 20)]
 
 
 def setup():
     from harmonisation import MatchUp
     matchup = MatchUp()
     return matchup
+
+
+def setup_open_nc():
+    from harmonisation import MatchUp
+    matchup = MatchUp()
+    datasets = matchup.open_nc_datasets(DATASET_PATHS)
+    return matchup, datasets
 
 
 class TestMatchUp(unittest.TestCase):
@@ -77,2833 +152,313 @@ class TestMatchUp(unittest.TestCase):
             self.assertTrue(type(test_dataset) == Dataset)
             self.assertEqual(test_dataset.filepath(), DATASET_PATH)
 
-    # def test_openMatchUpData_multi_r__(self):
-    #     """
-    #     Test for MatchUpData.openMatchUp() method for case with multiple matchup series datasets
-    #     - with only random uncertainty type
-    #     """
-    #
-    #     # Test Description
-    #     # ================
-    #     #
-    #     # 1. This test writes two test match-up data files:
-    #     #    + Reference - Sensor A
-    #     #    + Sensor A - Sensor B
-    #     #    Sensor A/B have three measurement function variables, each with uncertainty types random
-    #     #
-    #     # 2. The files are read by the match-up data reader
-    #     #
-    #     # 3. The MatchUpData object in memory is compared to the expected values
-    #
-    #     ################################################################################################################
-    #     # 1. Write test match-up data files
-    #     ################################################################################################################
-    #
-    #     # Define file paths
-    #     test_data_directory = pjoin(dirname(__file__), "temp_data_directory")
-    #     if not exists(test_data_directory):
-    #         makedirs(test_data_directory)
-    #
-    #     fname_matchup1 = pjoin(test_data_directory, "matchup1.nc")
-    #     fname_matchup2 = pjoin(test_data_directory, "matchup2.nc")
-    #     parameter_fname = pjoin(test_data_directory, "parameter.csv")
-    #
-    #     # a. Reference - Sensor A match-up data ------------------------------------------------------------------------
-    #
-    #     # i. Reference Sensor data
-    #     sensor_1_name_matchup1 = -1
-    #
-    #     X1_matchup1 = array([[16.2, 11.2, 15.1, 20.3, 18.1]]).T
-    #     Ur1_matchup1 = array([1.6, 1.5, 1.5, 1.3, 1.5])
-    #     Us1_matchup1 = array([0.0, 0.0, 0.0, 0.0, 0.0])
-    #     uncertainty_type1_matchup1 = array([1])
-    #
-    #     # ii. Sensor A data
-    #     sensor_2_name_matchup1 = 1
-    #
-    #     X2_matchup1 = array([[70.5, 150.5, 30.2],
-    #                          [70.6, 151.1, 20.4],
-    #                          [70.3, 149.8, 28.2],
-    #                          [70.7, 150.2, 50.7],
-    #                          [70.5, 151.4, 45.6]])
-    #
-    #     Ur2_matchup1 = array([[3.1, 5.0, 2.2],
-    #                           [3.2, 4.7, 1.7],
-    #                           [3.2, 5.1, 2.0],
-    #                           [3.1, 5.2, 4.3],
-    #                           [3.0, 5.3, 2.6]])
-    #
-    #     Us2_matchup1 = array([[0.0, 0.0, 0.0],
-    #                           [0.0, 0.0, 0.0],
-    #                           [0.0, 0.0, 0.0],
-    #                           [0.0, 0.0, 0.0],
-    #                           [0.0, 0.0, 0.0]])
-    #
-    #     uncertainty_type2_matchup1 = array([1, 1, 1])
-    #
-    #     # iii. Match-up data
-    #     K_matchup1 = array([1.2, 1.7, 1.3, 1.4, 1.3])
-    #     Kr_matchup1 = array([0.3, 0.3, 0.3, 0.3, 0.3])
-    #     Ks_matchup1 = array([0.4, 0.4, 0.4, 0.4, 0.4])
-    #     time1_matchup1 = array([1.0, 2.0, 3.0, 4.0, 5.0])
-    #     time2_matchup1 = array([1.1, 2.1, 3.1, 4.1, 5.1])
-    #
-    #     # --------------------------------------------------------------------------------------------------------------
-    #
-    #     # b. Sensor A - Sensor B match-up data -------------------------------------------------------------------------
-    #
-    #     # i. Sensor A data
-    #     sensor_1_name_matchup2 = 1
-    #
-    #     X1_matchup2 = array([[71.5, 140.5, 29.2],
-    #                          [71.6, 141.1, 37.4],
-    #                          [71.3, 139.8, 28.2],
-    #                          [71.7, 140.2, 50.7]])
-    #
-    #     Ur1_matchup2 = array([[3.3, 4.2, 2.3],
-    #                           [3.4, 4.3, 1.2],
-    #                           [3.1, 4.4, 2.3],
-    #                           [3.2, 4.3, 4.4]])
-    #
-    #     Us1_matchup2 = array([[0.0, 0.0, 0.0],
-    #                           [0.0, 0.0, 0.0],
-    #                           [0.0, 0.0, 0.0],
-    #                           [0.0, 0.0, 0.0]])
-    #
-    #     uncertainty_type1_matchup2 = array([1, 1, 1])
-    #
-    #     # ii. Sensor B data
-    #     sensor_2_name_matchup2 = 2
-    #
-    #     X2_matchup2 = array([[80.5, 160.5, 28.2],
-    #                          [80.6, 161.1, 32.4],
-    #                          [80.3, 169.8, 22.2],
-    #                          [80.7, 160.2, 53.7]])
-    #
-    #     Ur2_matchup2 = array([[2.1, 4.0, 3.2],
-    #                           [2.2, 3.7, 2.7],
-    #                           [2.2, 4.4, 3.0],
-    #                           [2.1, 4.7, 5.3]])
-    #
-    #     Us2_matchup2 = array([[0.0, 0.0, 0.0],
-    #                           [0.0, 0.0, 0.0],
-    #                           [0.0, 0.0, 0.0],
-    #                           [0.0, 0.0, 0.0]])
-    #
-    #     uncertainty_type2_matchup2 = array([1, 1, 1])
-    #
-    #     # iii. Match-up data
-    #     K_matchup2 = array([3.2, 3.7, 3.3, 3.4])
-    #     Kr_matchup2 = array([0.5, 0.5, 0.5, 0.5])
-    #     Ks_matchup2 = array([0.12, 0.12, 0.12, 0.12])
-    #     time1_matchup2 = array([1.0, 2.0, 3.0, 4.0])
-    #     time2_matchup2 = array([1.1, 2.1, 3.1, 4.1])
-    #
-    #     # --------------------------------------------------------------------------------------------------------------
-    #
-    #     # d. Test data to file -----------------------------------------------------------------------------------------
-    #
-    #     # i. Match-up 1
-    #     write_input_file(fname_matchup1,
-    #                      X1_matchup1, X2_matchup1,
-    #                      Ur1_matchup1, Ur2_matchup1, Us1_matchup1, Us2_matchup1,
-    #                      uncertainty_type1_matchup1, uncertainty_type2_matchup1,
-    #                      K_matchup1, Kr_matchup1, Ks_matchup1,
-    #                      time1_matchup1, time2_matchup1,
-    #                      sensor_1_name_matchup1, sensor_2_name_matchup1)
-    #
-    #     # ii. Match-up 2
-    #     write_input_file(fname_matchup2,
-    #                      X1_matchup2, X2_matchup2,
-    #                      Ur1_matchup2, Ur2_matchup2, Us1_matchup2, Us2_matchup2,
-    #                      uncertainty_type1_matchup2, uncertainty_type2_matchup2,
-    #                      K_matchup2, Kr_matchup2, Ks_matchup2,
-    #                      time1_matchup2, time2_matchup2,
-    #                      sensor_1_name_matchup2, sensor_2_name_matchup2)
-    #
-    #     # --------------------------------------------------------------------------------------------------------------
-    #
-    #     ################################################################################################################
-    #     # 2. Define expected values
-    #     ################################################################################################################
-    #
-    #     # Expected value of HData attributes
-    #     values_expected = array([16.2, 11.2, 15.1, 20.3, 18.1,
-    #                              70.5, 70.6, 70.3, 70.7, 70.5,
-    #                              71.5, 71.6, 71.3, 71.7,
-    #                              80.5, 80.6, 80.3, 80.7,
-    #                              150.5, 151.1, 149.8, 150.2, 151.4,
-    #                              140.5, 141.1, 139.8, 140.2,
-    #                              160.5, 161.1, 169.8, 160.2,
-    #                              30.2, 20.4, 28.2, 50.7, 45.6,
-    #                              29.2, 37.4, 28.2, 50.7,
-    #                              28.2, 32.4, 22.2, 53.7, ])
-    #     unc_expected = [Uncertainty("r", array([1.6, 1.5, 1.5, 1.3, 1.5])),
-    #                     Uncertainty("r", array([3.1, 3.2, 3.2, 3.1, 3.0])),
-    #                     Uncertainty("r", array([3.3, 3.4, 3.1, 3.2])),
-    #                     Uncertainty("r", array([2.1, 2.2, 2.2, 2.1])),
-    #                     Uncertainty("r", array([5.0, 4.7, 5.1, 5.2, 5.3])),
-    #                     Uncertainty("r", array([4.2, 4.3, 4.4, 4.3])),
-    #                     Uncertainty("r", array([4.0, 3.7, 4.4, 4.7])),
-    #                     Uncertainty("r", array([2.2, 1.7, 2.0, 4.3, 2.6])),
-    #                     Uncertainty("r", array([2.3, 1.2, 2.3, 4.4])),
-    #                     Uncertainty("r", array([3.2, 2.7, 3.0, 5.3]))]
-    #     w_matrices_expected = []
-    #     u_matrices_expected = []
-    #     ks_expected = array([1.2, 1.7, 1.3, 1.4, 1.3, 3.2, 3.7, 3.3, 3.4])
-    #     unck_expected = [Uncertainty("r", array([0.25, 0.25, 0.25, 0.25, 0.25])),
-    #                      Uncertainty("r", array([0.2644, 0.2644, 0.2644, 0.2644]))]
-    #     time1_expected = array([dt(1970, 1, 1, 1, 0, 1),
-    #                             dt(1970, 1, 1, 1, 0, 2),
-    #                             dt(1970, 1, 1, 1, 0, 3),
-    #                             dt(1970, 1, 1, 1, 0, 4),
-    #                             dt(1970, 1, 1, 1, 0, 5),
-    #                             dt(1970, 1, 1, 1, 0, 1),
-    #                             dt(1970, 1, 1, 1, 0, 2),
-    #                             dt(1970, 1, 1, 1, 0, 3),
-    #                             dt(1970, 1, 1, 1, 0, 4)])
-    #     time2_expected = array([dt(1970, 1, 1, 1, 0, 1, 100000),
-    #                             dt(1970, 1, 1, 1, 0, 2, 100000),
-    #                             dt(1970, 1, 1, 1, 0, 3, 100000),
-    #                             dt(1970, 1, 1, 1, 0, 4, 100000),
-    #                             dt(1970, 1, 1, 1, 0, 5, 100000),
-    #                             dt(1970, 1, 1, 1, 0, 1, 100000),
-    #                             dt(1970, 1, 1, 1, 0, 2, 100000),
-    #                             dt(1970, 1, 1, 1, 0, 3, 100000),
-    #                             dt(1970, 1, 1, 1, 0, 4, 100000)])
-    #     idx_expected = {"Nm": [5, 4],
-    #                     "cNm": [0, 5, 9],
-    #                     "Im": [[0, 1], [1, 2]],
-    #                     "sensors": [-1, 1, 2],
-    #                     "sensor_ms": [1, 3, 3],
-    #                     "n_sensor": [0, 1, 1, 2, 1, 1, 2, 1, 1, 2],
-    #                     "n_mu": [1, 1, 2, 2, 1, 2, 2, 1, 2, 2],
-    #                     "n_cov": [1, 1, 1, 1, 2, 2, 2, 3, 3, 3],
-    #                     "N_var": [5, 5, 4, 4, 5, 4, 4, 5, 4, 4],
-    #                     "idx": [0, 5, 10, 14, 18, 23, 27, 31, 36, 40, 44]}
-    #
-    #     ################################################################################################################
-    #     # 3. Run MatchUpData.read_data()
-    #     ################################################################################################################
-    #
-    #     MatchUpOp = MatchUp()
-    #
-    #     values_test, unc_test, w_matrices_test,\
-    #         u_matrices_test, ks_test, unck_test, time1_test, time2_test, \
-    #             idx_test = MatchUpOp.openMatchUpData([fname_matchup1, fname_matchup2], parameter_fname)
-    #
-    #     ################################################################################################################
-    #     # 4. Compare retrieve values to expect values
-    #     ################################################################################################################
-    #
-    #     # Test HData object attribute by attribute
-    #
-    #     # a. values
-    #     self.assertEqual(values_test.tolist(), values_expected.tolist())
-    #
-    #     # b. unc
-    #     for block_unc_test, block_unc_expected in zip(unc_test, unc_expected):
-    #         self.assertEqual(block_unc_expected.form, block_unc_test.form)
-    #         self.assertEqual(block_unc_expected.uR.tolist(), block_unc_test.uR.tolist())
-    #
-    #     # c. w_matrices
-    #     self.assertEqual(w_matrices_test, w_matrices_expected)
-    #
-    #     # d. u_matrices
-    #     self.assertEqual(u_matrices_test, u_matrices_expected)
-    #
-    #     # e. ks
-    #     self.assertEqual(ks_test.tolist(), ks_expected.tolist())
-    #
-    #     # f. unck
-    #     for block_unck_test, block_unck_expected in zip(unck_test, unck_expected):
-    #         self.assertEqual(block_unck_expected.form, block_unck_test.form)
-    #         self.assertEqual(block_unck_expected.uR.tolist(), block_unck_test.uR.tolist())
-    #
-    #     # g. time
-    #     self.assertEqual(time1_test.tolist(), time1_expected.tolist())
-    #     self.assertEqual(time2_test.tolist(), time2_expected.tolist())
-    #
-    #     # h. idx
-    #     self.assertEqual(set(idx_expected.keys()), set(idx_test.keys()))
-    #     for key in idx_expected.keys():
-    #         idx_i_test = idx_test[key]
-    #         idx_i_expected = idx_expected[key]
-    #         if isinstance(idx_i_expected, ndarray):
-    #             self.assertEqual(idx_i_test.tolist(), idx_i_expected.tolist())
-    #         else:
-    #             self.assertEqual(idx_i_test, idx_i_expected)
-    #
-    #     ################################################################################################################
-    #     # 5. Remove Test Data
-    #     ################################################################################################################
-    #
-    #     rmtree(test_data_directory)
-    #
-    # def test_openMatchUpData_multi_rs_(self):
-    #     """
-    #     Test for MatchUpData.openMatchUpData() method for case with multiple match-up series datasets
-    #     - with random and random and systematic uncertainty type
-    #     """
-    #
-    #     # Test Description
-    #     # ================
-    #     #
-    #     # 1. This test writes two test match-up data files:
-    #     #    + Reference - Sensor A
-    #     #    + Sensor A - Sensor B
-    #     #    Sensor A/B have three measurement function variables, with covariate 1 and 3 random uncertainty type and
-    #     #    covariate 2 with systematic uncertainty type
-    #     #
-    #     # 2. The files are read by the match-up data reader
-    #     #
-    #     # 3. The MatchUpData object in memory is compared to the expected values
-    #
-    #     ################################################################################################################
-    #     # 1. Write test match-up data files
-    #     ################################################################################################################
-    #
-    #     # Define file paths
-    #     test_data_directory = pjoin(temp_data_directory, str(int(random()*1000000)))
-    #     if not exists(test_data_directory):
-    #         makedirs(test_data_directory)
-    #
-    #     fname_matchup1 = pjoin(test_data_directory, "matchup1.nc")
-    #     fname_matchup2 = pjoin(test_data_directory, "matchup2.nc")
-    #
-    #     # a. Reference - Sensor A match-up data ------------------------------------------------------------------------
-    #
-    #     # i. Reference Sensor data
-    #     sensor_1_name_matchup1 = -1
-    #
-    #     X1_matchup1 = array([[16.2, 11.2, 15.1, 20.3, 18.1]]).T
-    #     Ur1_matchup1 = array([1.6, 1.5, 1.5, 1.3, 1.5])
-    #     Us1_matchup1 = array([0.0, 0.0, 0.0, 0.0, 0.0])
-    #     uncertainty_type1_matchup1 = array([1])
-    #
-    #     # ii. Sensor A data
-    #     sensor_2_name_matchup1 = 1
-    #
-    #     X2_matchup1 = array([[70.5, 150.5, 30.2],
-    #                          [70.6, 151.1, 20.4],
-    #                          [70.3, 149.8, 28.2],
-    #                          [70.7, 150.2, 50.7],
-    #                          [70.5, 151.4, 45.6]])
-    #
-    #     Ur2_matchup1 = array([[3.1, 5.0, 2.2],
-    #                           [3.2, 4.7, 1.7],
-    #                           [3.2, 5.1, 2.0],
-    #                           [3.1, 5.2, 4.3],
-    #                           [3.0, 5.3, 2.6]])
-    #
-    #     Us2_matchup1 = array([[0.0, 1.0, 0.0],
-    #                           [0.0, 1.0, 0.0],
-    #                           [0.0, 1.0, 0.0],
-    #                           [0.0, 1.0, 0.0],
-    #                           [0.0, 1.0, 0.0]])
-    #
-    #     uncertainty_type2_matchup1 = array([1, 2, 1])
-    #
-    #     # iii. Match-up data
-    #     K_matchup1 = array([1.2, 1.7, 1.3, 1.4, 1.3])
-    #     Kr_matchup1 = array([0.3, 0.3, 0.3, 0.3, 0.3])
-    #     Ks_matchup1 = array([0.4, 0.4, 0.4, 0.4, 0.4])
-    #     time1_matchup1 = array([1.0, 2.0, 3.0, 4.0, 5.0])
-    #     time2_matchup1 = array([1.1, 2.1, 3.1, 4.1, 5.1])
-    #
-    #     # --------------------------------------------------------------------------------------------------------------
-    #
-    #     # b. Sensor A - Sensor B match-up data -------------------------------------------------------------------------
-    #
-    #     # i. Sensor A data
-    #     sensor_1_name_matchup2 = 1
-    #
-    #     X1_matchup2 = array([[71.5, 140.5, 29.2],
-    #                          [71.6, 141.1, 37.4],
-    #                          [71.3, 139.8, 28.2],
-    #                          [71.7, 140.2, 50.7]])
-    #
-    #     Ur1_matchup2 = array([[3.3, 4.2, 2.3],
-    #                           [3.4, 4.3, 1.2],
-    #                           [3.1, 4.4, 2.3],
-    #                           [3.2, 4.3, 4.4]])
-    #
-    #     Us1_matchup2 = array([[0.0, 1.0, 0.0],
-    #                           [0.0, 1.0, 0.0],
-    #                           [0.0, 1.0, 0.0],
-    #                           [0.0, 1.0, 0.0]])
-    #
-    #     uncertainty_type1_matchup2 = array([1, 2, 1])
-    #
-    #     # ii. Sensor B data
-    #     sensor_2_name_matchup2 = 2
-    #
-    #     X2_matchup2 = array([[80.5, 160.5, 28.2],
-    #                          [80.6, 161.1, 32.4],
-    #                          [80.3, 169.8, 22.2],
-    #                          [80.7, 160.2, 53.7]])
-    #
-    #     Ur2_matchup2 = array([[2.1, 4.0, 3.2],
-    #                           [2.2, 3.7, 2.7],
-    #                           [2.2, 4.4, 3.0],
-    #                           [2.1, 4.7, 5.3]])
-    #
-    #     Us2_matchup2 = array([[0.0, 2.0, 0.0],
-    #                           [0.0, 2.0, 0.0],
-    #                           [0.0, 2.0, 0.0],
-    #                           [0.0, 2.0, 0.0]])
-    #
-    #     uncertainty_type2_matchup2 = array([1, 2, 1])
-    #
-    #     # iii. Match-up data
-    #     K_matchup2 = array([3.2, 3.7, 3.3, 3.4])
-    #     Kr_matchup2 = array([0.5, 0.5, 0.5, 0.5])
-    #     Ks_matchup2 = array([0.12, 0.12, 0.12, 0.12])
-    #     time1_matchup2 = array([1.0, 2.0, 3.0, 4.0])
-    #     time2_matchup2 = array([1.1, 2.1, 3.1, 4.1])
-    #
-    #     # --------------------------------------------------------------------------------------------------------------
-    #
-    #     # c. Test data to file -----------------------------------------------------------------------------------------
-    #
-    #     # i. Match-up 1
-    #     write_input_file(fname_matchup1,
-    #                      X1_matchup1, X2_matchup1,
-    #                      Ur1_matchup1, Ur2_matchup1, Us1_matchup1, Us2_matchup1,
-    #                      uncertainty_type1_matchup1, uncertainty_type2_matchup1,
-    #                      K_matchup1, Kr_matchup1, Ks_matchup1,
-    #                      time1_matchup1, time2_matchup1,
-    #                      sensor_1_name_matchup1, sensor_2_name_matchup1)
-    #
-    #     # ii. Match-up 2
-    #     write_input_file(fname_matchup2,
-    #                      X1_matchup2, X2_matchup2,
-    #                      Ur1_matchup2, Ur2_matchup2, Us1_matchup2, Us2_matchup2,
-    #                      uncertainty_type1_matchup2, uncertainty_type2_matchup2,
-    #                      K_matchup2, Kr_matchup2, Ks_matchup2,
-    #                      time1_matchup2, time2_matchup2,
-    #                      sensor_1_name_matchup2, sensor_2_name_matchup2)
-    #
-    #     # --------------------------------------------------------------------------------------------------------------
-    #
-    #     ################################################################################################################
-    #     # 2. Define expected values
-    #     ################################################################################################################
-    #
-    #     # Expected value of HData attributes
-    #     values_expected = array([16.2, 11.2, 15.1, 20.3, 18.1,
-    #                              70.5, 70.6, 70.3, 70.7, 70.5,
-    #                              71.5, 71.6, 71.3, 71.7,
-    #                              80.5, 80.6, 80.3, 80.7,
-    #                              150.5, 151.1, 149.8, 150.2, 151.4,
-    #                              140.5, 141.1, 139.8, 140.2,
-    #                              160.5, 161.1, 169.8, 160.2,
-    #                              30.2, 20.4, 28.2, 50.7, 45.6,
-    #                              29.2, 37.4, 28.2, 50.7,
-    #                              28.2, 32.4, 22.2, 53.7, ])
-    #     unc_expected = [Uncertainty("r", array([1.6, 1.5, 1.5, 1.3, 1.5])),
-    #                     Uncertainty("r", array([3.1, 3.2, 3.2, 3.1, 3.0])),
-    #                     Uncertainty("r", array([3.3, 3.4, 3.1, 3.2])),
-    #                     Uncertainty("r", array([2.1, 2.2, 2.2, 2.1])),
-    #                     Uncertainty("rs", (array([5.0, 4.7, 5.1, 5.2, 5.3]), 1.0)),
-    #                     Uncertainty("rs", (array([4.2, 4.3, 4.4, 4.3]), 1.0)),
-    #                     Uncertainty("rs", (array([4.0, 3.7, 4.4, 4.7]), 2.0)),
-    #                     Uncertainty("r", array([2.2, 1.7, 2.0, 4.3, 2.6])),
-    #                     Uncertainty("r", array([2.3, 1.2, 2.3, 4.4])),
-    #                     Uncertainty("r", array([3.2, 2.7, 3.0, 5.3]))]
-    #     w_matrices_expected = []
-    #     u_matrices_expected = []
-    #     ks_expected = array([1.2, 1.7, 1.3, 1.4, 1.3, 3.2, 3.7, 3.3, 3.4])
-    #     unck_expected = [Uncertainty("r", array([0.25, 0.25, 0.25, 0.25, 0.25])),
-    #                      Uncertainty("r", array([0.2644, 0.2644, 0.2644, 0.2644]))]
-    #     time1_expected = array([dt(1970, 1, 1, 1, 0, 1),
-    #                             dt(1970, 1, 1, 1, 0, 2),
-    #                             dt(1970, 1, 1, 1, 0, 3),
-    #                             dt(1970, 1, 1, 1, 0, 4),
-    #                             dt(1970, 1, 1, 1, 0, 5),
-    #                             dt(1970, 1, 1, 1, 0, 1),
-    #                             dt(1970, 1, 1, 1, 0, 2),
-    #                             dt(1970, 1, 1, 1, 0, 3),
-    #                             dt(1970, 1, 1, 1, 0, 4)])
-    #     time2_expected = array([dt(1970, 1, 1, 1, 0, 1, 100000),
-    #                             dt(1970, 1, 1, 1, 0, 2, 100000),
-    #                             dt(1970, 1, 1, 1, 0, 3, 100000),
-    #                             dt(1970, 1, 1, 1, 0, 4, 100000),
-    #                             dt(1970, 1, 1, 1, 0, 5, 100000),
-    #                             dt(1970, 1, 1, 1, 0, 1, 100000),
-    #                             dt(1970, 1, 1, 1, 0, 2, 100000),
-    #                             dt(1970, 1, 1, 1, 0, 3, 100000),
-    #                             dt(1970, 1, 1, 1, 0, 4, 100000)])
-    #     idx_expected = {"Nm": [5, 4],
-    #                     "cNm": [0, 5, 9],
-    #                     "Im": [[0, 1], [1, 2]],
-    #                     "sensors": [-1, 1, 2],
-    #                     "sensor_ms": [1, 3, 3],
-    #                     "n_sensor": [0, 1, 1, 2, 1, 1, 2, 1, 1, 2],
-    #                     "n_mu": [1, 1, 2, 2, 1, 2, 2, 1, 2, 2],
-    #                     "n_cov": [1, 1, 1, 1, 2, 2, 2, 3, 3, 3],
-    #                     "N_var": [5, 5, 4, 4, 5, 4, 4, 5, 4, 4],
-    #                     "idx": [0, 5, 10, 14, 18, 23, 27, 31, 36, 40, 44]}
-    #
-    #     ################################################################################################################
-    #     # 3. Run MatchUpData.read_data()
-    #     ################################################################################################################
-    #
-    #     MatchUpOp = MatchUp()
-    #
-    #     values_test, unc_test, w_matrices_test,\
-    #         u_matrices_test, ks_test, unck_test, time1_test, time2_test, \
-    #             idx_test = MatchUpOp.openMatchUpData([fname_matchup1, fname_matchup2])
-    #
-    #     ################################################################################################################
-    #     # 4. Compare retrieve values to expect values
-    #     ################################################################################################################
-    #
-    #     # Test HData object attribute by attribute
-    #
-    #     # a. values
-    #     self.assertEqual(values_test.tolist(), values_expected.tolist())
-    #
-    #     # b. unc
-    #     for block_unc_test, block_unc_expected in zip(unc_test, unc_expected):
-    #         self.assertEqual(block_unc_expected.form, block_unc_test.form)
-    #         self.assertEqual(block_unc_expected.uR.tolist(), block_unc_test.uR.tolist())
-    #         if block_unc_expected == "rs":
-    #             self.assertEqual(block_unc_expected.uS.tolist(), block_unc_test.uS.tolist())
-    #
-    #     # c. w_matrices
-    #     self.assertEqual(w_matrices_test, w_matrices_expected)
-    #
-    #     # d. u_matrices
-    #     self.assertEqual(u_matrices_test, u_matrices_expected)
-    #
-    #     # e. ks
-    #     self.assertEqual(ks_test.tolist(), ks_expected.tolist())
-    #
-    #     # f. unck
-    #     for block_unck_test, block_unck_expected in zip(unck_test, unck_expected):
-    #         self.assertEqual(block_unck_expected.form, block_unck_test.form)
-    #         self.assertEqual(block_unck_expected.uR.tolist(), block_unck_test.uR.tolist())
-    #
-    #     # g. time
-    #     self.assertEqual(time1_test.tolist(), time1_expected.tolist())
-    #     self.assertEqual(time2_test.tolist(), time2_expected.tolist())
-    #
-    #     # h. idx
-    #     self.assertEqual(set(idx_expected.keys()), set(idx_test.keys()))
-    #     for key in idx_expected.keys():
-    #         idx_i_test = idx_test[key]
-    #         idx_i_expected = idx_expected[key]
-    #         if isinstance(idx_i_expected, ndarray):
-    #             self.assertEqual(idx_i_test.tolist(), idx_i_expected.tolist())
-    #         else:
-    #             self.assertEqual(idx_i_test, idx_i_expected)
-    #
-    #     ################################################################################################################
-    #     # 5. Remove Test Data
-    #     ################################################################################################################
-    #
-    #     rmtree(test_data_directory)
-    #
-    # def test_openMatchUpData_multi_rsw(self):
-    #     """
-    #     Test for MatchUpData.openMatchUpData() method for case with mulitple match-up series datasets
-    #     - with random, random and systematic and w matrix uncertainty typea
-    #     """
-    #
-    #     # Test Description
-    #     # ================
-    #     #
-    #     # 1. This test writes two test match-up data files:
-    #     #    + Reference - Sensor A
-    #     #    + Sensor A - Sensor B
-    #     #    Sensor A/B have three measurement function variables, with covariate 1 w matrix uncertainty type, covariate
-    #     #    2 systematic uncertainty type and covariate 3 w matrix uncertainty type
-    #     #
-    #     # 2. The files are read by the match-up data reader
-    #     #
-    #     # 3. The MatchUpData object in memory is compared to the expected values
-    #
-    #     ################################################################################################################
-    #     # 1. Write test match-up data files
-    #     ################################################################################################################
-    #
-    #     # Define file paths
-    #     test_data_directory = pjoin(temp_data_directory, str(int(random()*1000000)))
-    #     if not exists(test_data_directory):
-    #         makedirs(test_data_directory)
-    #
-    #     fname_matchup1 = pjoin(test_data_directory, "matchup1.nc")
-    #     fname_matchup2 = pjoin(test_data_directory, "matchup2.nc")
-    #
-    #     # a. Reference - Sensor A match-up data ------------------------------------------------------------------------
-    #
-    #     # i. Reference Sensor data
-    #     sensor_1_name_matchup1 = -1
-    #
-    #     X1_matchup1 = array([[16.2, 11.2, 15.1, 20.3, 18.1]]).T
-    #     Ur1_matchup1 = array([1.6, 1.5, 1.5, 1.3, 1.5])
-    #     Us1_matchup1 = array([0.0, 0.0, 0.0, 0.0, 0.0])
-    #     uncertainty_type1_matchup1 = array([1])
-    #
-    #     # ii. Sensor A data
-    #     sensor_2_name_matchup1 = 1
-    #
-    #     X2_matchup1 = array([[70.5, 150.5, 30.2],
-    #                          [70.6, 151.1, 20.4],
-    #                          [70.3, 149.8, 28.2],
-    #                          [70.7, 150.2, 50.7],
-    #                          [70.5, 151.4, 45.6]])
-    #
-    #     Ur2_matchup1 = array([[3.1, 5.0, 2.2],
-    #                           [3.2, 4.7, 1.7],
-    #                           [3.2, 5.1, 2.0],
-    #                           [3.1, 5.2, 4.3],
-    #                           [3.0, 5.3, 2.6]])
-    #
-    #     Us2_matchup1 = array([[0.0, 1.0, 0.0],
-    #                           [0.0, 1.0, 0.0],
-    #                           [0.0, 1.0, 0.0],
-    #                           [0.0, 1.0, 0.0],
-    #                           [0.0, 1.0, 0.0]])
-    #
-    #     uncertainty_type2_matchup1 = array([1, 2, 3])
-    #
-    #     # iii. Match-up data
-    #     K_matchup1 = array([1.2, 1.7, 1.3, 1.4, 1.3])
-    #     Kr_matchup1 = array([0.3, 0.3, 0.3, 0.3, 0.3])
-    #     Ks_matchup1 = array([0.4, 0.4, 0.4, 0.4, 0.4])
-    #     time1_matchup1 = array([1.0, 2.0, 3.0, 4.0, 5.0])
-    #     time2_matchup1 = array([1.1, 2.1, 3.1, 4.1, 5.1])
-    #
-    #     # iv. w and u matrices
-    #     w_matrix_use1_matchup1 = array([0])
-    #     w_matrix_use2_matchup1 = array([0, 0, 1])
-    #     u_matrix_use1_matchup1 = array([0])
-    #     u_matrix_use2_matchup1 = array([0, 0, 1])
-    #
-    #     w2_matchup1 = array([[0.2, 0.2, 0.2, 0.2, 0.2, 0.0, 0.0, 0.0, 0.0],
-    #                          [0.0, 0.0, 0.2, 0.2, 0.2, 0.2, 0.2, 0.0, 0.0],
-    #                          [0.0, 0.0, 0.0, 0.2, 0.2, 0.2, 0.2, 0.2, 0.0],
-    #                          [0.0, 0.0, 0.0, 0.0, 0.2, 0.2, 0.2, 0.2, 0.2]])
-    #     w2_matchup1 = csr_matrix(w2_matchup1)
-    #
-    #     u_matrix2_matchup1 = array([0.2, 0.3, 0.2, 0.1, 0.3, 0.5, 0.3, 0.7, 0.8])
-    #
-    #     w_matrix_val_matchup1, w_matrix_row_matchup1, \
-    #         w_matrix_col_matchup1, w_matrix_nnz_matchup1, \
-    #             u_matrix_row_count_matchup1, u_matrix_matchup1 \
-    #                 = return_w_matrix_variables([w2_matchup1], [u_matrix2_matchup1])
-    #
-    #     # --------------------------------------------------------------------------------------------------------------
-    #
-    #     # b. Sensor A - Sensor B match-up data -------------------------------------------------------------------------
-    #
-    #     # i. Sensor A data
-    #     sensor_1_name_matchup2 = 1
-    #
-    #     X1_matchup2 = array([[71.5, 140.5, 29.2],
-    #                          [71.6, 141.1, 37.4],
-    #                          [71.3, 139.8, 28.2],
-    #                          [71.7, 140.2, 50.7]])
-    #
-    #     Ur1_matchup2 = array([[3.3, 4.2, 0.0],
-    #                           [3.4, 4.3, 0.0],
-    #                           [3.1, 4.4, 0.0],
-    #                           [3.2, 4.3, 0.0]])
-    #
-    #     Us1_matchup2 = array([[0.0, 1.0, 0.0],
-    #                           [0.0, 1.0, 0.0],
-    #                           [0.0, 1.0, 0.0],
-    #                           [0.0, 1.0, 0.0]])
-    #
-    #     uncertainty_type1_matchup2 = array([1, 2, 3])
-    #
-    #     # ii. Sensor B data
-    #     sensor_2_name_matchup2 = 2
-    #
-    #     X2_matchup2 = array([[80.5, 160.5, 28.2],
-    #                          [80.6, 161.1, 32.4],
-    #                          [80.3, 169.8, 22.2],
-    #                          [80.7, 160.2, 53.7]])
-    #
-    #     Ur2_matchup2 = array([[2.1, 4.0, 0.0],
-    #                           [2.2, 3.7, 0.0],
-    #                           [2.2, 4.4, 0.0],
-    #                           [2.1, 4.7, 0.0]])
-    #
-    #     Us2_matchup2 = array([[0.0, 2.0, 0.0],
-    #                           [0.0, 2.0, 0.0],
-    #                           [0.0, 2.0, 0.0],
-    #                           [0.0, 2.0, 0.0]])
-    #
-    #     uncertainty_type2_matchup2 = array([1, 2, 3])
-    #
-    #     # iii. Match-up data
-    #     K_matchup2 = array([3.2, 3.7, 3.3, 3.4])
-    #     Kr_matchup2 = array([0.5, 0.5, 0.5, 0.5])
-    #     Ks_matchup2 = array([0.12, 0.12, 0.12, 0.12])
-    #     time1_matchup2 = array([1.0, 2.0, 3.0, 4.0])
-    #     time2_matchup2 = array([1.1, 2.1, 3.1, 4.1])
-    #
-    #     # iv. w and u matrices
-    #     w_matrix_use1_matchup2 = array([0, 0, 1])
-    #     w_matrix_use2_matchup2 = array([0, 0, 1])
-    #     u_matrix_use1_matchup2 = array([0, 0, 1])
-    #     u_matrix_use2_matchup2 = array([0, 0, 2])
-    #
-    #     w12_matchup2 = array([[0.2, 0.2, 0.2, 0.2, 0.2, 0.0, 0.0, 0.0],
-    #                           [0.0, 0.2, 0.2, 0.2, 0.2, 0.2, 0.0, 0.0],
-    #                           [0.0, 0.0, 0.2, 0.2, 0.2, 0.2, 0.2, 0.0],
-    #                           [0.0, 0.0, 0.0, 0.2, 0.2, 0.2, 0.2, 0.2]])
-    #     w12_matchup2 = csr_matrix(w12_matchup2)
-    #
-    #     u_matrix1_matchup2 = array([0.2, 0.4, 0.3, 0.4, 0.3, 0.2, 0.5, 0.3])
-    #     u_matrix2_matchup2 = array([0.2, 0.3, 0.2, 0.1, 0.3, 0.5, 0.3, 0.7, 0.8])
-    #
-    #     w_matrix_val_matchup2, w_matrix_row_matchup2,\
-    #         w_matrix_col_matchup2, w_matrix_nnz_matchup2, \
-    #             u_matrix_row_count_matchup2, u_matrix_matchup2\
-    #                 = return_w_matrix_variables([w12_matchup2],
-    #                                             [u_matrix1_matchup2, u_matrix2_matchup2])
-    #
-    #     # --------------------------------------------------------------------------------------------------------------
-    #
-    #     # c. Write match-up data to file -------------------------------------------------------------------------------
-    #
-    #     # i. Match-up 1
-    #     write_input_file(fname_matchup1,
-    #                      X1_matchup1, X2_matchup1,
-    #                      Ur1_matchup1, Ur2_matchup1, Us1_matchup1, Us2_matchup1,
-    #                      uncertainty_type1_matchup1, uncertainty_type2_matchup1,
-    #                      K_matchup1, Kr_matchup1, Ks_matchup1,
-    #                      time1_matchup1, time2_matchup1,
-    #                      sensor_1_name_matchup1, sensor_2_name_matchup1)
-    #     append_W_to_input_file(fname_matchup1,
-    #                            w_matrix_val_matchup1, w_matrix_row_matchup1,
-    #                            w_matrix_col_matchup1, w_matrix_nnz_matchup1,
-    #                            u_matrix_row_count_matchup1, u_matrix_matchup1,
-    #                            w_matrix_use1_matchup1, w_matrix_use2_matchup1,
-    #                            u_matrix_use1_matchup1, u_matrix_use2_matchup1)
-    #
-    #     # ii. Match-up 2
-    #     write_input_file(fname_matchup2,
-    #                      X1_matchup2, X2_matchup2,
-    #                      Ur1_matchup2, Ur2_matchup2, Us1_matchup2, Us2_matchup2,
-    #                      uncertainty_type1_matchup2, uncertainty_type2_matchup2,
-    #                      K_matchup2, Kr_matchup2, Ks_matchup2,
-    #                      time1_matchup2, time2_matchup2,
-    #                      sensor_1_name_matchup2, sensor_2_name_matchup2)
-    #     append_W_to_input_file(fname_matchup2,
-    #                            w_matrix_val_matchup2, w_matrix_row_matchup2,
-    #                            w_matrix_col_matchup2, w_matrix_nnz_matchup2,
-    #                            u_matrix_row_count_matchup2, u_matrix_matchup2,
-    #                            w_matrix_use1_matchup2, w_matrix_use2_matchup2,
-    #                            u_matrix_use1_matchup2, u_matrix_use2_matchup2)
-    #
-    #     # --------------------------------------------------------------------------------------------------------------
-    #
-    #     ################################################################################################################
-    #     # 2. Define expected values
-    #     ################################################################################################################
-    #
-    #     # Expected value of HData attributes
-    #     values_expected = array([16.2, 11.2, 15.1, 20.3, 18.1,
-    #                              70.5, 70.6, 70.3, 70.7, 70.5,
-    #                              71.5, 71.6, 71.3, 71.7,
-    #                              80.5, 80.6, 80.3, 80.7,
-    #                              150.5, 151.1, 149.8, 150.2, 151.4,
-    #                              140.5, 141.1, 139.8, 140.2,
-    #                              160.5, 161.1, 169.8, 160.2,
-    #                              30.2, 20.4, 28.2, 50.7, 45.6,
-    #                              29.2, 37.4, 28.2, 50.7,
-    #                              28.2, 32.4, 22.2, 53.7, ])
-    #     unc_expected = [Uncertainty("r", array([1.6, 1.5, 1.5, 1.3, 1.5])),
-    #                     Uncertainty("r", array([3.1, 3.2, 3.2, 3.1, 3.0])),
-    #                     Uncertainty("r", array([3.3, 3.4, 3.1, 3.2])),
-    #                     Uncertainty("r", array([2.1, 2.2, 2.2, 2.1])),
-    #                     Uncertainty("rs", (array([5.0, 4.7, 5.1, 5.2, 5.3]), 1.0)),
-    #                     Uncertainty("rs", (array([4.2, 4.3, 4.4, 4.3]), 1.0)),
-    #                     Uncertainty("rs", (array([4.0, 3.7, 4.4, 4.7]), 2.0)),
-    #                     Uncertainty("ave", (0, 0)),
-    #                     Uncertainty("ave", (1, 1)),
-    #                     Uncertainty("ave", (2, 2))]
-    #     w_matrices_expected = [w2_matchup1, w12_matchup2]
-    #     u_matrices_expected = [u_matrix2_matchup1,
-    #                                     u_matrix1_matchup2,
-    #                                     u_matrix2_matchup2]
-    #     ks_expected = array([1.2, 1.7, 1.3, 1.4, 1.3, 3.2, 3.7, 3.3, 3.4])
-    #     unck_expected = [Uncertainty("r", array([0.25, 0.25, 0.25, 0.25, 0.25])),
-    #                      Uncertainty("r", array([0.2644, 0.2644, 0.2644, 0.2644]))]
-    #     time1_expected = array([dt(1970, 1, 1, 1, 0, 1),
-    #                             dt(1970, 1, 1, 1, 0, 2),
-    #                             dt(1970, 1, 1, 1, 0, 3),
-    #                             dt(1970, 1, 1, 1, 0, 4),
-    #                             dt(1970, 1, 1, 1, 0, 5),
-    #                             dt(1970, 1, 1, 1, 0, 1),
-    #                             dt(1970, 1, 1, 1, 0, 2),
-    #                             dt(1970, 1, 1, 1, 0, 3),
-    #                             dt(1970, 1, 1, 1, 0, 4)])
-    #     time2_expected = array([dt(1970, 1, 1, 1, 0, 1, 100000),
-    #                             dt(1970, 1, 1, 1, 0, 2, 100000),
-    #                             dt(1970, 1, 1, 1, 0, 3, 100000),
-    #                             dt(1970, 1, 1, 1, 0, 4, 100000),
-    #                             dt(1970, 1, 1, 1, 0, 5, 100000),
-    #                             dt(1970, 1, 1, 1, 0, 1, 100000),
-    #                             dt(1970, 1, 1, 1, 0, 2, 100000),
-    #                             dt(1970, 1, 1, 1, 0, 3, 100000),
-    #                             dt(1970, 1, 1, 1, 0, 4, 100000)])
-    #     idx_expected = {"Nm": [5, 4],
-    #                     "cNm": [0, 5, 9],
-    #                     "Im": [[0, 1], [1, 2]],
-    #                     "sensors": [-1, 1, 2],
-    #                     "sensor_ms": [1, 3, 3],
-    #                     "n_sensor": [0, 1, 1, 2, 1, 1, 2, 1, 1, 2],
-    #                     "n_mu": [1, 1, 2, 2, 1, 2, 2, 1, 2, 2],
-    #                     "n_cov": [1, 1, 1, 1, 2, 2, 2, 3, 3, 3],
-    #                     "N_var": [5, 5, 4, 4, 5, 4, 4, 5, 4, 4],
-    #                     "idx": [0, 5, 10, 14, 18, 23, 27, 31, 36, 40, 44]}
-    #
-    #     ################################################################################################################
-    #     # 3. Run MatchUpData.read_data()
-    #     ################################################################################################################
-    #
-    #     MatchUpOp = MatchUp()
-    #
-    #     values_test, unc_test, w_matrices_test,\
-    #         u_matrices_test, ks_test, unck_test, time1_test, time2_test, \
-    #             idx_test = MatchUpOp.openMatchUpData([fname_matchup1, fname_matchup2])
-    #
-    #     ################################################################################################################
-    #     # 4. Compare retrieve values to expect values
-    #     ################################################################################################################
-    #
-    #     # Test HData object attribute by attribute
-    #
-    #     # a. values
-    #     self.assertEqual(values_test.tolist(), values_expected.tolist())
-    #
-    #     # b. unc
-    #     for block_unc_test, block_unc_expected in zip(unc_test, unc_expected):
-    #         self.assertEqual(block_unc_expected.form, block_unc_test.form)
-    #         if block_unc_expected == "r":
-    #             self.assertEqual(block_unc_expected.uR.tolist(), block_unc_test.uR.tolist())
-    #         if block_unc_expected == "rs":
-    #             self.assertEqual(block_unc_expected.uR.tolist(), block_unc_test.uR.tolist())
-    #             self.assertEqual(block_unc_expected.uS.tolist(), block_unc_test.uS.tolist())
-    #         if block_unc_expected == "ave":
-    #             self.assertEqual(block_unc_expected.u_i, block_unc_test.u_i)
-    #             self.assertEqual(block_unc_expected.w_i, block_unc_test.w_i)
-    #
-    #     # c. w_matrices
-    #     for w_matrix_expected, w_matrix_test in zip(w_matrices_expected, w_matrices_test):
-    #         self.assertEqual(w_matrix_expected.data.tolist(), w_matrix_test.data.tolist())
-    #         self.assertEqual(w_matrix_expected.indices.tolist(), w_matrix_test.indices.tolist())
-    #         self.assertEqual(w_matrix_expected.indptr.tolist(), w_matrix_test.indptr.tolist())
-    #
-    #     # d. u_matrices
-    #     for u_matrix_expected, u_matrix_test in \
-    #             zip(u_matrices_expected, u_matrices_test):
-    #         self.assertEqual(u_matrix_expected.tolist(), u_matrix_test.tolist())
-    #
-    #     # e. ks
-    #     self.assertEqual(ks_test.tolist(), ks_expected.tolist())
-    #
-    #     # f. unck
-    #     for block_unck_test, block_unck_expected in zip(unck_test, unck_expected):
-    #         self.assertEqual(block_unck_expected.form, block_unck_test.form)
-    #         self.assertEqual(block_unck_expected.uR.tolist(), block_unck_test.uR.tolist())
-    #
-    #     # g. time
-    #     self.assertEqual(time1_test.tolist(), time1_expected.tolist())
-    #     self.assertEqual(time2_test.tolist(), time2_expected.tolist())
-    #
-    #     # h. idx
-    #     self.assertEqual(set(idx_expected.keys()), set(idx_test.keys()))
-    #     for key in idx_expected.keys():
-    #         idx_i_test = idx_test[key]
-    #         idx_i_expected = idx_expected[key]
-    #         if isinstance(idx_i_expected, ndarray):
-    #             self.assertEqual(idx_i_test.tolist(), idx_i_expected.tolist())
-    #         else:
-    #             self.assertEqual(idx_i_test, idx_i_expected)
-    #
-    #     ################################################################################################################
-    #     # 5. Remove Test Data
-    #     ################################################################################################################
-    #
-    #     rmtree(test_data_directory)
-    #
-    # def test_openMatchUpData_multi_r_w_reusedw(self):
-    #     """
-    #     Test for MatchUpData.openMatchUpData() method for case with mulitple match-up series datasets
-    #     - with random, random and systematic and w matrix uncertainty typea
-    #     """
-    #
-    #     # Test Description
-    #     # ================
-    #     #
-    #     # 1. This test writes two test match-up data files:
-    #     #    + Reference - Sensor A
-    #     #    + Sensor A - Sensor B
-    #     #    Sensor A/B have three measurement function variables, with covariate 1 w matrix uncertainty type, covariate
-    #     #    2 systematic uncertainty type and covariate 3 w matrix uncertainty type
-    #     #
-    #     # 2. The files are read by the match-up data reader
-    #     #
-    #     # 3. The MatchUpData object in memory is compared to the expected values
-    #
-    #     ################################################################################################################
-    #     # 1. Write test match-up data files
-    #     ################################################################################################################
-    #
-    #     # Define file paths
-    #     test_data_directory = pjoin(temp_data_directory, str(int(random()*1000000)))
-    #     if not exists(test_data_directory):
-    #         makedirs(test_data_directory)
-    #
-    #     fname_matchup1 = pjoin(test_data_directory, "matchup1.nc")
-    #     fname_matchup2 = pjoin(test_data_directory, "matchup2.nc")
-    #
-    #     # a. Reference - Sensor A match-up data ------------------------------------------------------------------------
-    #
-    #     # i. Reference Sensor data
-    #     sensor_1_name_matchup1 = -1
-    #
-    #     X1_matchup1 = array([[16.2, 11.2, 15.1, 20.3, 18.1]]).T
-    #     Ur1_matchup1 = array([1.6, 1.5, 1.5, 1.3, 1.5])
-    #     Us1_matchup1 = array([0.0, 0.0, 0.0, 0.0, 0.0])
-    #     uncertainty_type1_matchup1 = array([1])
-    #
-    #     # ii. Sensor A data
-    #     sensor_2_name_matchup1 = 1
-    #
-    #     X2_matchup1 = array([[70.5, 150.5, 30.2],
-    #                          [70.6, 151.1, 20.4],
-    #                          [70.3, 149.8, 28.2],
-    #                          [70.7, 150.2, 50.7],
-    #                          [70.5, 151.4, 45.6]])
-    #
-    #     Ur2_matchup1 = array([[3.1, 0.0, 0.0],
-    #                           [3.2, 0.0, 0.0],
-    #                           [3.2, 0.0, 0.0],
-    #                           [3.1, 0.0, 0.0],
-    #                           [3.0, 0.0, 0.0]])
-    #
-    #     Us2_matchup1 = array([[0.0, 0.0, 0.0],
-    #                           [0.0, 0.0, 0.0],
-    #                           [0.0, 0.0, 0.0],
-    #                           [0.0, 0.0, 0.0],
-    #                           [0.0, 0.0, 0.0]])
-    #
-    #     uncertainty_type2_matchup1 = array([1, 3, 3])
-    #
-    #     # iii. Match-up data
-    #     K_matchup1 = array([1.2, 1.7, 1.3, 1.4, 1.3])
-    #     Kr_matchup1 = array([0.3, 0.3, 0.3, 0.3, 0.3])
-    #     Ks_matchup1 = array([0.4, 0.4, 0.4, 0.4, 0.4])
-    #     time1_matchup1 = array([1.0, 2.0, 3.0, 4.0, 5.0])
-    #     time2_matchup1 = array([1.1, 2.1, 3.1, 4.1, 5.1])
-    #
-    #     # iv. w and u matrices
-    #     w_matrix_use1_matchup1 = array([0])
-    #     w_matrix_use2_matchup1 = array([0, 1, 1])
-    #     u_matrix_use1_matchup1 = array([0])
-    #     u_matrix_use2_matchup1 = array([0, 1, 1])
-    #
-    #     w2_matchup1 = array([[0.2, 0.2, 0.2, 0.2, 0.2, 0.0, 0.0, 0.0, 0.0],
-    #                          [0.0, 0.0, 0.2, 0.2, 0.2, 0.2, 0.2, 0.0, 0.0],
-    #                          [0.0, 0.0, 0.0, 0.2, 0.2, 0.2, 0.2, 0.2, 0.0],
-    #                          [0.0, 0.0, 0.0, 0.0, 0.2, 0.2, 0.2, 0.2, 0.2]])
-    #     w2_matchup1 = csr_matrix(w2_matchup1)
-    #
-    #     u_matrix2_matchup1 = array([0.2, 0.3, 0.2, 0.1, 0.3, 0.5, 0.3, 0.7, 0.8])
-    #
-    #     w_matrix_val_matchup1, w_matrix_row_matchup1, \
-    #     w_matrix_col_matchup1, w_matrix_nnz_matchup1, \
-    #     u_matrix_row_count_matchup1, u_matrix_matchup1 \
-    #         = return_w_matrix_variables([w2_matchup1], [u_matrix2_matchup1])
-    #
-    #     # --------------------------------------------------------------------------------------------------------------
-    #
-    #     # b. Sensor A - Sensor B match-up data -------------------------------------------------------------------------
-    #
-    #     # i. Sensor A data
-    #     sensor_1_name_matchup2 = 1
-    #
-    #     X1_matchup2 = array([[71.5, 140.5, 29.2],
-    #                          [71.6, 141.1, 37.4],
-    #                          [71.3, 139.8, 28.2],
-    #                          [71.7, 140.2, 50.7]])
-    #
-    #     Ur1_matchup2 = array([[3.3, 0.0, 0.0],
-    #                           [3.4, 0.0, 0.0],
-    #                           [3.1, 0.0, 0.0],
-    #                           [3.2, 0.0, 0.0]])
-    #
-    #     Us1_matchup2 = array([[0.0, 0.0, 0.0],
-    #                           [0.0, 0.0, 0.0],
-    #                           [0.0, 0.0, 0.0],
-    #                           [0.0, 0.0, 0.0]])
-    #
-    #     uncertainty_type1_matchup2 = array([1, 3, 3])
-    #
-    #     # ii. Sensor B data
-    #     sensor_2_name_matchup2 = 2
-    #
-    #     X2_matchup2 = array([[80.5, 160.5, 28.2],
-    #                          [80.6, 161.1, 32.4],
-    #                          [80.3, 169.8, 22.2],
-    #                          [80.7, 160.2, 53.7]])
-    #
-    #     Ur2_matchup2 = array([[2.1, 0.0, 0.0],
-    #                           [2.2, 0.0, 0.0],
-    #                           [2.2, 0.0, 0.0],
-    #                           [2.1, 0.0, 0.0]])
-    #
-    #     Us2_matchup2 = array([[0.0, 0.0, 0.0],
-    #                           [0.0, 0.0, 0.0],
-    #                           [0.0, 0.0, 0.0],
-    #                           [0.0, 0.0, 0.0]])
-    #
-    #     uncertainty_type2_matchup2 = array([1, 3, 3])
-    #
-    #     # iii. Match-up data
-    #     K_matchup2 = array([3.2, 3.7, 3.3, 3.4])
-    #     Kr_matchup2 = array([0.5, 0.5, 0.5, 0.5])
-    #     Ks_matchup2 = array([0.12, 0.12, 0.12, 0.12])
-    #     time1_matchup2 = array([1.0, 2.0, 3.0, 4.0])
-    #     time2_matchup2 = array([1.1, 2.1, 3.1, 4.1])
-    #
-    #     # iv. w and u matrices
-    #     w_matrix_use1_matchup2 = array([0, 1, 1])
-    #     w_matrix_use2_matchup2 = array([0, 2, 2])
-    #     u_matrix_use1_matchup2 = array([0, 1, 2])
-    #     u_matrix_use2_matchup2 = array([0, 3, 4])
-    #
-    #     w1_matchup2 = array([[0.2, 0.2, 0.2, 0.2, 0.2, 0.0, 0.0, 0.0],
-    #                          [0.0, 0.2, 0.2, 0.2, 0.2, 0.2, 0.0, 0.0],
-    #                          [0.0, 0.0, 0.2, 0.2, 0.2, 0.2, 0.2, 0.0],
-    #                          [0.0, 0.0, 0.0, 0.2, 0.2, 0.2, 0.2, 0.2]])
-    #     w1_matchup2 = csr_matrix(w1_matchup2)
-    #     w2_matchup2 = array([[0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.0, 0.0, 0.0],
-    #                          [0.0, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.0, 0.0],
-    #                          [0.0, 0.0, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.0],
-    #                          [0.0, 0.0, 0.0, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429]])
-    #     w2_matchup2 = csr_matrix(w2_matchup2)
-    #
-    #     u_matrix1_matchup2 = array([0.2, 0.4, 0.3, 0.4, 0.3, 0.2, 0.5, 0.3])
-    #     u_matrix2_matchup2 = array([0.2, 0.4, 0.5, 0.4, 0.7, 0.3, 0.5, 0.3])
-    #     u_matrix3_matchup2 = array([0.2, 0.3, 0.8, 0.2, 0.3, 0.5, 0.8, 0.7, 0.8, 0.6])
-    #     u_matrix4_matchup2 = array([0.2, 0.3, 0.2, 0.1, 0.3, 0.5, 0.3, 0.7, 0.8, 0.3])
-    #
-    #     w_matrix_val_matchup2, w_matrix_row_matchup2, \
-    #     w_matrix_col_matchup2, w_matrix_nnz_matchup2, \
-    #     u_matrix_row_count_matchup2, u_matrix_matchup2 \
-    #         = return_w_matrix_variables([w1_matchup2, w2_matchup2],
-    #                                     [u_matrix1_matchup2, u_matrix2_matchup2,
-    #                                      u_matrix3_matchup2, u_matrix4_matchup2])
-    #
-    #     # --------------------------------------------------------------------------------------------------------------
-    #
-    #     # c. Write match-up data to file -------------------------------------------------------------------------------
-    #
-    #     # i. Match-up 1
-    #     write_input_file(fname_matchup1,
-    #                      X1_matchup1, X2_matchup1,
-    #                      Ur1_matchup1, Ur2_matchup1, Us1_matchup1, Us2_matchup1,
-    #                      uncertainty_type1_matchup1, uncertainty_type2_matchup1,
-    #                      K_matchup1, Kr_matchup1, Ks_matchup1,
-    #                      time1_matchup1, time2_matchup1,
-    #                      sensor_1_name_matchup1, sensor_2_name_matchup1)
-    #     append_W_to_input_file(fname_matchup1,
-    #                            w_matrix_val_matchup1, w_matrix_row_matchup1,
-    #                            w_matrix_col_matchup1, w_matrix_nnz_matchup1,
-    #                            u_matrix_row_count_matchup1, u_matrix_matchup1,
-    #                            w_matrix_use1_matchup1, w_matrix_use2_matchup1,
-    #                            u_matrix_use1_matchup1, u_matrix_use2_matchup1)
-    #
-    #     # ii. Match-up 2
-    #     write_input_file(fname_matchup2,
-    #                      X1_matchup2, X2_matchup2,
-    #                      Ur1_matchup2, Ur2_matchup2, Us1_matchup2, Us2_matchup2,
-    #                      uncertainty_type1_matchup2, uncertainty_type2_matchup2,
-    #                      K_matchup2, Kr_matchup2, Ks_matchup2,
-    #                      time1_matchup2, time2_matchup2,
-    #                      sensor_1_name_matchup2, sensor_2_name_matchup2)
-    #     append_W_to_input_file(fname_matchup2,
-    #                            w_matrix_val_matchup2, w_matrix_row_matchup2,
-    #                            w_matrix_col_matchup2, w_matrix_nnz_matchup2,
-    #                            u_matrix_row_count_matchup2, u_matrix_matchup2,
-    #                            w_matrix_use1_matchup2, w_matrix_use2_matchup2,
-    #                            u_matrix_use1_matchup2, u_matrix_use2_matchup2)
-    #
-    #     # --------------------------------------------------------------------------------------------------------------
-    #
-    #     ################################################################################################################
-    #     # 2. Define expected values
-    #     ################################################################################################################
-    #
-    #     # Expected value of HData attributes
-    #     values_expected = array([16.2, 11.2, 15.1, 20.3, 18.1,
-    #                              70.5, 70.6, 70.3, 70.7, 70.5,
-    #                              71.5, 71.6, 71.3, 71.7,
-    #                              80.5, 80.6, 80.3, 80.7,
-    #                              150.5, 151.1, 149.8, 150.2, 151.4,
-    #                              140.5, 141.1, 139.8, 140.2,
-    #                              160.5, 161.1, 169.8, 160.2,
-    #                              30.2, 20.4, 28.2, 50.7, 45.6,
-    #                              29.2, 37.4, 28.2, 50.7,
-    #                              28.2, 32.4, 22.2, 53.7, ])
-    #     unc_expected = [Uncertainty("r", array([1.6, 1.5, 1.5, 1.3, 1.5])),
-    #                     Uncertainty("r", array([3.1, 3.2, 3.2, 3.1, 3.0])),
-    #                     Uncertainty("r", array([3.3, 3.4, 3.1, 3.2])),
-    #                     Uncertainty("r", array([2.1, 2.2, 2.2, 2.1])),
-    #                     Uncertainty("ave", (0, 0)),
-    #                     Uncertainty("ave", (0, 1)),
-    #                     Uncertainty("ave", (1, 2)),
-    #                     Uncertainty("ave", (1, 3)),
-    #                     Uncertainty("ave", (2, 4)),
-    #                     Uncertainty("ave", (2, 5))]
-    #     w_matrices_expected = [w2_matchup1, w1_matchup2, w2_matchup2]
-    #     u_matrices_expected = [u_matrix2_matchup1,
-    #                                     u_matrix1_matchup2,
-    #                                     u_matrix2_matchup2,
-    #                                     u_matrix3_matchup2,
-    #                                     u_matrix4_matchup2]
-    #     ks_expected = array([1.2, 1.7, 1.3, 1.4, 1.3, 3.2, 3.7, 3.3, 3.4])
-    #     unck_expected = [Uncertainty("r", array([0.25, 0.25, 0.25, 0.25, 0.25])),
-    #                      Uncertainty("r", array([0.2644, 0.2644, 0.2644, 0.2644]))]
-    #     time1_expected = array([dt(1970, 1, 1, 1, 0, 1),
-    #                             dt(1970, 1, 1, 1, 0, 2),
-    #                             dt(1970, 1, 1, 1, 0, 3),
-    #                             dt(1970, 1, 1, 1, 0, 4),
-    #                             dt(1970, 1, 1, 1, 0, 5),
-    #                             dt(1970, 1, 1, 1, 0, 1),
-    #                             dt(1970, 1, 1, 1, 0, 2),
-    #                             dt(1970, 1, 1, 1, 0, 3),
-    #                             dt(1970, 1, 1, 1, 0, 4)])
-    #     time2_expected = array([dt(1970, 1, 1, 1, 0, 1, 100000),
-    #                             dt(1970, 1, 1, 1, 0, 2, 100000),
-    #                             dt(1970, 1, 1, 1, 0, 3, 100000),
-    #                             dt(1970, 1, 1, 1, 0, 4, 100000),
-    #                             dt(1970, 1, 1, 1, 0, 5, 100000),
-    #                             dt(1970, 1, 1, 1, 0, 1, 100000),
-    #                             dt(1970, 1, 1, 1, 0, 2, 100000),
-    #                             dt(1970, 1, 1, 1, 0, 3, 100000),
-    #                             dt(1970, 1, 1, 1, 0, 4, 100000)])
-    #     idx_expected = {"Nm": [5, 4],
-    #                     "cNm": [0, 5, 9],
-    #                     "Im": [[0, 1], [1, 2]],
-    #                     "sensors": [-1, 1, 2],
-    #                     "sensor_ms": [1, 3, 3],
-    #                     "n_sensor": [0, 1, 1, 2, 1, 1, 2, 1, 1, 2],
-    #                     "n_mu": [1, 1, 2, 2, 1, 2, 2, 1, 2, 2],
-    #                     "n_cov": [1, 1, 1, 1, 2, 2, 2, 3, 3, 3],
-    #                     "N_var": [5, 5, 4, 4, 5, 4, 4, 5, 4, 4],
-    #                     "idx": [0, 5, 10, 14, 18, 23, 27, 31, 36, 40, 44]}
-    #
-    #     ################################################################################################################
-    #     # 3. Run MatchUpData.read_data()
-    #     ################################################################################################################
-    #
-    #     MatchUpOp = MatchUp()
-    #
-    #     values_test, unc_test, w_matrices_test, \
-    #     u_matrices_test, ks_test, unck_test, time1_test, time2_test, \
-    #         idx_test = MatchUpOp.openMatchUpData([fname_matchup1, fname_matchup2])
-    #
-    #     ################################################################################################################
-    #     # 4. Compare retrieve values to expect values
-    #     ################################################################################################################
-    #
-    #     # Test HData object attribute by attribute
-    #
-    #     # a. values
-    #     self.assertEqual(values_test.tolist(), values_expected.tolist())
-    #
-    #     # b. unc
-    #     for block_unc_test, block_unc_expected in zip(unc_test, unc_expected):
-    #         self.assertEqual(block_unc_expected.form, block_unc_test.form)
-    #         if block_unc_expected == "r":
-    #             self.assertEqual(block_unc_expected.uR.tolist(), block_unc_test.uR.tolist())
-    #         if block_unc_expected == "ave":
-    #             self.assertEqual(block_unc_expected.u_i, block_unc_test.u_i)
-    #             self.assertEqual(block_unc_expected.w_i, block_unc_test.w_i)
-    #
-    #     # c. w_matrices
-    #     for w_matrix_expected, w_matrix_test in zip(w_matrices_expected, w_matrices_test):
-    #         self.assertEqual(w_matrix_expected.data.tolist(), w_matrix_test.data.tolist())
-    #         self.assertEqual(w_matrix_expected.indices.tolist(), w_matrix_test.indices.tolist())
-    #         self.assertEqual(w_matrix_expected.indptr.tolist(), w_matrix_test.indptr.tolist())
-    #
-    #     # d. u_matrices
-    #     for u_matrix_expected, u_matrix_test in \
-    #             zip(u_matrices_expected, u_matrices_test):
-    #         self.assertEqual(u_matrix_expected.tolist(), u_matrix_test.tolist())
-    #
-    #     # e. ks
-    #     self.assertEqual(ks_test.tolist(), ks_expected.tolist())
-    #
-    #     # f. unck
-    #     for block_unck_test, block_unck_expected in zip(unck_test, unck_expected):
-    #         self.assertEqual(block_unck_expected.form, block_unck_test.form)
-    #         self.assertEqual(block_unck_expected.uR.tolist(), block_unck_test.uR.tolist())
-    #
-    #     # g. time
-    #     self.assertEqual(time1_test.tolist(), time1_expected.tolist())
-    #     self.assertEqual(time2_test.tolist(), time2_expected.tolist())
-    #
-    #     # h. idx
-    #     self.assertEqual(set(idx_expected.keys()), set(idx_test.keys()))
-    #     for key in idx_expected.keys():
-    #         idx_i_test = idx_test[key]
-    #         idx_i_expected = idx_expected[key]
-    #         if isinstance(idx_i_expected, ndarray):
-    #             self.assertEqual(idx_i_test.tolist(), idx_i_expected.tolist())
-    #         else:
-    #             self.assertEqual(idx_i_test, idx_i_expected)
-    #
-    #     ################################################################################################################
-    #     # 5. Remove Test Data
-    #     ################################################################################################################
-    #
-    #     rmtree(test_data_directory)
-    #
-    # def test_openMatchUpData_multi_r___notime(self):
-    #     """
-    #     Test for MatchUpData.openMatchUpData() method for case with multiple matchup series datasets
-    #     - with only random uncertainty type
-    #     - option to open time switched off
-    #     """
-    #
-    #     # Test Description
-    #     # ================
-    #     #
-    #     # 1. This test writes two test match-up data files:
-    #     #    + Reference - Sensor A
-    #     #    + Sensor A - Sensor B
-    #     #    Sensor A/B have three measurement function variables, each with uncertainty types random
-    #     #
-    #     # 2. The files are read by the match-up data reader
-    #     #
-    #     # 3. The MatchUpData object in memory is compared to the expected values
-    #
-    #     ################################################################################################################
-    #     # 1. Write test match-up data files
-    #     ################################################################################################################
-    #
-    #     # Define file paths
-    #     test_data_directory = pjoin(dirname(__file__), "temp_data_directory")
-    #     if not exists(test_data_directory):
-    #         makedirs(test_data_directory)
-    #
-    #     fname_matchup1 = pjoin(test_data_directory, "matchup1.nc")
-    #     fname_matchup2 = pjoin(test_data_directory, "matchup2.nc")
-    #
-    #     # a. Reference - Sensor A match-up data ------------------------------------------------------------------------
-    #
-    #     # i. Reference Sensor data
-    #     sensor_1_name_matchup1 = -1
-    #
-    #     X1_matchup1 = array([[16.2, 11.2, 15.1, 20.3, 18.1]]).T
-    #     Ur1_matchup1 = array([1.6, 1.5, 1.5, 1.3, 1.5])
-    #     Us1_matchup1 = array([0.0, 0.0, 0.0, 0.0, 0.0])
-    #     uncertainty_type1_matchup1 = array([1])
-    #
-    #     # ii. Sensor A data
-    #     sensor_2_name_matchup1 = 1
-    #
-    #     X2_matchup1 = array([[70.5, 150.5, 30.2],
-    #                          [70.6, 151.1, 20.4],
-    #                          [70.3, 149.8, 28.2],
-    #                          [70.7, 150.2, 50.7],
-    #                          [70.5, 151.4, 45.6]])
-    #
-    #     Ur2_matchup1 = array([[3.1, 5.0, 2.2],
-    #                           [3.2, 4.7, 1.7],
-    #                           [3.2, 5.1, 2.0],
-    #                           [3.1, 5.2, 4.3],
-    #                           [3.0, 5.3, 2.6]])
-    #
-    #     Us2_matchup1 = array([[0.0, 0.0, 0.0],
-    #                           [0.0, 0.0, 0.0],
-    #                           [0.0, 0.0, 0.0],
-    #                           [0.0, 0.0, 0.0],
-    #                           [0.0, 0.0, 0.0]])
-    #
-    #     uncertainty_type2_matchup1 = array([1, 1, 1])
-    #
-    #     # iii. Match-up data
-    #     K_matchup1 = array([1.2, 1.7, 1.3, 1.4, 1.3])
-    #     Kr_matchup1 = array([0.3, 0.3, 0.3, 0.3, 0.3])
-    #     Ks_matchup1 = array([0.4, 0.4, 0.4, 0.4, 0.4])
-    #     time1_matchup1 = array([1.0, 2.0, 3.0, 4.0, 5.0])
-    #     time2_matchup1 = array([1.1, 2.1, 3.1, 4.1, 5.1])
-    #
-    #     # --------------------------------------------------------------------------------------------------------------
-    #
-    #     # b. Sensor A - Sensor B match-up data -------------------------------------------------------------------------
-    #
-    #     # i. Sensor A data
-    #     sensor_1_name_matchup2 = 1
-    #
-    #     X1_matchup2 = array([[71.5, 140.5, 29.2],
-    #                          [71.6, 141.1, 37.4],
-    #                          [71.3, 139.8, 28.2],
-    #                          [71.7, 140.2, 50.7]])
-    #
-    #     Ur1_matchup2 = array([[3.3, 4.2, 2.3],
-    #                           [3.4, 4.3, 1.2],
-    #                           [3.1, 4.4, 2.3],
-    #                           [3.2, 4.3, 4.4]])
-    #
-    #     Us1_matchup2 = array([[0.0, 0.0, 0.0],
-    #                           [0.0, 0.0, 0.0],
-    #                           [0.0, 0.0, 0.0],
-    #                           [0.0, 0.0, 0.0]])
-    #
-    #     uncertainty_type1_matchup2 = array([1, 1, 1])
-    #
-    #     # ii. Sensor B data
-    #     sensor_2_name_matchup2 = 2
-    #
-    #     X2_matchup2 = array([[80.5, 160.5, 28.2],
-    #                          [80.6, 161.1, 32.4],
-    #                          [80.3, 169.8, 22.2],
-    #                          [80.7, 160.2, 53.7]])
-    #
-    #     Ur2_matchup2 = array([[2.1, 4.0, 3.2],
-    #                           [2.2, 3.7, 2.7],
-    #                           [2.2, 4.4, 3.0],
-    #                           [2.1, 4.7, 5.3]])
-    #
-    #     Us2_matchup2 = array([[0.0, 0.0, 0.0],
-    #                           [0.0, 0.0, 0.0],
-    #                           [0.0, 0.0, 0.0],
-    #                           [0.0, 0.0, 0.0]])
-    #
-    #     uncertainty_type2_matchup2 = array([1, 1, 1])
-    #
-    #     # iii. Match-up data
-    #     K_matchup2 = array([3.2, 3.7, 3.3, 3.4])
-    #     Kr_matchup2 = array([0.5, 0.5, 0.5, 0.5])
-    #     Ks_matchup2 = array([0.12, 0.12, 0.12, 0.12])
-    #     time1_matchup2 = array([1.0, 2.0, 3.0, 4.0])
-    #     time2_matchup2 = array([1.1, 2.1, 3.1, 4.1])
-    #
-    #     # --------------------------------------------------------------------------------------------------------------
-    #
-    #     # d. Test data to file -----------------------------------------------------------------------------------------
-    #
-    #     # i. Match-up 1
-    #     write_input_file(fname_matchup1,
-    #                      X1_matchup1, X2_matchup1,
-    #                      Ur1_matchup1, Ur2_matchup1, Us1_matchup1, Us2_matchup1,
-    #                      uncertainty_type1_matchup1, uncertainty_type2_matchup1,
-    #                      K_matchup1, Kr_matchup1, Ks_matchup1,
-    #                      time1_matchup1, time2_matchup1,
-    #                      sensor_1_name_matchup1, sensor_2_name_matchup1)
-    #
-    #     # ii. Match-up 2
-    #     write_input_file(fname_matchup2,
-    #                      X1_matchup2, X2_matchup2,
-    #                      Ur1_matchup2, Ur2_matchup2, Us1_matchup2, Us2_matchup2,
-    #                      uncertainty_type1_matchup2, uncertainty_type2_matchup2,
-    #                      K_matchup2, Kr_matchup2, Ks_matchup2,
-    #                      time1_matchup2, time2_matchup2,
-    #                      sensor_1_name_matchup2, sensor_2_name_matchup2)
-    #
-    #     # --------------------------------------------------------------------------------------------------------------
-    #
-    #     ################################################################################################################
-    #     # 2. Define expected values
-    #     ################################################################################################################
-    #
-    #     # Expected value of HData attributes
-    #     values_expected = array([16.2, 11.2, 15.1, 20.3, 18.1,
-    #                              70.5, 70.6, 70.3, 70.7, 70.5,
-    #                              71.5, 71.6, 71.3, 71.7,
-    #                              80.5, 80.6, 80.3, 80.7,
-    #                              150.5, 151.1, 149.8, 150.2, 151.4,
-    #                              140.5, 141.1, 139.8, 140.2,
-    #                              160.5, 161.1, 169.8, 160.2,
-    #                              30.2, 20.4, 28.2, 50.7, 45.6,
-    #                              29.2, 37.4, 28.2, 50.7,
-    #                              28.2, 32.4, 22.2, 53.7, ])
-    #     unc_expected = [Uncertainty("r", array([1.6, 1.5, 1.5, 1.3, 1.5])),
-    #                     Uncertainty("r", array([3.1, 3.2, 3.2, 3.1, 3.0])),
-    #                     Uncertainty("r", array([3.3, 3.4, 3.1, 3.2])),
-    #                     Uncertainty("r", array([2.1, 2.2, 2.2, 2.1])),
-    #                     Uncertainty("r", array([5.0, 4.7, 5.1, 5.2, 5.3])),
-    #                     Uncertainty("r", array([4.2, 4.3, 4.4, 4.3])),
-    #                     Uncertainty("r", array([4.0, 3.7, 4.4, 4.7])),
-    #                     Uncertainty("r", array([2.2, 1.7, 2.0, 4.3, 2.6])),
-    #                     Uncertainty("r", array([2.3, 1.2, 2.3, 4.4])),
-    #                     Uncertainty("r", array([3.2, 2.7, 3.0, 5.3]))]
-    #     w_matrices_expected = []
-    #     u_matrices_expected = []
-    #     ks_expected = array([1.2, 1.7, 1.3, 1.4, 1.3, 3.2, 3.7, 3.3, 3.4])
-    #     unck_expected = [Uncertainty("r", array([0.25, 0.25, 0.25, 0.25, 0.25])),
-    #                      Uncertainty("r", array([0.2644, 0.2644, 0.2644, 0.2644]))]
-    #     time1_expected = None
-    #     time2_expected = None
-    #     idx_expected = {"Nm": [5, 4],
-    #                     "cNm": [0, 5, 9],
-    #                     "Im": [[0, 1], [1, 2]],
-    #                     "sensors": [-1, 1, 2],
-    #                     "sensor_ms": [1, 3, 3],
-    #                     "n_sensor": [0, 1, 1, 2, 1, 1, 2, 1, 1, 2],
-    #                     "n_mu": [1, 1, 2, 2, 1, 2, 2, 1, 2, 2],
-    #                     "n_cov": [1, 1, 1, 1, 2, 2, 2, 3, 3, 3],
-    #                     "N_var": [5, 5, 4, 4, 5, 4, 4, 5, 4, 4],
-    #                     "idx": [0, 5, 10, 14, 18, 23, 27, 31, 36, 40, 44]}
-    #
-    #     ################################################################################################################
-    #     # 3. Run MatchUpData.read_data()
-    #     ################################################################################################################
-    #
-    #     MatchUpOp = MatchUp()
-    #
-    #     values_test, unc_test, w_matrices_test,\
-    #         u_matrices_test, ks_test, unck_test, time1_test, time2_test, \
-    #             idx_test = MatchUpOp.openMatchUpData([fname_matchup1, fname_matchup2], open_time=False)
-    #
-    #     ################################################################################################################
-    #     # 4. Compare retrieve values to expect values
-    #     ################################################################################################################
-    #
-    #     # Test HData object attribute by attribute
-    #
-    #     # a. values
-    #     self.assertEqual(values_test.tolist(), values_expected.tolist())
-    #
-    #     # b. unc
-    #     for block_unc_test, block_unc_expected in zip(unc_test, unc_expected):
-    #         self.assertEqual(block_unc_expected.form, block_unc_test.form)
-    #         self.assertEqual(block_unc_expected.uR.tolist(), block_unc_test.uR.tolist())
-    #
-    #     # c. w_matrices
-    #     self.assertEqual(w_matrices_test, w_matrices_expected)
-    #
-    #     # d. u_matrices
-    #     self.assertEqual(u_matrices_test, u_matrices_expected)
-    #
-    #     # e. ks
-    #     self.assertEqual(ks_test.tolist(), ks_expected.tolist())
-    #
-    #     # f. unck
-    #     for block_unck_test, block_unck_expected in zip(unck_test, unck_expected):
-    #         self.assertEqual(block_unck_expected.form, block_unck_test.form)
-    #         self.assertEqual(block_unck_expected.uR.tolist(), block_unck_test.uR.tolist())
-    #
-    #     # g. time
-    #     self.assertEqual(time1_test, time1_expected)
-    #     self.assertEqual(time2_test, time2_expected)
-    #
-    #     # h. idx
-    #     self.assertEqual(set(idx_expected.keys()), set(idx_test.keys()))
-    #     for key in idx_expected.keys():
-    #         idx_i_test = idx_test[key]
-    #         idx_i_expected = idx_expected[key]
-    #         if isinstance(idx_i_expected, ndarray):
-    #             self.assertEqual(idx_i_test.tolist(), idx_i_expected.tolist())
-    #         else:
-    #             self.assertEqual(idx_i_test, idx_i_expected)
-    #
-    #     ################################################################################################################
-    #     # 5. Remove Test Data
-    #     ################################################################################################################
-    #
-    #     rmtree(test_data_directory)
-    #
-    # def test_openMatchUpData_multi_rs__notime(self):
-    #     """
-    #     Test for MatchUpData.openMatchUpData() method for case with multiple match-up series datasets
-    #     - with random and random and systematic uncertainty type
-    #     - option to open time switched off
-    #     """
-    #
-    #     # Test Description
-    #     # ================
-    #     #
-    #     # 1. This test writes two test match-up data files:
-    #     #    + Reference - Sensor A
-    #     #    + Sensor A - Sensor B
-    #     #    Sensor A/B have three measurement function variables, with covariate 1 and 3 random uncertainty type and
-    #     #    covariate 2 with systematic uncertainty type
-    #     #
-    #     # 2. The files are read by the match-up data reader
-    #     #
-    #     # 3. The MatchUpData object in memory is compared to the expected values
-    #
-    #     ################################################################################################################
-    #     # 1. Write test match-up data files
-    #     ################################################################################################################
-    #
-    #     # Define file paths
-    #     test_data_directory = pjoin(temp_data_directory, str(int(random()*1000000)))
-    #     if not exists(test_data_directory):
-    #         makedirs(test_data_directory)
-    #
-    #     fname_matchup1 = pjoin(test_data_directory, "matchup1.nc")
-    #     fname_matchup2 = pjoin(test_data_directory, "matchup2.nc")
-    #
-    #     # a. Reference - Sensor A match-up data ------------------------------------------------------------------------
-    #
-    #     # i. Reference Sensor data
-    #     sensor_1_name_matchup1 = -1
-    #
-    #     X1_matchup1 = array([[16.2, 11.2, 15.1, 20.3, 18.1]]).T
-    #     Ur1_matchup1 = array([1.6, 1.5, 1.5, 1.3, 1.5])
-    #     Us1_matchup1 = array([0.0, 0.0, 0.0, 0.0, 0.0])
-    #     uncertainty_type1_matchup1 = array([1])
-    #
-    #     # ii. Sensor A data
-    #     sensor_2_name_matchup1 = 1
-    #
-    #     X2_matchup1 = array([[70.5, 150.5, 30.2],
-    #                          [70.6, 151.1, 20.4],
-    #                          [70.3, 149.8, 28.2],
-    #                          [70.7, 150.2, 50.7],
-    #                          [70.5, 151.4, 45.6]])
-    #
-    #     Ur2_matchup1 = array([[3.1, 5.0, 2.2],
-    #                           [3.2, 4.7, 1.7],
-    #                           [3.2, 5.1, 2.0],
-    #                           [3.1, 5.2, 4.3],
-    #                           [3.0, 5.3, 2.6]])
-    #
-    #     Us2_matchup1 = array([[0.0, 1.0, 0.0],
-    #                           [0.0, 1.0, 0.0],
-    #                           [0.0, 1.0, 0.0],
-    #                           [0.0, 1.0, 0.0],
-    #                           [0.0, 1.0, 0.0]])
-    #
-    #     uncertainty_type2_matchup1 = array([1, 2, 1])
-    #
-    #     # iii. Match-up data
-    #     K_matchup1 = array([1.2, 1.7, 1.3, 1.4, 1.3])
-    #     Kr_matchup1 = array([0.3, 0.3, 0.3, 0.3, 0.3])
-    #     Ks_matchup1 = array([0.4, 0.4, 0.4, 0.4, 0.4])
-    #     time1_matchup1 = array([1.0, 2.0, 3.0, 4.0, 5.0])
-    #     time2_matchup1 = array([1.1, 2.1, 3.1, 4.1, 5.1])
-    #
-    #     # --------------------------------------------------------------------------------------------------------------
-    #
-    #     # b. Sensor A - Sensor B match-up data -------------------------------------------------------------------------
-    #
-    #     # i. Sensor A data
-    #     sensor_1_name_matchup2 = 1
-    #
-    #     X1_matchup2 = array([[71.5, 140.5, 29.2],
-    #                          [71.6, 141.1, 37.4],
-    #                          [71.3, 139.8, 28.2],
-    #                          [71.7, 140.2, 50.7]])
-    #
-    #     Ur1_matchup2 = array([[3.3, 4.2, 2.3],
-    #                           [3.4, 4.3, 1.2],
-    #                           [3.1, 4.4, 2.3],
-    #                           [3.2, 4.3, 4.4]])
-    #
-    #     Us1_matchup2 = array([[0.0, 1.0, 0.0],
-    #                           [0.0, 1.0, 0.0],
-    #                           [0.0, 1.0, 0.0],
-    #                           [0.0, 1.0, 0.0]])
-    #
-    #     uncertainty_type1_matchup2 = array([1, 2, 1])
-    #
-    #     # ii. Sensor B data
-    #     sensor_2_name_matchup2 = 2
-    #
-    #     X2_matchup2 = array([[80.5, 160.5, 28.2],
-    #                          [80.6, 161.1, 32.4],
-    #                          [80.3, 169.8, 22.2],
-    #                          [80.7, 160.2, 53.7]])
-    #
-    #     Ur2_matchup2 = array([[2.1, 4.0, 3.2],
-    #                           [2.2, 3.7, 2.7],
-    #                           [2.2, 4.4, 3.0],
-    #                           [2.1, 4.7, 5.3]])
-    #
-    #     Us2_matchup2 = array([[0.0, 2.0, 0.0],
-    #                           [0.0, 2.0, 0.0],
-    #                           [0.0, 2.0, 0.0],
-    #                           [0.0, 2.0, 0.0]])
-    #
-    #     uncertainty_type2_matchup2 = array([1, 2, 1])
-    #
-    #     # iii. Match-up data
-    #     K_matchup2 = array([3.2, 3.7, 3.3, 3.4])
-    #     Kr_matchup2 = array([0.5, 0.5, 0.5, 0.5])
-    #     Ks_matchup2 = array([0.12, 0.12, 0.12, 0.12])
-    #     time1_matchup2 = array([1.0, 2.0, 3.0, 4.0])
-    #     time2_matchup2 = array([1.1, 2.1, 3.1, 4.1])
-    #
-    #     # --------------------------------------------------------------------------------------------------------------
-    #
-    #     # d. Test data to file -----------------------------------------------------------------------------------------
-    #
-    #     # i. Match-up 1
-    #     write_input_file(fname_matchup1,
-    #                      X1_matchup1, X2_matchup1,
-    #                      Ur1_matchup1, Ur2_matchup1, Us1_matchup1, Us2_matchup1,
-    #                      uncertainty_type1_matchup1, uncertainty_type2_matchup1,
-    #                      K_matchup1, Kr_matchup1, Ks_matchup1,
-    #                      time1_matchup1, time2_matchup1,
-    #                      sensor_1_name_matchup1, sensor_2_name_matchup1)
-    #
-    #     # ii. Match-up 2
-    #     write_input_file(fname_matchup2,
-    #                      X1_matchup2, X2_matchup2,
-    #                      Ur1_matchup2, Ur2_matchup2, Us1_matchup2, Us2_matchup2,
-    #                      uncertainty_type1_matchup2, uncertainty_type2_matchup2,
-    #                      K_matchup2, Kr_matchup2, Ks_matchup2,
-    #                      time1_matchup2, time2_matchup2,
-    #                      sensor_1_name_matchup2, sensor_2_name_matchup2)
-    #
-    #     # --------------------------------------------------------------------------------------------------------------
-    #
-    #     ################################################################################################################
-    #     # 2. Define expected values
-    #     ################################################################################################################
-    #
-    #     # Expected value of HData attributes
-    #     values_expected = array([16.2, 11.2, 15.1, 20.3, 18.1,
-    #                              70.5, 70.6, 70.3, 70.7, 70.5,
-    #                              71.5, 71.6, 71.3, 71.7,
-    #                              80.5, 80.6, 80.3, 80.7,
-    #                              150.5, 151.1, 149.8, 150.2, 151.4,
-    #                              140.5, 141.1, 139.8, 140.2,
-    #                              160.5, 161.1, 169.8, 160.2,
-    #                              30.2, 20.4, 28.2, 50.7, 45.6,
-    #                              29.2, 37.4, 28.2, 50.7,
-    #                              28.2, 32.4, 22.2, 53.7, ])
-    #     unc_expected = [Uncertainty("r", array([1.6, 1.5, 1.5, 1.3, 1.5])),
-    #                     Uncertainty("r", array([3.1, 3.2, 3.2, 3.1, 3.0])),
-    #                     Uncertainty("r", array([3.3, 3.4, 3.1, 3.2])),
-    #                     Uncertainty("r", array([2.1, 2.2, 2.2, 2.1])),
-    #                     Uncertainty("rs", (array([5.0, 4.7, 5.1, 5.2, 5.3]), 1.0)),
-    #                     Uncertainty("rs", (array([4.2, 4.3, 4.4, 4.3]), 1.0)),
-    #                     Uncertainty("rs", (array([4.0, 3.7, 4.4, 4.7]), 2.0)),
-    #                     Uncertainty("r", array([2.2, 1.7, 2.0, 4.3, 2.6])),
-    #                     Uncertainty("r", array([2.3, 1.2, 2.3, 4.4])),
-    #                     Uncertainty("r", array([3.2, 2.7, 3.0, 5.3]))]
-    #     w_matrices_expected = []
-    #     u_matrices_expected = []
-    #     ks_expected = array([1.2, 1.7, 1.3, 1.4, 1.3, 3.2, 3.7, 3.3, 3.4])
-    #     unck_expected = [Uncertainty("r", array([0.25, 0.25, 0.25, 0.25, 0.25])),
-    #                      Uncertainty("r", array([0.2644, 0.2644, 0.2644, 0.2644]))]
-    #     time1_expected = None
-    #     time2_expected = None
-    #     idx_expected = {"Nm": [5, 4],
-    #                     "cNm": [0, 5, 9],
-    #                     "Im": [[0, 1], [1, 2]],
-    #                     "sensors": [-1, 1, 2],
-    #                     "sensor_ms": [1, 3, 3],
-    #                     "n_sensor": [0, 1, 1, 2, 1, 1, 2, 1, 1, 2],
-    #                     "n_mu": [1, 1, 2, 2, 1, 2, 2, 1, 2, 2],
-    #                     "n_cov": [1, 1, 1, 1, 2, 2, 2, 3, 3, 3],
-    #                     "N_var": [5, 5, 4, 4, 5, 4, 4, 5, 4, 4],
-    #                     "idx": [0, 5, 10, 14, 18, 23, 27, 31, 36, 40, 44]}
-    #
-    #     ################################################################################################################
-    #     # 3. Run MatchUpData.read_data()
-    #     ################################################################################################################
-    #
-    #     MatchUpOp = MatchUp()
-    #
-    #     values_test, unc_test, w_matrices_test,\
-    #         u_matrices_test, ks_test, unck_test, time1_test, time2_test, \
-    #             idx_test = MatchUpOp.openMatchUpData([fname_matchup1, fname_matchup2], open_time=None)
-    #
-    #     ################################################################################################################
-    #     # 4. Compare retrieve values to expect values
-    #     ################################################################################################################
-    #
-    #     # Test HData object attribute by attribute
-    #
-    #     # a. values
-    #     self.assertEqual(values_test.tolist(), values_expected.tolist())
-    #
-    #     # b. unc
-    #     for block_unc_test, block_unc_expected in zip(unc_test, unc_expected):
-    #         self.assertEqual(block_unc_expected.form, block_unc_test.form)
-    #         self.assertEqual(block_unc_expected.uR.tolist(), block_unc_test.uR.tolist())
-    #         if block_unc_expected == "rs":
-    #             self.assertEqual(block_unc_expected.uS.tolist(), block_unc_test.uS.tolist())
-    #
-    #     # c. w_matrices
-    #     self.assertEqual(w_matrices_test, w_matrices_expected)
-    #
-    #     # d. u_matrices
-    #     self.assertEqual(u_matrices_test, u_matrices_expected)
-    #
-    #     # e. ks
-    #     self.assertEqual(ks_test.tolist(), ks_expected.tolist())
-    #
-    #     # f. unck
-    #     for block_unck_test, block_unck_expected in zip(unck_test, unck_expected):
-    #         self.assertEqual(block_unck_expected.form, block_unck_test.form)
-    #         self.assertEqual(block_unck_expected.uR.tolist(), block_unck_test.uR.tolist())
-    #
-    #     # g. time
-    #     self.assertEqual(time1_test, time1_expected)
-    #     self.assertEqual(time2_test, time2_expected)
-    #
-    #     # h. idx
-    #     self.assertEqual(set(idx_expected.keys()), set(idx_test.keys()))
-    #     for key in idx_expected.keys():
-    #         idx_i_test = idx_test[key]
-    #         idx_i_expected = idx_expected[key]
-    #         if isinstance(idx_i_expected, ndarray):
-    #             self.assertEqual(idx_i_test.tolist(), idx_i_expected.tolist())
-    #         else:
-    #             self.assertEqual(idx_i_test, idx_i_expected)
-    #
-    #     ################################################################################################################
-    #     # 5. Remove Test Data
-    #     ################################################################################################################
-    #
-    #     rmtree(test_data_directory)
-    #
-    # def test_openMatchUpData_multi_rsw_notime(self):
-    #     """
-    #     Test for MatchUpData.openMatchUpData() method for case with mulitple match-up series datasets
-    #     - with random, random and systematic and w matrix uncertainty type
-    #     - option to open time switched off
-    #     """
-    #
-    #     # Test Description
-    #     # ================
-    #     #
-    #     # 1. This test writes two test match-up data files:
-    #     #    + Reference - Sensor A
-    #     #    + Sensor A - Sensor B
-    #     #    Sensor A/B have three measurement function variables, with covariate 1 w matrix uncertainty type, covariate
-    #     #    2 systematic uncertainty type and covariate 3 w matrix uncertainty type
-    #     #
-    #     # 2. The files are read by the match-up data reader
-    #     #
-    #     # 3. The MatchUpData object in memory is compared to the expected values
-    #
-    #     ################################################################################################################
-    #     # 1. Write test match-up data files
-    #     ################################################################################################################
-    #
-    #     # Define file paths
-    #     test_data_directory = pjoin(temp_data_directory, str(int(random()*1000000)))
-    #     if not exists(test_data_directory):
-    #         makedirs(test_data_directory)
-    #
-    #     fname_matchup1 = pjoin(test_data_directory, "matchup1.nc")
-    #     fname_matchup2 = pjoin(test_data_directory, "matchup2.nc")
-    #
-    #     # a. Reference - Sensor A match-up data ------------------------------------------------------------------------
-    #
-    #     # i. Reference Sensor data
-    #     sensor_1_name_matchup1 = -1
-    #
-    #     X1_matchup1 = array([[16.2, 11.2, 15.1, 20.3, 18.1]]).T
-    #     Ur1_matchup1 = array([1.6, 1.5, 1.5, 1.3, 1.5])
-    #     Us1_matchup1 = array([0.0, 0.0, 0.0, 0.0, 0.0])
-    #     uncertainty_type1_matchup1 = array([1])
-    #
-    #     # ii. Sensor A data
-    #     sensor_2_name_matchup1 = 1
-    #
-    #     X2_matchup1 = array([[70.5, 150.5, 30.2],
-    #                          [70.6, 151.1, 20.4],
-    #                          [70.3, 149.8, 28.2],
-    #                          [70.7, 150.2, 50.7],
-    #                          [70.5, 151.4, 45.6]])
-    #
-    #     Ur2_matchup1 = array([[3.1, 5.0, 2.2],
-    #                           [3.2, 4.7, 1.7],
-    #                           [3.2, 5.1, 2.0],
-    #                           [3.1, 5.2, 4.3],
-    #                           [3.0, 5.3, 2.6]])
-    #
-    #     Us2_matchup1 = array([[0.0, 1.0, 0.0],
-    #                           [0.0, 1.0, 0.0],
-    #                           [0.0, 1.0, 0.0],
-    #                           [0.0, 1.0, 0.0],
-    #                           [0.0, 1.0, 0.0]])
-    #
-    #     uncertainty_type2_matchup1 = array([1, 2, 3])
-    #
-    #     # iii. Match-up data
-    #     K_matchup1 = array([1.2, 1.7, 1.3, 1.4, 1.3])
-    #     Kr_matchup1 = array([0.3, 0.3, 0.3, 0.3, 0.3])
-    #     Ks_matchup1 = array([0.4, 0.4, 0.4, 0.4, 0.4])
-    #     time1_matchup1 = array([1.0, 2.0, 3.0, 4.0, 5.0])
-    #     time2_matchup1 = array([1.1, 2.1, 3.1, 4.1, 5.1])
-    #
-    #     # iv. w and u matrices
-    #     w_matrix_use1_matchup1 = array([0])
-    #     w_matrix_use2_matchup1 = array([0, 0, 1])
-    #     u_matrix_use1_matchup1 = array([0])
-    #     u_matrix_use2_matchup1 = array([0, 0, 1])
-    #
-    #     w2_matchup1 = array([[0.2, 0.2, 0.2, 0.2, 0.2, 0.0, 0.0, 0.0, 0.0],
-    #                          [0.0, 0.0, 0.2, 0.2, 0.2, 0.2, 0.2, 0.0, 0.0],
-    #                          [0.0, 0.0, 0.0, 0.2, 0.2, 0.2, 0.2, 0.2, 0.0],
-    #                          [0.0, 0.0, 0.0, 0.0, 0.2, 0.2, 0.2, 0.2, 0.2]])
-    #     w2_matchup1 = csr_matrix(w2_matchup1)
-    #
-    #     u_matrix2_matchup1 = array([0.2, 0.3, 0.2, 0.1, 0.3, 0.5, 0.3, 0.7, 0.8])
-    #
-    #     w_matrix_val_matchup1, w_matrix_row_matchup1, \
-    #         w_matrix_col_matchup1, w_matrix_nnz_matchup1, \
-    #             u_matrix_row_count_matchup1, u_matrix_matchup1 \
-    #                 = return_w_matrix_variables([w2_matchup1], [u_matrix2_matchup1])
-    #
-    #     # --------------------------------------------------------------------------------------------------------------
-    #
-    #     # b. Sensor A - Sensor B match-up data -------------------------------------------------------------------------
-    #
-    #     # i. Sensor A data
-    #     sensor_1_name_matchup2 = 1
-    #
-    #     X1_matchup2 = array([[71.5, 140.5, 29.2],
-    #                          [71.6, 141.1, 37.4],
-    #                          [71.3, 139.8, 28.2],
-    #                          [71.7, 140.2, 50.7]])
-    #
-    #     Ur1_matchup2 = array([[3.3, 4.2, 0.0],
-    #                           [3.4, 4.3, 0.0],
-    #                           [3.1, 4.4, 0.0],
-    #                           [3.2, 4.3, 0.0]])
-    #
-    #     Us1_matchup2 = array([[0.0, 1.0, 0.0],
-    #                           [0.0, 1.0, 0.0],
-    #                           [0.0, 1.0, 0.0],
-    #                           [0.0, 1.0, 0.0]])
-    #
-    #     uncertainty_type1_matchup2 = array([1, 2, 3])
-    #
-    #     # ii. Sensor B data
-    #     sensor_2_name_matchup2 = 2
-    #
-    #     X2_matchup2 = array([[80.5, 160.5, 28.2],
-    #                          [80.6, 161.1, 32.4],
-    #                          [80.3, 169.8, 22.2],
-    #                          [80.7, 160.2, 53.7]])
-    #
-    #     Ur2_matchup2 = array([[2.1, 4.0, 0.0],
-    #                           [2.2, 3.7, 0.0],
-    #                           [2.2, 4.4, 0.0],
-    #                           [2.1, 4.7, 0.0]])
-    #
-    #     Us2_matchup2 = array([[0.0, 2.0, 0.0],
-    #                           [0.0, 2.0, 0.0],
-    #                           [0.0, 2.0, 0.0],
-    #                           [0.0, 2.0, 0.0]])
-    #
-    #     uncertainty_type2_matchup2 = array([1, 2, 3])
-    #
-    #     # iii. Match-up data
-    #     K_matchup2 = array([3.2, 3.7, 3.3, 3.4])
-    #     Kr_matchup2 = array([0.5, 0.5, 0.5, 0.5])
-    #     Ks_matchup2 = array([0.12, 0.12, 0.12, 0.12])
-    #     time1_matchup2 = array([1.0, 2.0, 3.0, 4.0])
-    #     time2_matchup2 = array([1.1, 2.1, 3.1, 4.1])
-    #
-    #     # iv. w and u matrices
-    #     w_matrix_use1_matchup2 = array([0, 0, 1])
-    #     w_matrix_use2_matchup2 = array([0, 0, 1])
-    #     u_matrix_use1_matchup2 = array([0, 0, 1])
-    #     u_matrix_use2_matchup2 = array([0, 0, 2])
-    #
-    #     w12_matchup2 = array([[0.2, 0.2, 0.2, 0.2, 0.2, 0.0, 0.0, 0.0],
-    #                           [0.0, 0.2, 0.2, 0.2, 0.2, 0.2, 0.0, 0.0],
-    #                           [0.0, 0.0, 0.2, 0.2, 0.2, 0.2, 0.2, 0.0],
-    #                           [0.0, 0.0, 0.0, 0.2, 0.2, 0.2, 0.2, 0.2]])
-    #     w12_matchup2 = csr_matrix(w12_matchup2)
-    #
-    #     u_matrix1_matchup2 = array([0.2, 0.4, 0.3, 0.4, 0.3, 0.2, 0.5, 0.3])
-    #     u_matrix2_matchup2 = array([0.2, 0.3, 0.2, 0.1, 0.3, 0.5, 0.3, 0.7, 0.8])
-    #
-    #     w_matrix_val_matchup2, w_matrix_row_matchup2,\
-    #         w_matrix_col_matchup2, w_matrix_nnz_matchup2, \
-    #             u_matrix_row_count_matchup2, u_matrix_matchup2\
-    #                 = return_w_matrix_variables([w12_matchup2],
-    #                                             [u_matrix1_matchup2, u_matrix2_matchup2])
-    #
-    #     # --------------------------------------------------------------------------------------------------------------
-    #
-    #     # c. Write match-up data to file -------------------------------------------------------------------------------
-    #
-    #     # i. Match-up 1
-    #     write_input_file(fname_matchup1,
-    #                      X1_matchup1, X2_matchup1,
-    #                      Ur1_matchup1, Ur2_matchup1, Us1_matchup1, Us2_matchup1,
-    #                      uncertainty_type1_matchup1, uncertainty_type2_matchup1,
-    #                      K_matchup1, Kr_matchup1, Ks_matchup1,
-    #                      time1_matchup1, time2_matchup1,
-    #                      sensor_1_name_matchup1, sensor_2_name_matchup1)
-    #     append_W_to_input_file(fname_matchup1,
-    #                            w_matrix_val_matchup1, w_matrix_row_matchup1,
-    #                            w_matrix_col_matchup1, w_matrix_nnz_matchup1,
-    #                            u_matrix_row_count_matchup1, u_matrix_matchup1,
-    #                            w_matrix_use1_matchup1, w_matrix_use2_matchup1,
-    #                            u_matrix_use1_matchup1, u_matrix_use2_matchup1)
-    #
-    #     # ii. Match-up 2
-    #     write_input_file(fname_matchup2,
-    #                      X1_matchup2, X2_matchup2,
-    #                      Ur1_matchup2, Ur2_matchup2, Us1_matchup2, Us2_matchup2,
-    #                      uncertainty_type1_matchup2, uncertainty_type2_matchup2,
-    #                      K_matchup2, Kr_matchup2, Ks_matchup2,
-    #                      time1_matchup2, time2_matchup2,
-    #                      sensor_1_name_matchup2, sensor_2_name_matchup2)
-    #     append_W_to_input_file(fname_matchup2,
-    #                            w_matrix_val_matchup2, w_matrix_row_matchup2,
-    #                            w_matrix_col_matchup2, w_matrix_nnz_matchup2,
-    #                            u_matrix_row_count_matchup2, u_matrix_matchup2,
-    #                            w_matrix_use1_matchup2, w_matrix_use2_matchup2,
-    #                            u_matrix_use1_matchup2, u_matrix_use2_matchup2)
-    #
-    #     # --------------------------------------------------------------------------------------------------------------
-    #
-    #     ################################################################################################################
-    #     # 2. Define expected values
-    #     ################################################################################################################
-    #
-    #     # Expected value of HData attributes
-    #     values_expected = array([16.2, 11.2, 15.1, 20.3, 18.1,
-    #                              70.5, 70.6, 70.3, 70.7, 70.5,
-    #                              71.5, 71.6, 71.3, 71.7,
-    #                              80.5, 80.6, 80.3, 80.7,
-    #                              150.5, 151.1, 149.8, 150.2, 151.4,
-    #                              140.5, 141.1, 139.8, 140.2,
-    #                              160.5, 161.1, 169.8, 160.2,
-    #                              30.2, 20.4, 28.2, 50.7, 45.6,
-    #                              29.2, 37.4, 28.2, 50.7,
-    #                              28.2, 32.4, 22.2, 53.7, ])
-    #     unc_expected = [Uncertainty("r", array([1.6, 1.5, 1.5, 1.3, 1.5])),
-    #                     Uncertainty("r", array([3.1, 3.2, 3.2, 3.1, 3.0])),
-    #                     Uncertainty("r", array([3.3, 3.4, 3.1, 3.2])),
-    #                     Uncertainty("r", array([2.1, 2.2, 2.2, 2.1])),
-    #                     Uncertainty("rs", (array([5.0, 4.7, 5.1, 5.2, 5.3]), 1.0)),
-    #                     Uncertainty("rs", (array([4.2, 4.3, 4.4, 4.3]), 1.0)),
-    #                     Uncertainty("rs", (array([4.0, 3.7, 4.4, 4.7]), 2.0)),
-    #                     Uncertainty("ave", (0, 0)),
-    #                     Uncertainty("ave", (1, 1)),
-    #                     Uncertainty("ave", (2, 2))]
-    #     w_matrices_expected = [w2_matchup1, w12_matchup2]
-    #     u_matrices_expected = [u_matrix2_matchup1,
-    #                                     u_matrix1_matchup2,
-    #                                     u_matrix2_matchup2]
-    #     ks_expected = array([1.2, 1.7, 1.3, 1.4, 1.3, 3.2, 3.7, 3.3, 3.4])
-    #     unck_expected = [Uncertainty("r", array([0.25, 0.25, 0.25, 0.25, 0.25])),
-    #                      Uncertainty("r", array([0.2644, 0.2644, 0.2644, 0.2644]))]
-    #     time1_expected = array([dt(1970, 1, 1, 1, 0, 1),
-    #                             dt(1970, 1, 1, 1, 0, 2),
-    #                             dt(1970, 1, 1, 1, 0, 3),
-    #                             dt(1970, 1, 1, 1, 0, 4),
-    #                             dt(1970, 1, 1, 1, 0, 5),
-    #                             dt(1970, 1, 1, 1, 0, 1),
-    #                             dt(1970, 1, 1, 1, 0, 2),
-    #                             dt(1970, 1, 1, 1, 0, 3),
-    #                             dt(1970, 1, 1, 1, 0, 4)])
-    #     time2_expected = array([dt(1970, 1, 1, 1, 0, 1, 100000),
-    #                             dt(1970, 1, 1, 1, 0, 2, 100000),
-    #                             dt(1970, 1, 1, 1, 0, 3, 100000),
-    #                             dt(1970, 1, 1, 1, 0, 4, 100000),
-    #                             dt(1970, 1, 1, 1, 0, 5, 100000),
-    #                             dt(1970, 1, 1, 1, 0, 1, 100000),
-    #                             dt(1970, 1, 1, 1, 0, 2, 100000),
-    #                             dt(1970, 1, 1, 1, 0, 3, 100000),
-    #                             dt(1970, 1, 1, 1, 0, 4, 100000)])
-    #     idx_expected = {"Nm": [5, 4],
-    #                     "cNm": [0, 5, 9],
-    #                     "Im": [[0, 1], [1, 2]],
-    #                     "sensors": [-1, 1, 2],
-    #                     "sensor_ms": [1, 3, 3],
-    #                     "n_sensor": [0, 1, 1, 2, 1, 1, 2, 1, 1, 2],
-    #                     "n_mu": [1, 1, 2, 2, 1, 2, 2, 1, 2, 2],
-    #                     "n_cov": [1, 1, 1, 1, 2, 2, 2, 3, 3, 3],
-    #                     "N_var": [5, 5, 4, 4, 5, 4, 4, 5, 4, 4],
-    #                     "idx": [0, 5, 10, 14, 18, 23, 27, 31, 36, 40, 44]}
-    #
-    #     ################################################################################################################
-    #     # 3. Run MatchUpData.read_data()
-    #     ################################################################################################################
-    #
-    #     MatchUpOp = MatchUp()
-    #
-    #     values_test, unc_test, w_matrices_test,\
-    #         u_matrices_test, ks_test, unck_test, time1_test, time2_test, \
-    #             idx_test = MatchUpOp.openMatchUpData([fname_matchup1, fname_matchup2])
-    #
-    #     ################################################################################################################
-    #     # 4. Compare retrieve values to expect values
-    #     ################################################################################################################
-    #
-    #     # Test HData object attribute by attribute
-    #
-    #     # a. values
-    #     self.assertEqual(values_test.tolist(), values_expected.tolist())
-    #
-    #     # b. unc
-    #     for block_unc_test, block_unc_expected in zip(unc_test, unc_expected):
-    #         self.assertEqual(block_unc_expected.form, block_unc_test.form)
-    #         if block_unc_expected == "r":
-    #             self.assertEqual(block_unc_expected.uR.tolist(), block_unc_test.uR.tolist())
-    #         if block_unc_expected == "rs":
-    #             self.assertEqual(block_unc_expected.uR.tolist(), block_unc_test.uR.tolist())
-    #             self.assertEqual(block_unc_expected.uS.tolist(), block_unc_test.uS.tolist())
-    #         if block_unc_expected == "ave":
-    #             self.assertEqual(block_unc_expected.u_i, block_unc_test.u_i)
-    #             self.assertEqual(block_unc_expected.w_i, block_unc_test.w_i)
-    #
-    #     # c. w_matrices
-    #     for w_matrix_expected, w_matrix_test in zip(w_matrices_expected, w_matrices_test):
-    #         self.assertEqual(w_matrix_expected.data.tolist(), w_matrix_test.data.tolist())
-    #         self.assertEqual(w_matrix_expected.indices.tolist(), w_matrix_test.indices.tolist())
-    #         self.assertEqual(w_matrix_expected.indptr.tolist(), w_matrix_test.indptr.tolist())
-    #
-    #     # d. u_matrices
-    #     for u_matrix_expected, u_matrix_test in \
-    #             zip(u_matrices_expected, u_matrices_test):
-    #         self.assertEqual(u_matrix_expected.tolist(), u_matrix_test.tolist())
-    #
-    #     # e. ks
-    #     self.assertEqual(ks_test.tolist(), ks_expected.tolist())
-    #
-    #     # f. unck
-    #     for block_unck_test, block_unck_expected in zip(unck_test, unck_expected):
-    #         self.assertEqual(block_unck_expected.form, block_unck_test.form)
-    #         self.assertEqual(block_unck_expected.uR.tolist(), block_unck_test.uR.tolist())
-    #
-    #     # g. time
-    #     self.assertEqual(time1_test.tolist(), time1_expected.tolist())
-    #     self.assertEqual(time2_test.tolist(), time2_expected.tolist())
-    #
-    #     # h. idx
-    #     self.assertEqual(set(idx_expected.keys()), set(idx_test.keys()))
-    #     for key in idx_expected.keys():
-    #         idx_i_test = idx_test[key]
-    #         idx_i_expected = idx_expected[key]
-    #         if isinstance(idx_i_expected, ndarray):
-    #             self.assertEqual(idx_i_test.tolist(), idx_i_expected.tolist())
-    #         else:
-    #             self.assertEqual(idx_i_test, idx_i_expected)
-    #
-    #     ################################################################################################################
-    #     # 5. Remove Test Data
-    #     ################################################################################################################
-    #
-    #     rmtree(test_data_directory)
-    #
-    # def test_openMatchUpData_multi_r___nounc(self):
-    #     """
-    #     Test for MatchUpData.openMatchUpData() method for case with multiple matchup series datasets
-    #     - with only random uncertainty type
-    #     - option to open uncertainty switched off
-    #     """
-    #
-    #     # Test Description
-    #     # ================
-    #     #
-    #     # 1. This test writes two test match-up data files:
-    #     #    + Reference - Sensor A
-    #     #    + Sensor A - Sensor B
-    #     #    Sensor A/B have three measurement function variables, each with uncertainty types random
-    #     #
-    #     # 2. The files are read by the match-up data reader
-    #     #
-    #     # 3. The MatchUpData object in memory is compared to the expected values
-    #
-    #     ################################################################################################################
-    #     # 1. Write test match-up data files
-    #     ################################################################################################################
-    #
-    #     # Define file paths
-    #     test_data_directory = pjoin(dirname(__file__), "temp_data_directory")
-    #     if not exists(test_data_directory):
-    #         makedirs(test_data_directory)
-    #
-    #     fname_matchup1 = pjoin(test_data_directory, "matchup1.nc")
-    #     fname_matchup2 = pjoin(test_data_directory, "matchup2.nc")
-    #
-    #     # a. Reference - Sensor A match-up data ------------------------------------------------------------------------
-    #
-    #     # i. Reference Sensor data
-    #     sensor_1_name_matchup1 = -1
-    #
-    #     X1_matchup1 = array([[16.2, 11.2, 15.1, 20.3, 18.1]]).T
-    #     Ur1_matchup1 = array([1.6, 1.5, 1.5, 1.3, 1.5])
-    #     Us1_matchup1 = array([0.0, 0.0, 0.0, 0.0, 0.0])
-    #     uncertainty_type1_matchup1 = array([1])
-    #
-    #     # ii. Sensor A data
-    #     sensor_2_name_matchup1 = 1
-    #
-    #     X2_matchup1 = array([[70.5, 150.5, 30.2],
-    #                          [70.6, 151.1, 20.4],
-    #                          [70.3, 149.8, 28.2],
-    #                          [70.7, 150.2, 50.7],
-    #                          [70.5, 151.4, 45.6]])
-    #
-    #     Ur2_matchup1 = array([[3.1, 5.0, 2.2],
-    #                           [3.2, 4.7, 1.7],
-    #                           [3.2, 5.1, 2.0],
-    #                           [3.1, 5.2, 4.3],
-    #                           [3.0, 5.3, 2.6]])
-    #
-    #     Us2_matchup1 = array([[0.0, 0.0, 0.0],
-    #                           [0.0, 0.0, 0.0],
-    #                           [0.0, 0.0, 0.0],
-    #                           [0.0, 0.0, 0.0],
-    #                           [0.0, 0.0, 0.0]])
-    #
-    #     uncertainty_type2_matchup1 = array([1, 1, 1])
-    #
-    #     # iii. Match-up data
-    #     K_matchup1 = array([1.2, 1.7, 1.3, 1.4, 1.3])
-    #     Kr_matchup1 = array([0.3, 0.3, 0.3, 0.3, 0.3])
-    #     Ks_matchup1 = array([0.4, 0.4, 0.4, 0.4, 0.4])
-    #     time1_matchup1 = array([1.0, 2.0, 3.0, 4.0, 5.0])
-    #     time2_matchup1 = array([1.1, 2.1, 3.1, 4.1, 5.1])
-    #
-    #     # --------------------------------------------------------------------------------------------------------------
-    #
-    #     # b. Sensor A - Sensor B match-up data -------------------------------------------------------------------------
-    #
-    #     # i. Sensor A data
-    #     sensor_1_name_matchup2 = 1
-    #
-    #     X1_matchup2 = array([[71.5, 140.5, 29.2],
-    #                          [71.6, 141.1, 37.4],
-    #                          [71.3, 139.8, 28.2],
-    #                          [71.7, 140.2, 50.7]])
-    #
-    #     Ur1_matchup2 = array([[3.3, 4.2, 2.3],
-    #                           [3.4, 4.3, 1.2],
-    #                           [3.1, 4.4, 2.3],
-    #                           [3.2, 4.3, 4.4]])
-    #
-    #     Us1_matchup2 = array([[0.0, 0.0, 0.0],
-    #                           [0.0, 0.0, 0.0],
-    #                           [0.0, 0.0, 0.0],
-    #                           [0.0, 0.0, 0.0]])
-    #
-    #     uncertainty_type1_matchup2 = array([1, 1, 1])
-    #
-    #     # ii. Sensor B data
-    #     sensor_2_name_matchup2 = 2
-    #
-    #     X2_matchup2 = array([[80.5, 160.5, 28.2],
-    #                          [80.6, 161.1, 32.4],
-    #                          [80.3, 169.8, 22.2],
-    #                          [80.7, 160.2, 53.7]])
-    #
-    #     Ur2_matchup2 = array([[2.1, 4.0, 3.2],
-    #                           [2.2, 3.7, 2.7],
-    #                           [2.2, 4.4, 3.0],
-    #                           [2.1, 4.7, 5.3]])
-    #
-    #     Us2_matchup2 = array([[0.0, 0.0, 0.0],
-    #                           [0.0, 0.0, 0.0],
-    #                           [0.0, 0.0, 0.0],
-    #                           [0.0, 0.0, 0.0]])
-    #
-    #     uncertainty_type2_matchup2 = array([1, 1, 1])
-    #
-    #     # iii. Match-up data
-    #     K_matchup2 = array([3.2, 3.7, 3.3, 3.4])
-    #     Kr_matchup2 = array([0.5, 0.5, 0.5, 0.5])
-    #     Ks_matchup2 = array([0.12, 0.12, 0.12, 0.12])
-    #     time1_matchup2 = array([1.0, 2.0, 3.0, 4.0])
-    #     time2_matchup2 = array([1.1, 2.1, 3.1, 4.1])
-    #
-    #     # --------------------------------------------------------------------------------------------------------------
-    #
-    #     # c. Parameter data --------------------------------------------------------------------------------------------
-    #
-    #     parameter = array([[1.0, 2.0],
-    #                        [3.0, 4.0]])
-    #
-    #     # --------------------------------------------------------------------------------------------------------------
-    #
-    #     # d. Test data to file -----------------------------------------------------------------------------------------
-    #
-    #     # i. Match-up 1
-    #     write_input_file(fname_matchup1,
-    #                      X1_matchup1, X2_matchup1,
-    #                      Ur1_matchup1, Ur2_matchup1, Us1_matchup1, Us2_matchup1,
-    #                      uncertainty_type1_matchup1, uncertainty_type2_matchup1,
-    #                      K_matchup1, Kr_matchup1, Ks_matchup1,
-    #                      time1_matchup1, time2_matchup1,
-    #                      sensor_1_name_matchup1, sensor_2_name_matchup1)
-    #
-    #     # ii. Match-up 2
-    #     write_input_file(fname_matchup2,
-    #                      X1_matchup2, X2_matchup2,
-    #                      Ur1_matchup2, Ur2_matchup2, Us1_matchup2, Us2_matchup2,
-    #                      uncertainty_type1_matchup2, uncertainty_type2_matchup2,
-    #                      K_matchup2, Kr_matchup2, Ks_matchup2,
-    #                      time1_matchup2, time2_matchup2,
-    #                      sensor_1_name_matchup2, sensor_2_name_matchup2)
-    #
-    #     # --------------------------------------------------------------------------------------------------------------
-    #
-    #     ################################################################################################################
-    #     # 2. Define expected values
-    #     ################################################################################################################
-    #
-    #     # Expected value of HData attributes
-    #     values_expected = array([16.2, 11.2, 15.1, 20.3, 18.1,
-    #                              70.5, 70.6, 70.3, 70.7, 70.5,
-    #                              71.5, 71.6, 71.3, 71.7,
-    #                              80.5, 80.6, 80.3, 80.7,
-    #                              150.5, 151.1, 149.8, 150.2, 151.4,
-    #                              140.5, 141.1, 139.8, 140.2,
-    #                              160.5, 161.1, 169.8, 160.2,
-    #                              30.2, 20.4, 28.2, 50.7, 45.6,
-    #                              29.2, 37.4, 28.2, 50.7,
-    #                              28.2, 32.4, 22.2, 53.7, ])
-    #     unc_expected = None
-    #     w_matrices_expected = None
-    #     u_matrices_expected = None
-    #     ks_expected = array([1.2, 1.7, 1.3, 1.4, 1.3, 3.2, 3.7, 3.3, 3.4])
-    #     unck_expected = None
-    #     time1_expected = array([dt(1970, 1, 1, 1, 0, 1),
-    #                             dt(1970, 1, 1, 1, 0, 2),
-    #                             dt(1970, 1, 1, 1, 0, 3),
-    #                             dt(1970, 1, 1, 1, 0, 4),
-    #                             dt(1970, 1, 1, 1, 0, 5),
-    #                             dt(1970, 1, 1, 1, 0, 1),
-    #                             dt(1970, 1, 1, 1, 0, 2),
-    #                             dt(1970, 1, 1, 1, 0, 3),
-    #                             dt(1970, 1, 1, 1, 0, 4)])
-    #     time2_expected = array([dt(1970, 1, 1, 1, 0, 1, 100000),
-    #                             dt(1970, 1, 1, 1, 0, 2, 100000),
-    #                             dt(1970, 1, 1, 1, 0, 3, 100000),
-    #                             dt(1970, 1, 1, 1, 0, 4, 100000),
-    #                             dt(1970, 1, 1, 1, 0, 5, 100000),
-    #                             dt(1970, 1, 1, 1, 0, 1, 100000),
-    #                             dt(1970, 1, 1, 1, 0, 2, 100000),
-    #                             dt(1970, 1, 1, 1, 0, 3, 100000),
-    #                             dt(1970, 1, 1, 1, 0, 4, 100000)])
-    #     idx_expected = {"Nm": [5, 4],
-    #                     "cNm": [0, 5, 9],
-    #                     "Im": [[0, 1], [1, 2]],
-    #                     "sensors": [-1, 1, 2],
-    #                     "sensor_ms": [1, 3, 3],
-    #                     "n_sensor": [0, 1, 1, 2, 1, 1, 2, 1, 1, 2],
-    #                     "n_mu": [1, 1, 2, 2, 1, 2, 2, 1, 2, 2],
-    #                     "n_cov": [1, 1, 1, 1, 2, 2, 2, 3, 3, 3],
-    #                     "N_var": [5, 5, 4, 4, 5, 4, 4, 5, 4, 4],
-    #                     "idx": [0, 5, 10, 14, 18, 23, 27, 31, 36, 40, 44]}
-    #
-    #     ################################################################################################################
-    #     # 3. Run MatchUpData.read_data()
-    #     ################################################################################################################
-    #
-    #     MatchUpOp = MatchUp()
-    #
-    #     values_test, unc_test, w_matrices_test,\
-    #         u_matrices_test, ks_test, unck_test, time1_test, time2_test, \
-    #             idx_test = MatchUpOp.openMatchUpData([fname_matchup1, fname_matchup2], open_uncertainty=False)
-    #
-    #     ################################################################################################################
-    #     # 4. Compare retrieve values to expect values
-    #     ################################################################################################################
-    #
-    #     # Test HData object attribute by attribute
-    #
-    #     # a. values
-    #     self.assertEqual(values_test.tolist(), values_expected.tolist())
-    #
-    #     # b. unc
-    #     self.assertEqual(unc_expected, unc_test)
-    #
-    #     # c. w_matrices
-    #     self.assertEqual(w_matrices_test, w_matrices_expected)
-    #
-    #     # d. u_matrices
-    #     self.assertEqual(u_matrices_test, u_matrices_expected)
-    #
-    #     # e. ks
-    #     self.assertEqual(ks_test.tolist(), ks_expected.tolist())
-    #
-    #     # f. unck
-    #     self.assertEqual(unck_expected, unck_test)
-    #
-    #     # g. time
-    #     self.assertEqual(time1_test.tolist(), time1_expected.tolist())
-    #     self.assertEqual(time2_test.tolist(), time2_expected.tolist())
-    #
-    #     # h. idx
-    #     self.assertEqual(set(idx_expected.keys()), set(idx_test.keys()))
-    #     for key in idx_expected.keys():
-    #         idx_i_test = idx_test[key]
-    #         idx_i_expected = idx_expected[key]
-    #         if isinstance(idx_i_expected, ndarray):
-    #             self.assertEqual(idx_i_test.tolist(), idx_i_expected.tolist())
-    #         else:
-    #             self.assertEqual(idx_i_test, idx_i_expected)
-    #
-    #     ################################################################################################################
-    #     # 5. Remove Test Data
-    #     ################################################################################################################
-    #
-    #     rmtree(test_data_directory)
-    #
-    # def test_openMatchUpData_multi_rs__nounc(self):
-    #     """
-    #     Test for MatchUpData.openMatchUpData() method for case with multiple match-up series datasets
-    #     - with random and random and systematic uncertainty type
-    #     - with option to open uncertainties switched off
-    #     """
-    #
-    #     # Test Description
-    #     # ================
-    #     #
-    #     # 1. This test writes two test match-up data files:
-    #     #    + Reference - Sensor A
-    #     #    + Sensor A - Sensor B
-    #     #    Sensor A/B have three measurement function variables, with covariate 1 and 3 random uncertainty type and
-    #     #    covariate 2 with systematic uncertainty type
-    #     #
-    #     # 2. The files are read by the match-up data reader
-    #     #
-    #     # 3. The MatchUpData object in memory is compared to the expected values
-    #
-    #     ################################################################################################################
-    #     # 1. Write test match-up data files
-    #     ################################################################################################################
-    #
-    #     # Define file paths
-    #     test_data_directory = pjoin(temp_data_directory, str(int(random()*1000000)))
-    #     if not exists(test_data_directory):
-    #         makedirs(test_data_directory)
-    #
-    #     fname_matchup1 = pjoin(test_data_directory, "matchup1.nc")
-    #     fname_matchup2 = pjoin(test_data_directory, "matchup2.nc")
-    #
-    #     # a. Reference - Sensor A match-up data ------------------------------------------------------------------------
-    #
-    #     # i. Reference Sensor data
-    #     sensor_1_name_matchup1 = -1
-    #
-    #     X1_matchup1 = array([[16.2, 11.2, 15.1, 20.3, 18.1]]).T
-    #     Ur1_matchup1 = array([1.6, 1.5, 1.5, 1.3, 1.5])
-    #     Us1_matchup1 = array([0.0, 0.0, 0.0, 0.0, 0.0])
-    #     uncertainty_type1_matchup1 = array([1])
-    #
-    #     # ii. Sensor A data
-    #     sensor_2_name_matchup1 = 1
-    #
-    #     X2_matchup1 = array([[70.5, 150.5, 30.2],
-    #                          [70.6, 151.1, 20.4],
-    #                          [70.3, 149.8, 28.2],
-    #                          [70.7, 150.2, 50.7],
-    #                          [70.5, 151.4, 45.6]])
-    #
-    #     Ur2_matchup1 = array([[3.1, 5.0, 2.2],
-    #                           [3.2, 4.7, 1.7],
-    #                           [3.2, 5.1, 2.0],
-    #                           [3.1, 5.2, 4.3],
-    #                           [3.0, 5.3, 2.6]])
-    #
-    #     Us2_matchup1 = array([[0.0, 1.0, 0.0],
-    #                           [0.0, 1.0, 0.0],
-    #                           [0.0, 1.0, 0.0],
-    #                           [0.0, 1.0, 0.0],
-    #                           [0.0, 1.0, 0.0]])
-    #
-    #     uncertainty_type2_matchup1 = array([1, 2, 1])
-    #
-    #     # iii. Match-up data
-    #     K_matchup1 = array([1.2, 1.7, 1.3, 1.4, 1.3])
-    #     Kr_matchup1 = array([0.3, 0.3, 0.3, 0.3, 0.3])
-    #     Ks_matchup1 = array([0.4, 0.4, 0.4, 0.4, 0.4])
-    #     time1_matchup1 = array([1.0, 2.0, 3.0, 4.0, 5.0])
-    #     time2_matchup1 = array([1.1, 2.1, 3.1, 4.1, 5.1])
-    #
-    #     # --------------------------------------------------------------------------------------------------------------
-    #
-    #     # b. Sensor A - Sensor B match-up data -------------------------------------------------------------------------
-    #
-    #     # i. Sensor A data
-    #     sensor_1_name_matchup2 = 1
-    #
-    #     X1_matchup2 = array([[71.5, 140.5, 29.2],
-    #                          [71.6, 141.1, 37.4],
-    #                          [71.3, 139.8, 28.2],
-    #                          [71.7, 140.2, 50.7]])
-    #
-    #     Ur1_matchup2 = array([[3.3, 4.2, 2.3],
-    #                           [3.4, 4.3, 1.2],
-    #                           [3.1, 4.4, 2.3],
-    #                           [3.2, 4.3, 4.4]])
-    #
-    #     Us1_matchup2 = array([[0.0, 1.0, 0.0],
-    #                           [0.0, 1.0, 0.0],
-    #                           [0.0, 1.0, 0.0],
-    #                           [0.0, 1.0, 0.0]])
-    #
-    #     uncertainty_type1_matchup2 = array([1, 2, 1])
-    #
-    #     # ii. Sensor B data
-    #     sensor_2_name_matchup2 = 2
-    #
-    #     X2_matchup2 = array([[80.5, 160.5, 28.2],
-    #                          [80.6, 161.1, 32.4],
-    #                          [80.3, 169.8, 22.2],
-    #                          [80.7, 160.2, 53.7]])
-    #
-    #     Ur2_matchup2 = array([[2.1, 4.0, 3.2],
-    #                           [2.2, 3.7, 2.7],
-    #                           [2.2, 4.4, 3.0],
-    #                           [2.1, 4.7, 5.3]])
-    #
-    #     Us2_matchup2 = array([[0.0, 2.0, 0.0],
-    #                           [0.0, 2.0, 0.0],
-    #                           [0.0, 2.0, 0.0],
-    #                           [0.0, 2.0, 0.0]])
-    #
-    #     uncertainty_type2_matchup2 = array([1, 2, 1])
-    #
-    #     # iii. Match-up data
-    #     K_matchup2 = array([3.2, 3.7, 3.3, 3.4])
-    #     Kr_matchup2 = array([0.5, 0.5, 0.5, 0.5])
-    #     Ks_matchup2 = array([0.12, 0.12, 0.12, 0.12])
-    #     time1_matchup2 = array([1.0, 2.0, 3.0, 4.0])
-    #     time2_matchup2 = array([1.1, 2.1, 3.1, 4.1])
-    #
-    #     # --------------------------------------------------------------------------------------------------------------
-    #
-    #     # d. Test data to file -----------------------------------------------------------------------------------------
-    #
-    #     # i. Match-up 1
-    #     write_input_file(fname_matchup1,
-    #                      X1_matchup1, X2_matchup1,
-    #                      Ur1_matchup1, Ur2_matchup1, Us1_matchup1, Us2_matchup1,
-    #                      uncertainty_type1_matchup1, uncertainty_type2_matchup1,
-    #                      K_matchup1, Kr_matchup1, Ks_matchup1,
-    #                      time1_matchup1, time2_matchup1,
-    #                      sensor_1_name_matchup1, sensor_2_name_matchup1)
-    #
-    #     # ii. Match-up 2
-    #     write_input_file(fname_matchup2,
-    #                      X1_matchup2, X2_matchup2,
-    #                      Ur1_matchup2, Ur2_matchup2, Us1_matchup2, Us2_matchup2,
-    #                      uncertainty_type1_matchup2, uncertainty_type2_matchup2,
-    #                      K_matchup2, Kr_matchup2, Ks_matchup2,
-    #                      time1_matchup2, time2_matchup2,
-    #                      sensor_1_name_matchup2, sensor_2_name_matchup2)
-    #
-    #     # --------------------------------------------------------------------------------------------------------------
-    #
-    #     ################################################################################################################
-    #     # 2. Define expected values
-    #     ################################################################################################################
-    #
-    #     # Expected value of HData attributes
-    #     values_expected = array([16.2, 11.2, 15.1, 20.3, 18.1,
-    #                              70.5, 70.6, 70.3, 70.7, 70.5,
-    #                              71.5, 71.6, 71.3, 71.7,
-    #                              80.5, 80.6, 80.3, 80.7,
-    #                              150.5, 151.1, 149.8, 150.2, 151.4,
-    #                              140.5, 141.1, 139.8, 140.2,
-    #                              160.5, 161.1, 169.8, 160.2,
-    #                              30.2, 20.4, 28.2, 50.7, 45.6,
-    #                              29.2, 37.4, 28.2, 50.7,
-    #                              28.2, 32.4, 22.2, 53.7, ])
-    #     unc_expected = None
-    #     w_matrices_expected = None
-    #     u_matrices_expected = None
-    #     ks_expected = array([1.2, 1.7, 1.3, 1.4, 1.3, 3.2, 3.7, 3.3, 3.4])
-    #     unck_expected = None
-    #     time1_expected = array([dt(1970, 1, 1, 1, 0, 1),
-    #                             dt(1970, 1, 1, 1, 0, 2),
-    #                             dt(1970, 1, 1, 1, 0, 3),
-    #                             dt(1970, 1, 1, 1, 0, 4),
-    #                             dt(1970, 1, 1, 1, 0, 5),
-    #                             dt(1970, 1, 1, 1, 0, 1),
-    #                             dt(1970, 1, 1, 1, 0, 2),
-    #                             dt(1970, 1, 1, 1, 0, 3),
-    #                             dt(1970, 1, 1, 1, 0, 4)])
-    #     time2_expected = array([dt(1970, 1, 1, 1, 0, 1, 100000),
-    #                             dt(1970, 1, 1, 1, 0, 2, 100000),
-    #                             dt(1970, 1, 1, 1, 0, 3, 100000),
-    #                             dt(1970, 1, 1, 1, 0, 4, 100000),
-    #                             dt(1970, 1, 1, 1, 0, 5, 100000),
-    #                             dt(1970, 1, 1, 1, 0, 1, 100000),
-    #                             dt(1970, 1, 1, 1, 0, 2, 100000),
-    #                             dt(1970, 1, 1, 1, 0, 3, 100000),
-    #                             dt(1970, 1, 1, 1, 0, 4, 100000)])
-    #     idx_expected = {"Nm": [5, 4],
-    #                     "cNm": [0, 5, 9],
-    #                     "Im": [[0, 1], [1, 2]],
-    #                     "sensors": [-1, 1, 2],
-    #                     "sensor_ms": [1, 3, 3],
-    #                     "n_sensor": [0, 1, 1, 2, 1, 1, 2, 1, 1, 2],
-    #                     "n_mu": [1, 1, 2, 2, 1, 2, 2, 1, 2, 2],
-    #                     "n_cov": [1, 1, 1, 1, 2, 2, 2, 3, 3, 3],
-    #                     "N_var": [5, 5, 4, 4, 5, 4, 4, 5, 4, 4],
-    #                     "idx": [0, 5, 10, 14, 18, 23, 27, 31, 36, 40, 44]}
-    #
-    #     ################################################################################################################
-    #     # 3. Run MatchUpData.read_data()
-    #     ################################################################################################################
-    #
-    #     MatchUpOp = MatchUp()
-    #
-    #     values_test, unc_test, w_matrices_test,\
-    #         u_matrices_test, ks_test, unck_test, time1_test, time2_test, \
-    #             idx_test = MatchUpOp.openMatchUpData([fname_matchup1, fname_matchup2], open_uncertainty=False)
-    #
-    #     ################################################################################################################
-    #     # 4. Compare retrieve values to expect values
-    #     ################################################################################################################
-    #
-    #     # Test HData object attribute by attribute
-    #
-    #     # a. values
-    #     self.assertEqual(values_test.tolist(), values_expected.tolist())
-    #
-    #     # b. unc
-    #     self.assertEqual(unc_expected, unc_test)
-    #
-    #     # c. w_matrices
-    #     self.assertEqual(w_matrices_test, w_matrices_expected)
-    #
-    #     # d. u_matrices
-    #     self.assertEqual(u_matrices_test, u_matrices_expected)
-    #
-    #     # e. ks
-    #     self.assertEqual(ks_test.tolist(), ks_expected.tolist())
-    #
-    #     # f. unck
-    #     self.assertEqual(unck_expected, unck_test)
-    #
-    #     # g. time
-    #     self.assertEqual(time1_test.tolist(), time1_expected.tolist())
-    #     self.assertEqual(time2_test.tolist(), time2_expected.tolist())
-    #
-    #     # h. idx
-    #     self.assertEqual(set(idx_expected.keys()), set(idx_test.keys()))
-    #     for key in idx_expected.keys():
-    #         idx_i_test = idx_test[key]
-    #         idx_i_expected = idx_expected[key]
-    #         if isinstance(idx_i_expected, ndarray):
-    #             self.assertEqual(idx_i_test.tolist(), idx_i_expected.tolist())
-    #         else:
-    #             self.assertEqual(idx_i_test, idx_i_expected)
-    #
-    #     ################################################################################################################
-    #     # 5. Remove Test Data
-    #     ################################################################################################################
-    #
-    #     rmtree(test_data_directory)
-    #
-    # def test_openMatchUpData_multi_rsw_nounc(self):
-    #     """
-    #     Test for MatchUpData.openMatchUpData() method for case with mulitple match-up series datasets
-    #     - with random, random and systematic and w matrix uncertainty type
-    #     - with option to open uncertainties switched off
-    #     """
-    #
-    #     # Test Description
-    #     # ================
-    #     #
-    #     # 1. This test writes two test match-up data files:
-    #     #    + Reference - Sensor A
-    #     #    + Sensor A - Sensor B
-    #     #    Sensor A/B have three measurement function variables, with covariate 1 w matrix uncertainty type, covariate
-    #     #    2 systematic uncertainty type and covariate 3 w matrix uncertainty type
-    #     #
-    #     # 2. The files are read by the match-up data reader
-    #     #
-    #     # 3. The MatchUpData object in memory is compared to the expected values
-    #
-    #     ################################################################################################################
-    #     # 1. Write test match-up data files
-    #     ################################################################################################################
-    #
-    #     # Define file paths
-    #     test_data_directory = pjoin(temp_data_directory, str(int(random()*1000000)))
-    #     if not exists(test_data_directory):
-    #         makedirs(test_data_directory)
-    #
-    #     fname_matchup1 = pjoin(test_data_directory, "matchup1.nc")
-    #     fname_matchup2 = pjoin(test_data_directory, "matchup2.nc")
-    #
-    #     # a. Reference - Sensor A match-up data ------------------------------------------------------------------------
-    #
-    #     # i. Reference Sensor data
-    #     sensor_1_name_matchup1 = -1
-    #
-    #     X1_matchup1 = array([[16.2, 11.2, 15.1, 20.3, 18.1]]).T
-    #     Ur1_matchup1 = array([1.6, 1.5, 1.5, 1.3, 1.5])
-    #     Us1_matchup1 = array([0.0, 0.0, 0.0, 0.0, 0.0])
-    #     uncertainty_type1_matchup1 = array([1])
-    #
-    #     # ii. Sensor A data
-    #     sensor_2_name_matchup1 = 1
-    #
-    #     X2_matchup1 = array([[70.5, 150.5, 30.2],
-    #                          [70.6, 151.1, 20.4],
-    #                          [70.3, 149.8, 28.2],
-    #                          [70.7, 150.2, 50.7],
-    #                          [70.5, 151.4, 45.6]])
-    #
-    #     Ur2_matchup1 = array([[3.1, 5.0, 2.2],
-    #                           [3.2, 4.7, 1.7],
-    #                           [3.2, 5.1, 2.0],
-    #                           [3.1, 5.2, 4.3],
-    #                           [3.0, 5.3, 2.6]])
-    #
-    #     Us2_matchup1 = array([[0.0, 1.0, 0.0],
-    #                           [0.0, 1.0, 0.0],
-    #                           [0.0, 1.0, 0.0],
-    #                           [0.0, 1.0, 0.0],
-    #                           [0.0, 1.0, 0.0]])
-    #
-    #     uncertainty_type2_matchup1 = array([1, 2, 3])
-    #
-    #     # iii. Match-up data
-    #     K_matchup1 = array([1.2, 1.7, 1.3, 1.4, 1.3])
-    #     Kr_matchup1 = array([0.3, 0.3, 0.3, 0.3, 0.3])
-    #     Ks_matchup1 = array([0.4, 0.4, 0.4, 0.4, 0.4])
-    #     time1_matchup1 = array([1.0, 2.0, 3.0, 4.0, 5.0])
-    #     time2_matchup1 = array([1.1, 2.1, 3.1, 4.1, 5.1])
-    #
-    #     # iv. w and u matrices
-    #     w_matrix_use1_matchup1 = array([0])
-    #     w_matrix_use2_matchup1 = array([0, 0, 1])
-    #     u_matrix_use1_matchup1 = array([0])
-    #     u_matrix_use2_matchup1 = array([0, 0, 1])
-    #
-    #     w2_matchup1 = array([[0.2, 0.2, 0.2, 0.2, 0.2, 0.0, 0.0, 0.0, 0.0],
-    #                          [0.0, 0.0, 0.2, 0.2, 0.2, 0.2, 0.2, 0.0, 0.0],
-    #                          [0.0, 0.0, 0.0, 0.2, 0.2, 0.2, 0.2, 0.2, 0.0],
-    #                          [0.0, 0.0, 0.0, 0.0, 0.2, 0.2, 0.2, 0.2, 0.2]])
-    #     w2_matchup1 = csr_matrix(w2_matchup1)
-    #
-    #     u_matrix2_matchup1 = array([0.2, 0.3, 0.2, 0.1, 0.3, 0.5, 0.3, 0.7, 0.8])
-    #
-    #     w_matrix_val_matchup1, w_matrix_row_matchup1, \
-    #         w_matrix_col_matchup1, w_matrix_nnz_matchup1, \
-    #             u_matrix_row_count_matchup1, u_matrix_matchup1 \
-    #                 = return_w_matrix_variables([w2_matchup1], [u_matrix2_matchup1])
-    #
-    #     # --------------------------------------------------------------------------------------------------------------
-    #
-    #     # b. Sensor A - Sensor B match-up data -------------------------------------------------------------------------
-    #
-    #     # i. Sensor A data
-    #     sensor_1_name_matchup2 = 1
-    #
-    #     X1_matchup2 = array([[71.5, 140.5, 29.2],
-    #                          [71.6, 141.1, 37.4],
-    #                          [71.3, 139.8, 28.2],
-    #                          [71.7, 140.2, 50.7]])
-    #
-    #     Ur1_matchup2 = array([[3.3, 4.2, 0.0],
-    #                           [3.4, 4.3, 0.0],
-    #                           [3.1, 4.4, 0.0],
-    #                           [3.2, 4.3, 0.0]])
-    #
-    #     Us1_matchup2 = array([[0.0, 1.0, 0.0],
-    #                           [0.0, 1.0, 0.0],
-    #                           [0.0, 1.0, 0.0],
-    #                           [0.0, 1.0, 0.0]])
-    #
-    #     uncertainty_type1_matchup2 = array([1, 2, 3])
-    #
-    #     # ii. Sensor B data
-    #     sensor_2_name_matchup2 = 2
-    #
-    #     X2_matchup2 = array([[80.5, 160.5, 28.2],
-    #                          [80.6, 161.1, 32.4],
-    #                          [80.3, 169.8, 22.2],
-    #                          [80.7, 160.2, 53.7]])
-    #
-    #     Ur2_matchup2 = array([[2.1, 4.0, 0.0],
-    #                           [2.2, 3.7, 0.0],
-    #                           [2.2, 4.4, 0.0],
-    #                           [2.1, 4.7, 0.0]])
-    #
-    #     Us2_matchup2 = array([[0.0, 2.0, 0.0],
-    #                           [0.0, 2.0, 0.0],
-    #                           [0.0, 2.0, 0.0],
-    #                           [0.0, 2.0, 0.0]])
-    #
-    #     uncertainty_type2_matchup2 = array([1, 2, 3])
-    #
-    #     # iii. Match-up data
-    #     K_matchup2 = array([3.2, 3.7, 3.3, 3.4])
-    #     Kr_matchup2 = array([0.5, 0.5, 0.5, 0.5])
-    #     Ks_matchup2 = array([0.12, 0.12, 0.12, 0.12])
-    #     time1_matchup2 = array([1.0, 2.0, 3.0, 4.0])
-    #     time2_matchup2 = array([1.1, 2.1, 3.1, 4.1])
-    #
-    #     # iv. w and u matrices
-    #     w_matrix_use1_matchup2 = array([0, 0, 1])
-    #     w_matrix_use2_matchup2 = array([0, 0, 1])
-    #     u_matrix_use1_matchup2 = array([0, 0, 1])
-    #     u_matrix_use2_matchup2 = array([0, 0, 2])
-    #
-    #     w12_matchup2 = array([[0.2, 0.2, 0.2, 0.2, 0.2, 0.0, 0.0, 0.0],
-    #                           [0.0, 0.2, 0.2, 0.2, 0.2, 0.2, 0.0, 0.0],
-    #                           [0.0, 0.0, 0.2, 0.2, 0.2, 0.2, 0.2, 0.0],
-    #                           [0.0, 0.0, 0.0, 0.2, 0.2, 0.2, 0.2, 0.2]])
-    #     w12_matchup2 = csr_matrix(w12_matchup2)
-    #
-    #     u_matrix1_matchup2 = array([0.2, 0.4, 0.3, 0.4, 0.3, 0.2, 0.5, 0.3])
-    #     u_matrix2_matchup2 = array([0.2, 0.3, 0.2, 0.1, 0.3, 0.5, 0.3, 0.7, 0.8])
-    #
-    #     w_matrix_val_matchup2, w_matrix_row_matchup2,\
-    #         w_matrix_col_matchup2, w_matrix_nnz_matchup2, \
-    #             u_matrix_row_count_matchup2, u_matrix_matchup2\
-    #                 = return_w_matrix_variables([w12_matchup2],
-    #                                             [u_matrix1_matchup2, u_matrix2_matchup2])
-    #
-    #     # --------------------------------------------------------------------------------------------------------------
-    #
-    #     # c. Write match-up data to file -------------------------------------------------------------------------------
-    #
-    #     # i. Match-up 1
-    #     write_input_file(fname_matchup1,
-    #                      X1_matchup1, X2_matchup1,
-    #                      Ur1_matchup1, Ur2_matchup1, Us1_matchup1, Us2_matchup1,
-    #                      uncertainty_type1_matchup1, uncertainty_type2_matchup1,
-    #                      K_matchup1, Kr_matchup1, Ks_matchup1,
-    #                      time1_matchup1, time2_matchup1,
-    #                      sensor_1_name_matchup1, sensor_2_name_matchup1)
-    #     append_W_to_input_file(fname_matchup1,
-    #                            w_matrix_val_matchup1, w_matrix_row_matchup1,
-    #                            w_matrix_col_matchup1, w_matrix_nnz_matchup1,
-    #                            u_matrix_row_count_matchup1, u_matrix_matchup1,
-    #                            w_matrix_use1_matchup1, w_matrix_use2_matchup1,
-    #                            u_matrix_use1_matchup1, u_matrix_use2_matchup1)
-    #
-    #     # ii. Match-up 2
-    #     write_input_file(fname_matchup2,
-    #                      X1_matchup2, X2_matchup2,
-    #                      Ur1_matchup2, Ur2_matchup2, Us1_matchup2, Us2_matchup2,
-    #                      uncertainty_type1_matchup2, uncertainty_type2_matchup2,
-    #                      K_matchup2, Kr_matchup2, Ks_matchup2,
-    #                      time1_matchup2, time2_matchup2,
-    #                      sensor_1_name_matchup2, sensor_2_name_matchup2)
-    #     append_W_to_input_file(fname_matchup2,
-    #                            w_matrix_val_matchup2, w_matrix_row_matchup2,
-    #                            w_matrix_col_matchup2, w_matrix_nnz_matchup2,
-    #                            u_matrix_row_count_matchup2, u_matrix_matchup2,
-    #                            w_matrix_use1_matchup2, w_matrix_use2_matchup2,
-    #                            u_matrix_use1_matchup2, u_matrix_use2_matchup2)
-    #
-    #     # --------------------------------------------------------------------------------------------------------------
-    #
-    #     ################################################################################################################
-    #     # 2. Define expected values
-    #     ################################################################################################################
-    #
-    #     # Expected value of HData attributes
-    #     values_expected = array([16.2, 11.2, 15.1, 20.3, 18.1,
-    #                              70.5, 70.6, 70.3, 70.7, 70.5,
-    #                              71.5, 71.6, 71.3, 71.7,
-    #                              80.5, 80.6, 80.3, 80.7,
-    #                              150.5, 151.1, 149.8, 150.2, 151.4,
-    #                              140.5, 141.1, 139.8, 140.2,
-    #                              160.5, 161.1, 169.8, 160.2,
-    #                              30.2, 20.4, 28.2, 50.7, 45.6,
-    #                              29.2, 37.4, 28.2, 50.7,
-    #                              28.2, 32.4, 22.2, 53.7, ])
-    #     unc_expected = None
-    #     w_matrices_expected = None
-    #     u_matrices_expected = None
-    #     ks_expected = array([1.2, 1.7, 1.3, 1.4, 1.3, 3.2, 3.7, 3.3, 3.4])
-    #     unck_expected = None
-    #     time1_expected = array([dt(1970, 1, 1, 1, 0, 1),
-    #                             dt(1970, 1, 1, 1, 0, 2),
-    #                             dt(1970, 1, 1, 1, 0, 3),
-    #                             dt(1970, 1, 1, 1, 0, 4),
-    #                             dt(1970, 1, 1, 1, 0, 5),
-    #                             dt(1970, 1, 1, 1, 0, 1),
-    #                             dt(1970, 1, 1, 1, 0, 2),
-    #                             dt(1970, 1, 1, 1, 0, 3),
-    #                             dt(1970, 1, 1, 1, 0, 4)])
-    #     time2_expected = array([dt(1970, 1, 1, 1, 0, 1, 100000),
-    #                             dt(1970, 1, 1, 1, 0, 2, 100000),
-    #                             dt(1970, 1, 1, 1, 0, 3, 100000),
-    #                             dt(1970, 1, 1, 1, 0, 4, 100000),
-    #                             dt(1970, 1, 1, 1, 0, 5, 100000),
-    #                             dt(1970, 1, 1, 1, 0, 1, 100000),
-    #                             dt(1970, 1, 1, 1, 0, 2, 100000),
-    #                             dt(1970, 1, 1, 1, 0, 3, 100000),
-    #                             dt(1970, 1, 1, 1, 0, 4, 100000)])
-    #     idx_expected = {"Nm": [5, 4],
-    #                     "cNm": [0, 5, 9],
-    #                     "Im": [[0, 1], [1, 2]],
-    #                     "sensors": [-1, 1, 2],
-    #                     "sensor_ms": [1, 3, 3],
-    #                     "n_sensor": [0, 1, 1, 2, 1, 1, 2, 1, 1, 2],
-    #                     "n_mu": [1, 1, 2, 2, 1, 2, 2, 1, 2, 2],
-    #                     "n_cov": [1, 1, 1, 1, 2, 2, 2, 3, 3, 3],
-    #                     "N_var": [5, 5, 4, 4, 5, 4, 4, 5, 4, 4],
-    #                     "idx": [0, 5, 10, 14, 18, 23, 27, 31, 36, 40, 44]}
-    #
-    #     ################################################################################################################
-    #     # 3. Run MatchUpData.read_data()
-    #     ################################################################################################################
-    #
-    #     MatchUpOp = MatchUp()
-    #
-    #     values_test, unc_test, w_matrices_test,\
-    #         u_matrices_test, ks_test, unck_test, time1_test, time2_test, \
-    #             idx_test = MatchUpOp.openMatchUpData([fname_matchup1, fname_matchup2], open_uncertainty=False)
-    #
-    #     ################################################################################################################
-    #     # 4. Compare retrieve values to expect values
-    #     ################################################################################################################
-    #
-    #     # Test HData object attribute by attribute
-    #
-    #     # a. values
-    #     self.assertEqual(values_test.tolist(), values_expected.tolist())
-    #
-    #     # b. unc
-    #     self.assertEqual(unc_expected, unc_test)
-    #
-    #     # c. w_matrices
-    #     self.assertEqual(w_matrices_test, w_matrices_expected)
-    #
-    #     # d. u_matrices
-    #     self.assertEqual(u_matrices_test, u_matrices_expected)
-    #
-    #     # e. ks
-    #     self.assertEqual(ks_test.tolist(), ks_expected.tolist())
-    #
-    #     # f. unck
-    #     self.assertEqual(unck_expected, unck_test)
-    #
-    #     # g. time
-    #     self.assertEqual(time1_test.tolist(), time1_expected.tolist())
-    #     self.assertEqual(time2_test.tolist(), time2_expected.tolist())
-    #
-    #     # h. idx
-    #     self.assertEqual(set(idx_expected.keys()), set(idx_test.keys()))
-    #     for key in idx_expected.keys():
-    #         idx_i_test = idx_test[key]
-    #         idx_i_expected = idx_expected[key]
-    #         if isinstance(idx_i_expected, ndarray):
-    #             self.assertEqual(idx_i_test.tolist(), idx_i_expected.tolist())
-    #         else:
-    #             self.assertEqual(idx_i_test, idx_i_expected)
-    #
-    #     ################################################################################################################
-    #     # 5. Remove Test Data
-    #     ################################################################################################################
-    #
-    #     rmtree(test_data_directory)
+    def test_get_idx_from_nc_datasets__single(self):
+        matchup, datasets = setup_open_nc()
+        idxs = matchup.get_idx_from_nc_datasets([datasets[0]])
+        self.assertItemsEqual(idxs.keys(), IDX_SINGLE.keys())
+
+        for key in IDX_SINGLE.keys():
+            self.assertItemsEqual(idxs[key], IDX_SINGLE[key])
+
+    def test_get_idx_from_nc_datasets__multi(self):
+        matchup, datasets = setup_open_nc()
+        idxs = matchup.get_idx_from_nc_datasets(datasets)
+        self.assertItemsEqual(idxs.keys(), IDX_MULTI.keys())
+
+        for key in IDX_MULTI.keys():
+            self.assertItemsEqual(idxs[key], IDX_MULTI[key])
+
+    def test_get_idx_Nm_from_nc_datasets___single(self):
+        matchup, datasets = setup_open_nc()
+
+        test_Nm = matchup.get_idx_Nm_from_nc_datasets([datasets[0]])
+
+        self.assertItemsEqual(test_Nm, IDX_SINGLE["Nm"])
+
+    def test_get_idx_Nm_from_nc_datasets___multi(self):
+        matchup, datasets = setup_open_nc()
+
+        test_Nm = matchup.get_idx_Nm_from_nc_datasets(datasets)
+
+        self.assertItemsEqual(test_Nm, IDX_MULTI["Nm"])
+
+    def test_get_idx_cNm_from_nc_datasets___single(self):
+        matchup, datasets = setup_open_nc()
+
+        test_cNm = matchup.get_idx_cNm_from_nc_datasets([datasets[0]])
+
+        self.assertItemsEqual(test_cNm, IDX_SINGLE["cNm"])
+
+    def test_get_idx_cNm_from_nc_datasets___multi(self):
+        matchup, datasets = setup_open_nc()
+
+        test_cNm = matchup.get_idx_cNm_from_nc_datasets(datasets)
+
+        self.assertItemsEqual(test_cNm, IDX_MULTI["cNm"])
+
+    def test_get_idx_sensors_from_nc_datasets___single(self):
+        matchup, datasets = setup_open_nc()
+
+        test_sensors, test_sensor_ms = matchup.get_idx_sensors_from_nc_datasets([datasets[0]])
+
+        self.assertItemsEqual(test_sensors, IDX_SINGLE["sensors"])
+        self.assertItemsEqual(test_sensor_ms, IDX_SINGLE["sensor_ms"])
+
+    def test_get_idx_sensors_from_nc_datasets___multi(self):
+        matchup, datasets = setup_open_nc()
+
+        test_sensors, test_sensor_ms = matchup.get_idx_sensors_from_nc_datasets(datasets)
+
+        self.assertItemsEqual(test_sensors, IDX_MULTI["sensors"])
+        self.assertItemsEqual(test_sensor_ms, IDX_MULTI["sensor_ms"])
+
+    def test_get_idx_Im_from_nc_datasets___single(self):
+        matchup, datasets = setup_open_nc()
+
+        test_Im = matchup.get_idx_Im_from_nc_datasets([datasets[0]], IDX_SINGLE["sensors"])
+
+        self.assertItemsEqual(test_Im, IDX_SINGLE["Im"])
+
+    def test_get_idx_Im_from_nc_datasets___multi(self):
+        matchup, datasets = setup_open_nc()
+
+        test_Im = matchup.get_idx_Im_from_nc_datasets(datasets, IDX_MULTI["sensors"])
+
+        self.assertItemsEqual(test_Im, IDX_MULTI["Im"])
+
+    def test_get_idx_n_sensor_from_nc_datasets___single(self):
+        matchup, datasets = setup_open_nc()
+
+        test_n_sensor = matchup.get_idx_n_sensor_from_nc_datasets(IDX_SINGLE["Im"], IDX_SINGLE["sensor_ms"])
+
+        self.assertItemsEqual(test_n_sensor, IDX_SINGLE["n_sensor"])
+
+    def test_get_idx_n_sensor_from_nc_datasets___multi(self):
+        matchup, datasets = setup_open_nc()
+
+        test_n_sensor = matchup.get_idx_n_sensor_from_nc_datasets(IDX_MULTI["Im"], IDX_MULTI["sensor_ms"])
+
+        self.assertItemsEqual(test_n_sensor, IDX_MULTI["n_sensor"])
+
+    def test_get_idx_n_mu_from_nc_datasets___single(self):
+        matchup, datasets = setup_open_nc()
+
+        test_n_mu = matchup.get_idx_n_mu_from_nc_datasets(IDX_SINGLE["Im"], IDX_SINGLE["sensor_ms"])
+
+        self.assertItemsEqual(test_n_mu, IDX_SINGLE["n_mu"])
+
+    def test_get_idx_n_mu_from_nc_datasets___multi(self):
+        matchup, datasets = setup_open_nc()
+
+        test_n_mu = matchup.get_idx_n_mu_from_nc_datasets(IDX_MULTI["Im"], IDX_MULTI["sensor_ms"])
+
+        self.assertItemsEqual(test_n_mu, IDX_MULTI["n_mu"])
+
+    def test_get_idx_n_cov_from_nc_datasets___single(self):
+        matchup, datasets = setup_open_nc()
+
+        test_n_cov = matchup.get_idx_n_cov_from_nc_datasets(IDX_SINGLE["Im"], IDX_SINGLE["sensor_ms"])
+
+        self.assertItemsEqual(test_n_cov, IDX_SINGLE["n_cov"])
+
+    def test_get_idx_n_cov_from_nc_datasets___multi(self):
+        matchup, datasets = setup_open_nc()
+
+        test_n_cov = matchup.get_idx_n_cov_from_nc_datasets(IDX_MULTI["Im"], IDX_MULTI["sensor_ms"])
+
+        self.assertItemsEqual(test_n_cov, IDX_MULTI["n_cov"])
+
+    def test_get_idx_N_var_from_nc_datasets___single(self):
+        matchup, datasets = setup_open_nc()
+
+        test_N_var = matchup.get_idx_N_var_from_nc_datasets(IDX_SINGLE["Nm"], IDX_SINGLE["n_mu"])
+
+        self.assertItemsEqual(test_N_var, IDX_SINGLE["N_var"])
+
+    def test_get_idx_N_var_from_nc_datasets___multi(self):
+        matchup, datasets = setup_open_nc()
+
+        test_N_var = matchup.get_idx_N_var_from_nc_datasets(IDX_MULTI["Nm"], IDX_MULTI["n_mu"])
+
+        self.assertItemsEqual(test_N_var, IDX_MULTI["N_var"])
+
+    def test_get_idx_idxs_from_nc_datasets___single(self):
+        matchup, datasets = setup_open_nc()
+
+        test_idxs = matchup.get_idx_idxs_from_nc_datasets(IDX_SINGLE["N_var"])
+
+        self.assertItemsEqual(test_idxs, IDX_SINGLE["idx"])
+
+    def test_get_idx_idxs_from_nc_datasets___multi(self):
+        matchup, datasets = setup_open_nc()
+
+        test_idxs = matchup.get_idx_idxs_from_nc_datasets(IDX_MULTI["N_var"])
+
+        self.assertItemsEqual(test_idxs, IDX_MULTI["idx"])
+
+    def test_get_get_idx_additional_values_name_from_nc_datasets___single(self):
+        matchup, datasets = setup_open_nc()
+
+        test_additional_values_name = \
+            matchup.get_idx_additional_values_name_from_nc_datasets([datasets[0]])
+
+        self.assertItemsEqual(test_additional_values_name, IDX_SINGLE_ADDITIONAL_VALUES["additional_values_name"])
+
+    def test_get_idx_additional_values_name_from_nc_datasets___multi(self):
+        matchup, datasets = setup_open_nc()
+
+        test_additional_values_name = \
+            matchup.get_idx_additional_values_name_from_nc_datasets(datasets)
+
+        self.assertItemsEqual(test_additional_values_name, IDX_MULTI_ADDITIONAL_VALUES["additional_values_name"])
+
+    def test_get_idx_from_nc_datasets___single(self):
+        matchup, datasets = setup_open_nc()
+        test_idx = matchup.get_idx_from_nc_datasets([datasets[0]])
+
+        self.assertItemsEqual(sorted(test_idx.keys()), sorted(IDX_SINGLE.keys()))
+
+    def test_get_idx_from_nc_datasets___multi(self):
+        matchup, datasets = setup_open_nc()
+        test_idx = matchup.get_idx_from_nc_datasets(datasets)
+
+        self.assertItemsEqual(sorted(test_idx.keys()), sorted(IDX_MULTI.keys()))
+
+    def test_open_matrix_idxs_from_nc_datasets___multi(self):
+        matchup, datasets = setup_open_nc()
+        w_matrix_idxs, u_matrix_idxs = matchup.open_matrix_idxs_from_nc_datasets(datasets)
+
+        self.assertItemsEqual(w_matrix_idxs, [[1, 1], [2, 1], [3, 1]])
+        self.assertItemsEqual(u_matrix_idxs, [[1, 1], [2, 1], [3, 1]])
+
+    def test_get_block_idxs(self):
+        matchup, datasets = setup_open_nc()
+        idxs = matchup.get_idx_from_nc_datasets(datasets)
+        block_idxs = matchup.get_block_idxs(idxs)
+
+        self.assertItemsEqual(block_idxs, [(0, 1, 1), (1, 1, 1), (1, 2, 1), (2, 2, 1), (2, 3, 1), (3, 3, 1), (1, 1, 2),
+                                           (1, 2, 2), (2, 2, 2), (2, 3, 2), (3, 3, 2), (1, 1, 3), (1, 2, 3), (2, 2, 3),
+                                           (2, 3, 3), (3, 3, 3), (1, 1, 4), (1, 2, 4), (2, 2, 4), (2, 3, 4), (3, 3, 4)])
+
+    def test_open_unc_from_nc_datasets___multi(self):
+        matchup, datasets = setup_open_nc()
+        idxs = matchup.get_idx_from_nc_datasets(datasets)
+        unc, w_matrices, u_matrices = matchup.open_unc_from_nc_datasets(datasets, idxs)
+
+        # test unc
+
+        self.assertItemsEqual([u.typeID for u in unc], TEST_UNC_TYPEID)
+
+        for u, test_ur in zip(unc, TEST_UNC_UR):
+            if test_ur is not None:
+                self.assertEqual(type(u.uR), MaskedArray)
+                self.assertEqual(u.uR.shape, (10000,))
+                self.assertTrue(all(uR_i == test_ur for uR_i in u.uR))
+
+        for u, test_w_i, test_u_i in zip(unc, TEST_UNC_W_I, TEST_UNC_U_I):
+            if test_w_i is not None:
+                self.assertEqual(u.w_i, test_w_i)
+                self.assertEqual(u.u_i, test_u_i)
+
+        for u, test_us, test_us_i in zip(unc, TEST_UNC_US, TEST_UNC_US_I):
+            if test_us is not None:
+                self.assertEqual(type(u.uS), MaskedArray)
+                self.assertEqual(u.uS.shape, (10000,))
+                self.assertTrue(all(uS == test_us for uS in u.uS))
+                self.assertEqual(u.uS_i, test_us_i)
+
+        for i, d in enumerate(datasets):
+            self.assertTrue(all(a == b for a, b in zip(w_matrices[i].indices, matchup._open_w_matrix(d, 1).indices)))
+            self.assertTrue(all(a == b for a, b in zip(w_matrices[i].indptr, matchup._open_w_matrix(d, 1).indptr)))
+            self.assertTrue(all(a == b for a, b in zip(w_matrices[i].data, matchup._open_w_matrix(d, 1).data)))
+
+        for i, d in enumerate(datasets):
+            self.assertTrue(all(a == b for a, b in zip(u_matrices[i], matchup._open_u_matrix(d, 1))))
+
+    def test_open_values_from_nc_datasets___multi(self):
+        matchup, datasets = setup_open_nc()
+        idxs = matchup.get_idx_from_nc_datasets(datasets)
+        values = matchup.open_values_from_nc_datasets(datasets, idxs)
+
+        self.assertEqual(type(values), ndarray)
+        self.assertEqual(values.shape, (210000,))
+
+        for i in range(21):
+            self.assertAlmostEquals(values[i*10000], TEST_VALUES_BLOCK_FIRSTS[i], places=4)
+
+    def test_open_ks_from_nc_datasets___multi(self):
+        matchup, datasets = setup_open_nc()
+        idxs = matchup.get_idx_from_nc_datasets(datasets)
+        ks = matchup.open_ks_from_nc_datasets(datasets, idxs)
+
+        self.assertEqual(type(ks), ndarray)
+        self.assertEqual(ks.shape, (30000,))
+
+        for i in range(3):
+            self.assertAlmostEquals(ks[i * 10000], TEST_KS_MU_FIRSTS[i], places=4)
+
+    def test_open_unck_from_nc_datasets___multi(self):
+        matchup, datasets = setup_open_nc()
+        idxs = matchup.get_idx_from_nc_datasets(datasets)
+        unck = matchup.open_unck_from_nc_datasets(datasets, idxs)
+
+        # test unc
+
+        self.assertItemsEqual([u.typeID for u in unck], TEST_UNCK_TYPEID)
+
+        for u, test_ur in zip(unck, TEST_UNCK_UR):
+            if test_ur is not None:
+                self.assertEqual(type(u.uR), MaskedArray)
+                self.assertEqual(u.uR.shape, (10000,))
+                self.assertTrue(all(uR_i == test_ur for uR_i in u.uR))
+
+    def test_open_additional_values_from_nc_datasets___multi(self):
+        matchup, datasets = setup_open_nc()
+        idxs = matchup.get_idx_from_nc_datasets(datasets)
+        additional_values, idxs = matchup.open_additional_values_from_nc_datasets(datasets, idxs)
+
+        self.assertItemsEqual(idxs.keys(), IDX_MULTI_ADDITIONAL_VALUES.keys())
+
+        for key in IDX_MULTI_ADDITIONAL_VALUES.keys():
+            self.assertItemsEqual(idxs[key], IDX_MULTI_ADDITIONAL_VALUES[key])
+
+        self.assertEqual(type(additional_values), ndarray)
+        self.assertEqual(additional_values.shape, (30000,3))
+        for i, additional_values_block_firsts in enumerate(TEST_ADDITIONAL_VALUES_BLOCK_FIRSTS):
+            for j, additional_values_block_first_col in enumerate(additional_values_block_firsts):
+                if isnan(additional_values_block_first_col):
+                    self.assertTrue(isnan(additional_values[i*10000, j]))
+                else:
+                    self.assertAlmostEquals(additional_values[i*10000, j], additional_values_block_first_col, places=4)
+
+    def test_open_time_from_nc_datasets___multi(self):
+        matchup, datasets = setup_open_nc()
+        idxs = matchup.get_idx_from_nc_datasets(datasets)
+        time1, time2 = matchup.open_time_from_nc_datasets(datasets, idxs)
+
+        self.assertEqual(type(time1), ndarray)
+        self.assertEqual(time1.shape, (30000,))
+
+        self.assertEqual(type(time2), ndarray)
+        self.assertEqual(time2.shape, (30000,))
+
+        for i, time_first in enumerate(TEST_TIME_FIRSTS):
+            self.assertEquals(time1[i * 10000], time_first)
+            self.assertEquals(time2[i * 10000], time_first)
+
+    def test_open_optional_index_from_nc_datasets___multi(self):
+        matchup, datasets = setup_open_nc()
+        idxs = matchup.get_idx_from_nc_datasets(datasets)
+        across_track_index1 = matchup.open_optional_index_from_nc_datasets("across_track_index1", datasets, idxs)
+
+        self.assertEqual(type(across_track_index1), ndarray)
+        self.assertEqual(across_track_index1.shape, (30000,))
+
+        for i, across_track_index_first in enumerate(TEST_ACROSS_TRACK_INDEX_FIRSTS):
+            if isnan(across_track_index_first):
+                self.assertTrue(isnan(across_track_index1[i*10000]))
+            else:
+                self.assertEquals(across_track_index1[i*10000], across_track_index_first)
 
 
 if __name__ == '__main__':
