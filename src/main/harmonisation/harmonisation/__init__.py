@@ -1,4 +1,5 @@
 from core.matchup.matchupIO.MatchUp import MatchUp
+from core.matchup.matchupIO.MatchUpReader import open_matchup
 from core.matchup.matchupIO.Uncertainty import Uncertainty
 # from core.matchup.matchupToolbox.utils.matchup_maths import evaluate_measurand, evaluate_adjusted_measurand, evaluate_K
 # from core.matchup.matchupProcessing.sample2ind.Sample2Ind import Sample2Ind
