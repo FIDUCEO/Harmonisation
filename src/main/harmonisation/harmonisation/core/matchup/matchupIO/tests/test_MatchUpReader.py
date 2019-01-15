@@ -1,5 +1,5 @@
 """
-Test of MatchUp Class
+Tests for MatchUpReader Class
 """
 
 '''___Built-In Modules___'''
@@ -11,10 +11,11 @@ from datetime import datetime
 
 '''___Third-Party Modules___'''
 from numpy.ma import MaskedArray
-from numpy import ndarray, nan, isnan
+from numpy import ndarray, nan, isnan, array
 from netCDF4 import Dataset
 
 '''___harmonisation Modules___'''
+from harmonisation.sensor_data.test_sim.test_sim import SENSOR_DATA
 
 
 '''___Authorship___'''
@@ -105,21 +106,37 @@ TEST_ADDITIONAL_VALUES_BLOCK_FIRSTS = [[0, 45.5201530456543, 40.0528106689453],
 TEST_ACROSS_TRACK_INDEX_FIRSTS = [1, nan, 1]
 TEST_TIME_FIRSTS = [datetime(1970, 1, 1, 0, 0), datetime(1970, 1, 1, 2, 46, 40), datetime(1970, 1, 1, 5, 33, 20)]
 
+SENSOR_DATA_PATH = pjoin(abspath("../../../.."), "sensor_data", "test_sim", "test_sim.py")
+TEST_A = array([0., 0., 0., 0., 0., 0., 0., 0., 0.])
+IDX_MULTI_SENSOR_DATA = {"Nm": [10000, 10000, 10000],
+                         "cNm": [0, 10000, 20000, 30000],
+                         "sensors": ["0", "1", "2", "3"],
+                         "sensor_ms": [1, 4, 4, 4],
+                         "Im": [[0, 1], [1, 2], [2, 3]],
+                         "n_sensor": [0, 1, 1, 2, 2, 3, 1, 1, 2, 2, 3, 1, 1, 2, 2, 3, 1, 1, 2, 2, 3],
+                         "n_mu": [1, 1, 2, 2, 3, 3, 1, 2, 2, 3, 3, 1, 2, 2, 3, 3, 1, 2, 2, 3, 3],
+                         "n_cov": [1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4],
+                         "N_var": [10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000,
+                                   10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000],
+                         "idx": [0, 10000, 20000, 30000, 40000, 50000, 60000, 70000, 80000, 90000, 100000, 110000,
+                                 120000, 130000, 140000, 150000, 160000, 170000, 180000, 190000, 200000, 210000],
+                         "parameter_sensor": ["1", "1", "1", "2", "2", "2", "3", "3", "3"],
+                         "sensor_model_constant_sensor": []}
 
 def setup():
-    from harmonisation import MatchUp
-    matchup = MatchUp()
+    from harmonisation.core.matchup.matchupIO.MatchUpReader import MatchUpReader
+    matchup = MatchUpReader()
     return matchup
 
 
 def setup_open_nc():
-    from harmonisation import MatchUp
-    matchup = MatchUp()
+    from harmonisation.core.matchup.matchupIO.MatchUpReader import MatchUpReader
+    matchup = MatchUpReader()
     datasets = matchup.open_nc_datasets(DATASET_PATHS)
     return matchup, datasets
 
 
-class TestMatchUp(unittest.TestCase):
+class TestMatchUpReader(unittest.TestCase):
 
     def test_open_nc_datasets___str_dir(self):
         dataset_directory = dirname(DATASET_PATHS[0])
@@ -459,6 +476,29 @@ class TestMatchUp(unittest.TestCase):
                 self.assertTrue(isnan(across_track_index1[i*10000]))
             else:
                 self.assertEquals(across_track_index1[i*10000], across_track_index_first)
+
+    def test_open_sensor_data(self):
+        matchup, datasets = setup_open_nc()
+        sensor_data = matchup.open_sensor_data(SENSOR_DATA_PATH)
+
+        self.assertEqual(SENSOR_DATA.keys(), sensor_data.keys())
+
+    def test_extract_sensor_data(self):
+        matchup, datasets = setup_open_nc()
+        idxs = matchup.get_idx_from_nc_datasets(datasets)
+        a, sensor_model_constant, sensor_model, adjustment_model, idx = matchup.extract_sensor_data(SENSOR_DATA, idxs)
+
+        self.assertItemsEqual(a, TEST_A)
+        self.assertEqual(sensor_model_constant, [])
+
+        self.assertEqual(len(sensor_model), 4)
+        self.assertTrue((type(i) == function for i in sensor_model))
+
+        self.assertEqual(len(adjustment_model), 4)
+        self.assertTrue((type(i) == function for i in adjustment_model))
+
+        for key in IDX_MULTI_SENSOR_DATA.keys():
+            self.assertItemsEqual(idxs[key], IDX_MULTI_SENSOR_DATA[key])
 
 
 if __name__ == '__main__':
