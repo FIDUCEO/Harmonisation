@@ -83,10 +83,6 @@ def plot_scatter(savePath, Y, X, xlbl=None, ylbl=None, title=None, yerr=None, xe
             xerr = [xerr_i[~isnan(Y_i)] for Y_i, xerr_i in zip(Y, xerr)] if xerr is not None else None
             Y = [Y_i[~isnan(Y_i)] for Y_i in Y]
 
-        for i in range(len(Y)):
-            if yerr is not None:
-                print Y[i].shape, X[i].shape, yerr[i].shape
-
     if legend == None:
         if (type(X) == list) and ((type(X[0]) == list) & (type(X[0]) == ndarray)):
             legend = ['__nolegend__' for i in range(len(X))]
