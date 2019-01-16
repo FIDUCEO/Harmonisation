@@ -162,7 +162,7 @@ class MatchUp(object):
     def setSensorData(self, sensor_data):
         MatchUpReaderOp = MatchUpReader.MatchUpReader()
         self.a, self.sensor_model_constant, self.sensor_model, \
-            self.adjustment_model, self.idx = MatchUpReaderOp.extract_sensor_data(sensor_data)
+            self.adjustment_model, self.idx = MatchUpReaderOp.extract_sensor_data(sensor_data, self.idx)
 
     def getVariableData(self, variable_number, sensor_name, matchup_number):
 
