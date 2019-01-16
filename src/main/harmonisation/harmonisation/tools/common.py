@@ -188,7 +188,7 @@ def read_parsed_cmdline(parsed_cmdline, solver_options=True):
         return dataset_dir, sensor_data, output_dir, show
     else:
         dataset_dir = parsed_cmdline.input_directory
-        sensor_data = SensorDataFactory().get_sensor_data(parsed_cmdline.sensor_data)
+        sensor_data = SensorDataFactory().get_sensor_data(parsed_cmdline.sensor)
         output_dir = parsed_cmdline.output_directory
         if solver_options:
             pc_input = parsed_cmdline.pc_input
@@ -254,7 +254,7 @@ def read_job_file(filename):
 
     # Get data directories and paths
     dataset_dir = abspath(config.get('harmonisation', 'dataset_dir'))
-    sensor_data = SensorDataFactory().get_sensor_data(config.get('harmonisation', 'sensor_data'))
+    sensor_data = SensorDataFactory().get_sensor_data(config.get('harmonisation', 'sensor'))
     output_dir = abspath(config.get('harmonisation', 'output_dir'))
     pc_input = None
     save_pc = None
