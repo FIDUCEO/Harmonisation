@@ -10,7 +10,7 @@ $ harm_plot --help
 '''___Third Party Modules___'''
 
 '''___harmonisation Modules___'''
-from harmonisation.version import _short_name_, __version__, __tag__
+from harmonisation.version import __version__
 from common import *
 from HarmonisationPlottingOp import HarmonisationPlottingOp
 
@@ -19,7 +19,6 @@ from HarmonisationPlottingOp import HarmonisationPlottingOp
 __author__ = ["Sam Hunt", "Peter Harris"]
 __created__ = "20/10/2018"
 __version__ = __version__
-__tag__ = __tag__
 __credits__ = ["Jon Mittaz"]
 __maintainer__ = "Sam Hunt"
 __email__ = "sam.hunt@npl.co.uk"
@@ -44,10 +43,10 @@ def main():
     conf = {}
 
     # Initialise plotting operator
-    harmp_plot_op = HarmonisationPlottingOp(dataset_dir=dataset_dir,
-                                            sensor_data=sensor_data,
-                                            output_dir=output_dir,
-                                            software_cfg=conf)
+    harm_plot_op = HarmonisationPlottingOp(dataset_dir=dataset_dir,
+                                           sensor_data=sensor_data,
+                                           output_dir=output_dir,
+                                           logger=logger)
 
     # Run plotting operator
     harm_plot_op.run()
