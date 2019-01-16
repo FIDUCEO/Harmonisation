@@ -25,7 +25,8 @@ __email__ = "sam.hunt@npl.co.uk"
 __status__ = "Development"
 
 
-parsed_cmdline = parse_cmdline(solver_options=False)
+parsed_cmdline = parse_cmdline(description="Generate plots for harmonisation output",
+                               solver_options=False)
 logger = configure_logging(parsed_cmdline.log, parsed_cmdline.verbose, parsed_cmdline.quiet)
 
 preamble = "\nErrors-in-Variables Sensor Harmonisation Result Plotting"

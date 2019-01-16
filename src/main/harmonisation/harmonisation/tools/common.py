@@ -43,9 +43,9 @@ class ListSensors(argparse.Action):
         parser.exit()
 
 
-def parse_cmdline(solver_options=True):
+def parse_cmdline(description, solver_options=True):
     parser = argparse.ArgumentParser(
-        description="Run Full Errors-in-Variables Solver for input dataset",
+        description=description,
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
     job_help_msg = "Path of job file. Either define this or -i, -s and -o arguments"
