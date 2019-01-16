@@ -30,6 +30,7 @@ __status__ = "Development"
 DATASET_PATHS = [abspath("../../../../../../../data/simulated_matchup/0_1.nc"),
                  abspath("../../../../../../../data/simulated_matchup/1_2.nc"),
                  abspath("../../../../../../../data/simulated_matchup/2_3.nc")]
+SENSOR_DATA_PATH = pjoin(abspath("../../../../../.."), "sensor_data", "test_sim", "test_sim.py")
 OUTPUT_DIRECTORY = abspath("../../../../../../../data/simulated_matchup_result")
 PLOTS_DIRECTORY = pjoin(OUTPUT_DIRECTORY, "plots")
 
@@ -37,7 +38,7 @@ PLOTS_DIRECTORY = pjoin(OUTPUT_DIRECTORY, "plots")
 def setup_open():
     from harmonisation.core.matchup.matchupToolbox.harmonisation.harmonisationVis import HarmonisationVis
 
-    matchup = open_matchup(DATASET_PATHS)
+    matchup = open_matchup(DATASET_PATHS, SENSOR_DATA_PATH)
     harmonisation_result = HarmonisationResult(OUTPUT_DIRECTORY)
 
     harm_vis = HarmonisationVis(matchup, harmonisation_result)
@@ -67,7 +68,7 @@ class TestHarmonisationVis(unittest.TestCase):
         harm_vis = setup_open()
         harm_vis.plot_L1_harm_v_L2_harm_scatter(PLOTS_DIRECTORY)
 
-        # teardown_rm()
+        teardown_rm()
 
 
 
