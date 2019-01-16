@@ -127,7 +127,7 @@ class HarmonisationVis(MatchUpVis):
     def get_L1_harm_musamples(self):
         if self.L1_harm_musamples is None:
             self.L1_harm_musamples = self.musample_values(self.get_L1_harm())
-        return self.kres_harm_harm_musamples
+        return self.L1_harm_musamples
 
     def get_L2_harm_musamples(self):
         if self.L2_harm_musamples is None:
