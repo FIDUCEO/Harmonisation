@@ -1,5 +1,5 @@
 """
-MatchUp Data Class
+MatchUpReader Class
 """
 
 '''___Built-In Modules___'''
