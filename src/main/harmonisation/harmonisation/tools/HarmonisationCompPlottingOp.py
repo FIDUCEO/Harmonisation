@@ -3,19 +3,20 @@ Harmonsation Comparison Output Plotting Implementation
 """
 
 '''___Built-In Modules___'''
-from os import makedirs
 
 '''___Third Party Modules___'''
 
 '''___harmonisation Modules___'''
 from harmonisation.version import __version__, __tag__
 from common import *
-from harmonisation import HarmonisationResult, HarmonisationVis
+from harmonisation import open_matchup, HarmonisationResult, HarmonisationVis
 
 
 '''___Authorship___'''
 __author__ = ["Sam Hunt", "Peter Harris"]
 __created__ = "12/12/2017"
+__version__ = __version__
+__tag__ = __tag__
 __credits__ = ["Jon Mittaz"]
 __maintainer__ = "Sam Hunt"
 __email__ = "sam.hunt@npl.co.uk"
@@ -90,32 +91,22 @@ class HarmonisationComparisonPlottingOp:
             Run comparison plotting routine
     """
 
-    def __init__(self, dataset_paths=None, sensor_data_path=None, output_dir=None,
-                 data_reader=None, hout_path=None, hres_paths=None):
+    def __init__(self, dataset_dir=None, sensor_data=None, output_dir=None):
         """
         Initialise harmonisation comparison plotting class
 
-        :type dataset_paths: list:str
-        :param dataset_paths: Paths of matchup series files in matchup dataset directory
+        :type dataset_dir: list:str
+        :param dataset_dir: Match-up dataset directory
 
-        :type sensor_data_path: str
-        :param sensor_data_path: Path of sensor data for of matchup sensors, contains reference set of parameters
+        :type sensor_data: str
+        :param sensor_data: Path of sensor data for of match-up sensors, contains reference set of parameters
 
         :type output_dir: str
         :param output_dir: Path of directory to store output data files in
-
-        :type data_reader: cls
-        :param data_reader: Python class to open harmonisation data. If none given default data reader used.
-
-        :type hout_path: str
-        :param hout_path: path of harmonisation output file
-
-        :type hres_paths: str
-        :param hres_paths: path of harmonisation residual files
         """
 
-        self.dataset_paths = None
-        self.sensor_data_path = None
+        self.dataset_dir = None
+        self.sensor_data = None
         self.output_dir = None
         self.plot_dir = None
         self.matchup_dataset = None
@@ -123,9 +114,9 @@ class HarmonisationComparisonPlottingOp:
         self.hout_path = None
         self.hres_paths = None
 
-        if (dataset_paths is not None) and (sensor_data_path is not None):
-            self.dataset_paths = dataset_paths
-            self.sensor_data_path = sensor_data_path
+        if (dataset_dir is not None) and (sensor_data is not None):
+            self.dataset_dir = dataset_dir
+            self.sensor_data = sensor_data
             self.output_dir = output_dir
             self.plots_dir = pjoin(output_dir, "plots")
             try:
@@ -133,46 +124,34 @@ class HarmonisationComparisonPlottingOp:
             except OSError:
                 pass
 
-        if data_reader is not None:
-            self.data_reader = data_reader
-
-        else:
-            from nplcore import MatchUp
-            self.data_reader = MatchUp
-
-        if hout_path is not None:
-            self.hout_path = hout_path
-            self.hres_paths = hres_paths
-
     def run(self, verbose=True):
         """
         Generates plots for dataset specified by paths defined object attributes
         """
 
         # Initialise
-        dataset_paths = self.dataset_paths
-        sensor_data_path = self.sensor_data_path
+        dataset_dir = self.dataset_dir
+        sensor_data = self.sensor_data
+        output_dir = self.output_dir
         plots_dir = self.plots_dir
-        hout_path = self.hout_path
-        hres_paths = self.hres_paths
 
         ################################################################################################################
         # 1.	Read Match-up Data and Harmonisation Result Data
         ################################################################################################################
 
         print"Match-up Dataset:"
-        for path in dataset_paths:
-            print ">", path
+        print ">", dataset_dir
 
         print"\nSensor Data:"
-        print ">", sensor_data_path
+        print ">", sensor_data
 
-        print "\nHarmonisation Output File:"
-        print ">", hout_path
+        print "\nHarmonisation Output:"
+        print ">", output_dir
 
         print("\nOpening Files...")
-        MatchUpData = self.data_reader(dataset_paths, sensor_data_path, open_uncertainty=False)
-        HarmResult = HarmonisationResult(hout_path)
+        MatchUpData = open_matchup(dataset_dir, open_uncertainty=False)
+        MatchUpData.setSensorData(sensor_data)
+        HarmResult = HarmonisationResult(output_dir, open_residuals=False)
 
         if verbose:
             print HarmResult.parameter_sensors
@@ -187,7 +166,8 @@ class HarmonisationComparisonPlottingOp:
         print("Generating Plots...")
 
         HarmVisOp = HarmonisationVis(MatchUpData, HarmResult)
-        HarmVisOp.plot_compare_calibration(plots_dir, HarmResult.parameter, HarmResult.parameter_covariance_matrix, verbose=verbose)
+        HarmVisOp.plot_compare_calibration(plots_dir, HarmResult.parameter,
+                                           HarmResult.parameter_covariance_matrix, verbose=verbose)
 
         print "\nPlots written to:", plots_dir
 
