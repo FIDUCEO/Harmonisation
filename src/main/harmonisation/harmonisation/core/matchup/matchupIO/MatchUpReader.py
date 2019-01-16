@@ -12,12 +12,12 @@ import sys
 from importlib import import_module
 
 '''___Third-Party Modules___'''
-from numpy import array, zeros, append, asarray, cumsum, int32, ones, nan, float32
+from numpy import zeros, append, asarray, cumsum, int32, ones, nan, float32
 from scipy.sparse import csr_matrix
 from netCDF4 import Dataset
 
 '''___harmonisation Modules___'''
-from harmonisation import MatchUp
+import MatchUp
 from Uncertainty import Uncertainty
 
 '''___Authorship___'''
@@ -110,7 +110,7 @@ class MatchUpReader:
         datasets = self.open_nc_datasets(paths_matchup)
 
         # Initialise empty matchup object
-        matchup = MatchUp()
+        matchup = MatchUp.MatchUp()
 
         # Define 1D Data Structure
         matchup.idx = self.get_idx_from_nc_datasets(datasets)
