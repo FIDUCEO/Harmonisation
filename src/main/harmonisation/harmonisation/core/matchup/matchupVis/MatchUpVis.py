@@ -360,7 +360,6 @@ class MatchUpVis:
                     Xaverages.append(Xaverages_i[~isnan(averages_i)])
 
             # Plot X for all match-up series
-            print stds
             plot_scatter(pjoin(directory, fname + "." + cov_name + "_sensor_2_binned.pdf"), averages, Xaverages,
                          xlbl=cov_label + " - Sensor 2", ylbl=title, title="",
                          yerr=stds, xerr=None, txt=None, line='-', legend=matchup_labels, legend_loc="outside",

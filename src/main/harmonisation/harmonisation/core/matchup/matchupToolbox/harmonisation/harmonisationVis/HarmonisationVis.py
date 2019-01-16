@@ -283,8 +283,6 @@ class HarmonisationVis(MatchUpVis):
                 measurand_diff_i = measurand_diff[istart:iend, i_pair]
                 u_measurand_cov_2_i = u_measurand_cov_2[istart:iend, i_pair]
 
-                print measurand_2[istart, i_pair]
-
                 path = pjoin(directory, "compare_calibration." + sensor_name + ".pdf")
                 plot_scatter(path, measurand_diff_i, measurand_1_i, yerr=2*u_measurand_cov_2_i,
                              title="Sampled Radiance Residual - " + str(sensor_name),
