@@ -49,6 +49,7 @@ def setup_open():
 
     return harm_vis
 
+
 def teardown_rm():
     rmtree(PLOTS_DIRECTORY)
     return 0
@@ -60,7 +61,7 @@ class TestHarmonisationVis(unittest.TestCase):
         harm_vis = setup_open()
         harm_vis.plot_L1_nom_v_L2_nom_scatter(PLOTS_DIRECTORY)
 
-        # teardown_rm()
+        teardown_rm()
 
 
 if __name__ == '__main__':
