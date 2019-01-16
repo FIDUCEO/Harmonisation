@@ -3,8 +3,10 @@ HarmonisationResult Class - In memory representation of the results of the harmo
 """
 
 '''___Built-In Modules___'''
-from os.path import split, splitext
+from os import listdir
+from os.path import split, splitext, isfile
 from os.path import join as pjoin
+import re
 
 '''___Third-Party Modules___'''
 from netCDF4 import Dataset, stringtochar, chartostring
@@ -124,15 +126,15 @@ class HarmonisationResult:
             Write data to harmonisation residual file[s]
     """
 
-    def __init__(self, harmonisation_output_file_path=None, harmonisation_residual_file_paths=None):
+    def __init__(self, output_dir=None, open_residuals=True):
         """
         Initialise HarmonisationResult object to store harmonisation output data
 
-        :type harmonisation_output_file_path: str
-        :param harmonisation_output_file_path: path of harmonisation output file
+        :type output_dir: str
+        :param output_dir: path of harmonisation output files' directory
 
-        :type harmonisation_residual_file_paths: list:str
-        :param harmonisation_residual_file_paths: list of path of harmonisation residual file paths
+        :type open_residuals: bool
+        :param open_residuals: option for open harmonisation residual files
         """
 
         # 1. Initialise attributes -------------------------------------------------------------------------------------
@@ -158,23 +160,74 @@ class HarmonisationResult:
         # e. Additional variables
         self.additional_variables = {}
 
-        # --------------------------------------------------------------------------------------------------------------
+        if output_dir is not None:
+            harmonisation_output_file_path = self._get_harm_output_path(output_dir)
 
-        # 2. Open harmonisation residual files if path provided --------------------------------------------------------
-        if harmonisation_residual_file_paths is not None:
-            self.values_res, self.ks_res, \
-                self.idx, self.additional_attributes \
-                    = self.open_harmonisation_residual_files(harmonisation_residual_file_paths)
-        # --------------------------------------------------------------------------------------------------------------
-
-        # 3. Open harmonisation output file if path provided -----------------------------------------------------------
-        if harmonisation_output_file_path is not None:
             self.parameter, self.parameter_sensors, \
                 self.parameter_covariance_matrix, self.cost, \
                     self.cost_dof, self.cost_p_value, \
                         self.additional_attributes, self.additional_variables \
                             = self.open_harmonisation_output_file(harmonisation_output_file_path)
-        # --------------------------------------------------------------------------------------------------------------
+
+            if open_residuals:
+                harmonisation_residual_file_paths = self._get_harm_res_paths(output_dir)
+                self.values_res, self.ks_res, \
+                    self.idx, self.additional_attributes \
+                        = self.open_harmonisation_residual_files(harmonisation_residual_file_paths)
+
+    def _get_harm_output_path(self, output_dir):
+        """
+        Return path harmonisation result file in directory
+
+        :type output_dir: str
+        :param output_dir: path of directory containing harmonisation output and residual data files
+
+        :return:
+            :harm_output_path: list
+
+            Path of harmonisation result file in given directory
+        """
+
+        harm_output_path = None
+
+        harm_output_path_rule = re.compile('harm(?:(?!.*res.*).*)\.nc')
+
+        for f in listdir(output_dir):
+            if harm_output_path_rule.match(f):
+                if harm_output_path is not None:
+                    raise IOError("More than one harmonisation result file in output directory")
+                harm_output_path = pjoin(output_dir, f)
+
+        if harm_output_path is None:
+            raise IOError("No harmonisation result file in output directory")
+
+        return harm_output_path
+
+    def _get_harm_res_paths(self, output_dir):
+        """
+        Return path harmonisation residuals files in directory
+
+        :type output_dir: str
+        :param output_dir: path of directory containing harmonisation output and residual data files
+
+        :return:
+            :harm_res_paths: list
+
+            Paths of harmonisation residual files in given directory
+        """
+
+        harm_res_paths = []
+
+        harm_res_path_rule = re.compile('harm(?:(?=.*res.*).*)\.nc')
+
+        for f in listdir(output_dir):
+            if harm_res_path_rule.match(f):
+                harm_res_paths.append(pjoin(output_dir, f))
+
+        if not harm_res_paths:
+            harm_res_paths = None
+
+        return harm_res_paths
 
     def open_harmonisation_output_file(self, harmonisation_output_file_path):
         """
