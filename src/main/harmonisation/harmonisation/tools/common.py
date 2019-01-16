@@ -183,7 +183,9 @@ def read_parsed_cmdline(parsed_cmdline, solver_options=True):
 
     if parsed_cmdline.job_file is not None:
         dataset_dir, sensor_data, output_dir, pc_input, save_pc, gn_input, save_gn = read_job_file(parsed_cmdline.job_file)
-        return dataset_dir, sensor_data, output_dir, pc_input, save_pc, gn_input, save_gn, show
+        if solver_options:
+            return dataset_dir, sensor_data, output_dir, pc_input, save_pc, gn_input, save_gn, show
+        return dataset_dir, sensor_data, output_dir, show
     else:
         dataset_dir = parsed_cmdline.input_directory
         sensor_data = SensorDataFactory().get_sensor_data(parsed_cmdline.sensor_data)
@@ -260,29 +262,6 @@ def read_job_file(filename):
     save_gn = None
 
     return dataset_dir, sensor_data, output_dir, pc_input, save_pc, gn_input, save_gn
-
-
-def get_harm_paths(output_dir):
-    """
-    Return path of harmonisation output file and list of paths of harmonisation residuals files in directory
-
-    :param output_dir: str
-        path of directory containing only harmonisation output and residual data files
-
-    :return:
-        :dataset_paths: list: str
-            Paths of matchup series files in matchup dataset directory
-    """
-
-    harm_output_path = None
-    harm_res_paths = []
-    for f in listdir(output_dir):
-        if (isfile(pjoin(output_dir, f))) and (f[-3:] == ".nc") and ("res" in f):
-            harm_res_paths.append(pjoin(output_dir, f))
-        elif (isfile(pjoin(output_dir, f))) and (f[-3:] == ".nc"):
-            harm_output_path = pjoin(output_dir, f)
-
-    return harm_output_path, harm_res_paths
 
 
 def import_file(path):
