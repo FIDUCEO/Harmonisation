@@ -38,11 +38,6 @@ def main():
 
     dataset_dir, sensor_data, output_dir, show = read_parsed_cmdline(parsed_cmdline, solver_options=False)
 
-    logger.info("Match-up Dataset Directory: "+dataset_dir)
-    logger.info("Harmonisation Result Directory: "+output_dir)
-
-    conf = {}
-
     # Initialise plotting operator
     harm_plot_op = HarmonisationPlottingOp(dataset_dir=dataset_dir,
                                            sensor_data=sensor_data,
@@ -51,8 +46,6 @@ def main():
 
     # Run plotting operator
     harm_plot_op.run()
-
-    logger.info("Complete")
 
     return 0
 
