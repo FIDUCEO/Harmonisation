@@ -103,7 +103,7 @@ class HarmonisationPlottingOp:
         """
 
         # 1. Read Match-up Data and Harmonisation Result Data
-        self.logger.info("Match-up Dataset: "+self.dataset_dir)
+        self.logger.info("Match-up Dataset: "+abspath(self.dataset_dir))
 
         self.logger.debug("Opening Match-up Dataset...")
         MatchUpData = open_matchup(self.dataset_dir, open_uncertainty=False)
@@ -113,7 +113,7 @@ class HarmonisationPlottingOp:
         self.logger.info("Harmonisation Output Dataset: " + self.output_dir)
 
         self.logger.debug("Opening Harmonisation Result Dataset...")
-        HarmResult = HarmonisationResult(self.output_dir, open_residuals=False)
+        HarmResult = HarmonisationResult(abspath(self.output_dir), open_residuals=False)
         self.logger.debug("Complete")
 
         # 2.	Make plots
@@ -171,7 +171,7 @@ class HarmonisationPlottingOp:
         HarmVisOp.plot_kres_nom_harm_additional_variables_binned_line(diagnostic_kres_nom_harm_x_plots_dir)
         self.logger.debug("Complete")
 
-        self.logger.info("Plots written to: "+self.plots_dir)
+        self.logger.info("Plots written to: "+abspath(self.plots_dir))
 
 
 if __name__ == "__main__":
