@@ -146,7 +146,7 @@ class MatchUpVis:
     def get_L1_nom_musamples(self):
         if self.L1_nom_musamples is None:
             self.L1_nom_musamples = self.musample_values(self.get_L1_nom())
-        return self.kres_nom_nom_musamples
+        return self.L1_nom_musamples
 
     def get_L2_nom_musamples(self):
         if self.L2_nom_musamples is None:
@@ -287,7 +287,8 @@ class MatchUpVis:
         return 0
 
     def plot_L1_nom_v_L2_nom_scatter(self, directory):
-        plot_scatter(pjoin(self, directory, "L1_vs_L2_nominal_scatter.pdf"),
+
+        plot_scatter(pjoin(directory, "L1_vs_L2_nominal_scatter.pdf"),
                      self.get_L1_nom_musamples(),
                      self.get_L2_nom_musamples(),
                      xlbl="Nominal Sensor 2 Measurand",
