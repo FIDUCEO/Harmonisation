@@ -101,24 +101,24 @@ def parse_cmdline(description, solver_options=True):
     parser.add_argument("--version", action="version", version='v%s' % __version__)
 
     if solver_options:
-        mutually_exclusive_msg = "--job_file and --input_directory|--sensor_data|--output_directory|--save_pc|" \
+        mutually_exclusive_msg = "--job_file and --input_directory|--sensor|--output_directory|--save_pc|" \
                                  "--pc_input|--gn_input|--save_gn are mutually exclusive"
         args = parser.parse_args()
-        if args.job_file and (args.input_directory or args.sensor_data or args.output_directory
+        if args.job_file and (args.input_directory or args.sensor or args.output_directory
                               or args.save_pc or args.pc_input or args.gn_input or args.save_gn):
             print(mutually_exclusive_msg)
             sys.exit(2)
 
     else:
         args = parser.parse_args()
-        mutually_exclusive_msg = "--job_file and --input_directory|--sensor_data|--output_directory"
+        mutually_exclusive_msg = "--job_file and --input_directory|--sensor|--output_directory"
 
-        if args.job_file and (args.input_directory or args.sensor_data or args.output_directory):
+        if args.job_file and (args.input_directory or args.sensor or args.output_directory):
             print(mutually_exclusive_msg)
             sys.exit(2)
 
-    if not args.job_file and not (args.input_directory and args.sensor_data and args.output_directory):
-        print("If --job_file not defined --input_directory & --sensor_data & --output_directory required")
+    if not args.job_file and not (args.input_directory and args.sensor and args.output_directory):
+        print("If --job_file not defined --input_directory & --sensor & --output_directory required")
         sys.exit(2)
 
     return args
