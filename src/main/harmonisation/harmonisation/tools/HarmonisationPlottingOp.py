@@ -10,7 +10,9 @@ from numpy import concatenate
 '''___Harmonisation Modules___'''
 from harmonisation.version import __version__, __tag__
 from common import *
-from harmonisation import MatchUp, HarmonisationResult, HarmonisationVis
+from harmonisation import open_matchup
+from harmonisation.core.matchup.matchupToolbox.harmonisation.harmonisationIO.HarmonisationResult import HarmonisationResult
+from harmonisation.core.matchup.matchupToolbox.harmonisation.harmonisationVis.HarmonisationVis import HarmonisationVis
 
 
 '''___Authorship___'''
@@ -54,12 +56,11 @@ class HarmonisationPlottingOp:
 
             Harmonisation output directory path
 
-        .. py:attribute:: software_cfg
+        .. py:attribute:: plot_dir
 
-            *dict*
+            *str*
 
-            Software configuration directory
-
+            Plot directory path
 
     :Methods:
         .. py:method:: run(...):
@@ -68,11 +69,11 @@ class HarmonisationPlottingOp:
 
     """
 
-    def __init__(self, dataset_dir, sensor_data, output_dir, software_cfg):
+    def __init__(self, dataset_dir, sensor_data, output_dir, logger=None):
         """
         Initialise harmonisation algorithm class
 
-        :type dataset_dir: list
+        :type dataset_dir: str
         :param dataset_dir: Match-up dataset directory
 
         :type sensor_data: dict
@@ -81,81 +82,47 @@ class HarmonisationPlottingOp:
         :type output_dir: str
         :param output_dir: Harmonisation output directory path
 
-        :type software_cfg: dict
-        :param software_cfg: Software configuration directory
+        :type logger: logging.Logger
+        :param logger: Logger
         """
 
-        self.dataset_dir = None
-        self.sensor_data = None
-        self.output_dir = None
-        self.plot_dir = None
-        self.software = None
-        self.software_version = None
-        self.software_tag = None
-        self.job_id = None
-        self.matchup_dataset = None
-        self.HarmData = None
+        self.dataset_dir = dataset_dir
+        self.sensor_data = sensor_data
+        self.output_dir = output_dir
+        self.plots_dir = pjoin(output_dir, "plots")
+        self.logger = logger
 
-        if (dataset_dir is not None) and (sensor_data is not None):
-            self.dataset_dir = dataset_dir
-            self.sensor_data = sensor_data
-            self.output_dir = output_dir
-            self.plots_dir = pjoin(output_dir, "plots")
-            try:
-                makedirs(self.plots_dir)
-            except OSError:
-                pass
-
-        if software_cfg is not None:
-            #self.software = software_cfg['software']
-            #self.software_version = software_cfg['version']
-            #self.software_tag = software_cfg['tag']
-            self.job_id = software_cfg["job_id"]
-            self.matchup_dataset = software_cfg['matchup_dataset']
-
-        else:
-            self.software = "MM"
-            self.software_version = "V.V"
-            self.software_tag = "TTTTTTT"
-            self.job_id = "CC"
-            self.matchup_dataset = "TEST"
+        try:
+            makedirs(self.plots_dir)
+        except OSError:
+            pass
 
     def run(self):
         """
         Generates plots for dataset specified by paths defined object attributes
         """
 
-        # Initialise
-        dataset_dir = self.dataset_dir
-        sensor_data = self.sensor_data
-        output_dir = self.output_dir
-        plots_dir = self.plots_dir
+        # 1. Read Match-up Data and Harmonisation Result Data
+        self.logger.info("Match-up Dataset: "+self.dataset_dir)
 
-        ################################################################################################################
-        # 1.	Read Match-up Data and Harmonisation Result Data
-        ################################################################################################################
+        self.logger.debug("Opening Match-up Dataset...")
+        MatchUpData = open_matchup(self.dataset_dir, open_uncertainty=False)
+        MatchUpData.setSensorData(self.sensor_data)
+        self.logger.debug("Complete")
 
-        print"Match-up Dataset:"
-        print ">", dataset_dir
+        self.logger.info("Harmonisation Output Dataset: " + self.output_dir)
 
-        print"\nSensor Data:"
-        #print ">", sensor_data_path
+        self.logger.debug("Opening Harmonisation Result Dataset...")
+        HarmResult = HarmonisationResult(self.output_dir, open_residuals=False)
+        self.logger.debug("Complete")
 
-        print("\nOpening Files...")
-        MatchUpData = MatchUp(dataset_dir, sensor_data, open_uncertainty=False)
-        HarmResult = HarmonisationResult(output_dir, open_residual=False)
-
-        ################################################################################################################
         # 2.	Make plots
-        ################################################################################################################
-
-        print("Generating Plots...")
-
+        self.logger.debug("Generating Plots...")
         HarmVisOp = HarmonisationVis(MatchUpData, HarmResult)
 
         # Define plot directories
-        overview_plots_dir = pjoin(plots_dir, "overview")
-        diagnostic_plots_dir = pjoin(plots_dir, "diagnostics")
+        overview_plots_dir = pjoin(self.plots_dir, "overview")
+        diagnostic_plots_dir = pjoin(self.plots_dir, "diagnostics")
 
         diagnostic_kres_harmonised_plots_dir = pjoin(diagnostic_plots_dir, "kres_harmonised")
         diagnostic_kres_harmonised_X_plots_dir = pjoin(diagnostic_kres_harmonised_plots_dir, "sensor_state_variables")
@@ -202,8 +169,10 @@ class HarmonisationPlottingOp:
         HarmVisOp.plot_kres_nom_harm_X_binned_line(diagnostic_kres_nom_harm_X_plots_dir)
         HarmVisOp.plot_kres_harm_harm_additional_variables_binned_line(diagnostic_kres_harmonised_x_plots_dir)
         HarmVisOp.plot_kres_nom_harm_additional_variables_binned_line(diagnostic_kres_nom_harm_x_plots_dir)
+        self.logger.debug("Complete")
 
-        print "\nPlots written to:", plots_dir
+        self.logger.info("Plots written to: "+self.plots_dir)
+
 
 if __name__ == "__main__":
     pass
