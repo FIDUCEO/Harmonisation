@@ -11,7 +11,9 @@ import matplotlib
 matplotlib.use('Agg')  # Force matplotlib to not use any Xwindows backend.
 
 '''___harmonisation Modules___'''
-from harmonisation import evaluate_K, evaluate_adjusted_measurand, evaluate_measurand, SimulateMatchUp, MatchUpVis
+from harmonisation.core.matchup.matchupToolbox.utils.matchup_maths import evaluate_K, evaluate_adjusted_measurand, evaluate_measurand
+from harmonisation.core.matchup.matchupProcessing.simulate_matchup.SimulateMatchUp import SimulateMatchUp
+from harmonisation.core.matchup.matchupVis.MatchUpVis import MatchUpVis
 from harmonisation.core.utils.plots import plot_scatter, plot_2dhist, plot_density
 
 
