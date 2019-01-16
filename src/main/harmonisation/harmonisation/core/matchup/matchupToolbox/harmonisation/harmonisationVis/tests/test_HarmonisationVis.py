@@ -70,6 +70,11 @@ class TestHarmonisationVis(unittest.TestCase):
 
         teardown_rm()
 
+    def test_plot_kres_harm_harm_X_binned_line(self):
+        harm_vis = setup_open()
+        harm_vis.plot_kres_harm_harm_X_binned_line(PLOTS_DIRECTORY)
+
+        teardown_rm()
 
 
 if __name__ == '__main__':
