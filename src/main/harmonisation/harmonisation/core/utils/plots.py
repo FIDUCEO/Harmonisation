@@ -58,27 +58,34 @@ def plot_scatter(savePath, Y, X, xlbl=None, ylbl=None, title=None, yerr=None, xe
     # initialise plot
     fig = plt.figure(figsize=fig_size)
     ax = fig.add_subplot(111)
-
     # Ignore nans
-    if (str(type(X)) == "<type 'numpy.ndarray'>"):
-        if(X.dtype == float):
+    if (type(X) == ndarray) or (type(Y) == ndarray):
+        if (type(X) == ndarray) and (X.dtype == float):
             Y = Y[~isnan(X)]
+            yerr = yerr[~isnan(X)] if yerr is not None else None
+            xerr = xerr[~isnan(X)] if xerr is not None else None
             X = X[~isnan(X)]
-        if (Y.dtype == float):
+        if (type(Y) == ndarray) and Y.dtype == float:
             X = X[~isnan(Y)]
+            yerr = yerr[~isnan(Y)] if yerr is not None else None
+            xerr = xerr[~isnan(Y)] if xerr is not None else None
             Y = Y[~isnan(Y)]
+
     else:
         if X[0].dtype == float:
             Y = [Y_i[~isnan(X_i)] for X_i, Y_i in zip(X, Y)]
+            yerr = [yerr_i[~isnan(X_i)] for X_i, yerr_i in zip(X, yerr)] if yerr is not None else None
+            xerr = [xerr_i[~isnan(X_i)] for X_i, xerr_i in zip(X, xerr)] if xerr is not None else None
             X = [X_i[~isnan(X_i)] for X_i in X]
         if Y[0].dtype == float:
             X = [X_i[~isnan(Y_i)] for X_i, Y_i in zip(X, Y)]
+            yerr = [yerr_i[~isnan(Y_i)] for Y_i, yerr_i in zip(Y, yerr)] if yerr is not None else None
+            xerr = [xerr_i[~isnan(Y_i)] for Y_i, xerr_i in zip(Y, xerr)] if xerr is not None else None
             Y = [Y_i[~isnan(Y_i)] for Y_i in Y]
 
-    if (str(type(Y)) == "<type 'numpy.ndarray'>"):
-        if (Y.dtype == float):
-            X = X[~isnan(Y)]
-            Y = Y[~isnan(Y)]
+        for i in range(len(Y)):
+            if yerr is not None:
+                print Y[i].shape, X[i].shape, yerr[i].shape
 
     if legend == None:
         if (type(X) == list) and ((type(X[0]) == list) & (type(X[0]) == ndarray)):
@@ -161,18 +168,20 @@ def plot_scatter(savePath, Y, X, xlbl=None, ylbl=None, title=None, yerr=None, xe
         colours = [cmap(i) for i in np.linspace(0, 1, len(X))]
 
     for i, (X_i, Y_i) in enumerate(zip(X, Y)):
-        ax.errorbar(X_i, Y_i, yerr=yerr, xerr=xerr,
-                         marker='o',
-                         ecolor='#333333',
-                         elinewidth=2,
-                         markerfacecolor=colours[i % len(colours)],
-                         markeredgecolor='#333333',
-                         markeredgewidth=1,
-                         markersize=4,
-                         capsize=0,
-                         linestyle=line,
-                         color=colours[i % len(colours)],
-                         label=legend[i])
+        ax.errorbar(X_i, Y_i,
+                    yerr=yerr[i] if yerr is not None else None,
+                    xerr=xerr[i] if xerr is not None else None,
+                    marker='o',
+                    ecolor='#333333',
+                    elinewidth=2,
+                    markerfacecolor=colours[i % len(colours)],
+                    markeredgecolor='#333333',
+                    markeredgewidth=1,
+                    markersize=4,
+                    capsize=0,
+                    linestyle=line,
+                    color=colours[i % len(colours)],
+                    label=legend[i])
 
     if set(legend) != {'__nolegend__'}:
         if legend_loc == "top_right":
