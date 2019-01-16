@@ -144,9 +144,9 @@ class MatchUpReader:
 
         # Open sensor data
         if path_sensor_data is not None:
-            sensor_data = self.open_sensor_data(path_sensor_data)
+            matchup.sensor_data = self.open_sensor_data(path_sensor_data)
             matchup.a, matchup.sensor_model_constant, matchup.sensor_model,\
-                matchup.adjustment_model, matchup.idx = self.extract_sensor_data(sensor_data, matchup.idx)
+                matchup.adjustment_model, matchup.idx = self.extract_sensor_data(matchup.sensor_data, matchup.idx)
 
         matchup._original_idx = deepcopy(matchup.idx)
 
