@@ -209,7 +209,7 @@ class HarmonisationVis(MatchUpVis):
         return 0
 
     def plot_L1_harm_v_L2_harm_scatter(self, directory):
-        plot_scatter(pjoin(self, directory, "L1_vs_L2_harmonised_scatter.pdf"),
+        plot_scatter(pjoin(directory, "L1_vs_L2_harmonised_scatter.pdf"),
                      self.get_L1_harm_musamples(),
                      self.get_L2_harm_musamples(),
                      xlbl="Harmonised Sensor 2 Measurand",

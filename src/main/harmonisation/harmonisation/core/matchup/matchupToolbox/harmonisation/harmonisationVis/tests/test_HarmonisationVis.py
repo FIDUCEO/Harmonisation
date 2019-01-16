@@ -63,6 +63,13 @@ class TestHarmonisationVis(unittest.TestCase):
 
         teardown_rm()
 
+    def test_plot_L1_harm_v_L2_harm_scatter(self):
+        harm_vis = setup_open()
+        harm_vis.plot_L1_harm_v_L2_harm_scatter(PLOTS_DIRECTORY)
+
+        # teardown_rm()
+
+
 
 if __name__ == '__main__':
     unittest.main()
