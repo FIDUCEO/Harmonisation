@@ -63,7 +63,7 @@ class MatchUpVis:
         if self.L1_nom is None:
             if self.MatchUpData is not None:
                 try:
-                    self.L1_nom = self.MatchUpData.getAdditionalData("nominal_BT1")
+                    self.L1_nom = self.MatchUpData.getAdditionalData("nominal_measurand1")
                 except:
                     raise ValueError("Nominal Measurand 1 data not available in Matchup data")
             else:
@@ -74,7 +74,7 @@ class MatchUpVis:
         if self.L2_nom is None:
             if self.MatchUpData is not None:
                 try:
-                    self.L2_nom = self.MatchUpData.getAdditionalData("nominal_BT2")
+                    self.L2_nom = self.MatchUpData.getAdditionalData("nominal_measurand2")
                 except:
                     raise ValueError("Nominal Measurand 2 data not available in Matchup data")
             else:
@@ -346,14 +346,12 @@ class MatchUpVis:
 
                     # Bin data by match-up series limits
                     averages_i, stds_i, Xaverages_i = bin(Y[i1:i2], X, bins=50, X_range=[min(X), max(X)])
-
                     # Plot match-up series
                     fname_i = pjoin(directory, fname+"." + cov_name + "_" + sensor_2_name + "_binned." + mu_fn + ".pdf")
-                    plot_scatter(fname_i, averages_i[~isnan(averages_i)], Xaverages_i[~isnan(averages_i)],
+                    plot_scatter(fname_i, averages_i, Xaverages_i,
                                  xlbl=cov_label+" - "+sensor_2_name, ylbl=title+" ("+matchup_labels[i]+")",
                                  title="", yerr=stds_i, xerr=None, txt=None,
                                  line='-', legend=None, solid_ylines=[0], ylim=ylim)
-
                     # Bin data by full limits
                     averages_i, stds_i, Xaverages_i = bin(Y[i1:i2], X, bins=50, X_range=[Xmin, Xmax])
                     averages.append(averages_i[~isnan(averages_i)])
@@ -361,6 +359,7 @@ class MatchUpVis:
                     Xaverages.append(Xaverages_i[~isnan(averages_i)])
 
             # Plot X for all match-up series
+            print stds
             plot_scatter(pjoin(directory, fname + "." + cov_name + "_sensor_2_binned.pdf"), averages, Xaverages,
                          xlbl=cov_label + " - Sensor 2", ylbl=title, title="",
                          yerr=stds, xerr=None, txt=None, line='-', legend=matchup_labels, legend_loc="outside",
@@ -428,7 +427,7 @@ class MatchUpVis:
 
             # Plot match-up series data
             fname_i = pjoin(directory, fname + "." + x_name + "_" + sensor_2_name + "_binned." + mu_fn + ".pdf")
-            plot_scatter(fname_i, averages_i[~isnan(averages_i)], averages_x_i[~isnan(averages_i)],
+            plot_scatter(fname_i, averages_i, averages_x_i,
                          xlbl=x_label + " - " + sensor_2_name, ylbl=title + " (" + matchup_labels[i] + ")",
                          title="", yerr=stds_i, xerr=None, txt=None,
                          line='-', legend=None, solid_ylines=[0], ylim=ylim)
