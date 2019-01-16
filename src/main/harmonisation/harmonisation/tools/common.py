@@ -58,8 +58,8 @@ def parse_cmdline(description, solver_options=True):
     parser.add_argument("-i", "--input_directory", action="store",
                         help="Path of input dataset directory.")
 
-    parser.add_argument("-s", "--sensor_data", action="store",
-                        help="Sensor data (choose from list given by --list_sensors option)")
+    parser.add_argument("-s", "--sensor", action="store",
+                        help="Sensor the matchup data is for (choose from list given by --list_sensors option)")
 
     parser.add_argument("-o", "--output_directory", action="store",
                         help="Path of output dataset directory.")
