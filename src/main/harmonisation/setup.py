@@ -41,7 +41,7 @@ setup(name='harmonisation',
       ext_modules=cythonize(extensions),
       include_dirs=[np.get_include()],
       package_data={"": ["*.dat"]},
-      install_requires=['numpy>=1.11.0', 'netCDF4>=1.1.0', 'scipy>=0.19', 'matplotlib>=2.2.2'],
+      install_requires=['numpy>=1.11.0', 'netCDF4>=1.1.0', 'scipy>=0.19', 'matplotlib==2.2.2'],
       entry_points={
           'console_scripts': [
               'full_eiv_solver =  harmonisation.tools.full_eiv_solver:main',
