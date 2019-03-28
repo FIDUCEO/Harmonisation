@@ -10,7 +10,7 @@ $ full_eiv_solver --help
 '''___Third Party Modules___'''
 
 '''___harmonisation Modules___'''
-from harmonisation.version import __version__, __tag__, _short_name_
+from harmonisation.version import __version__, __tag__, __short_name__
 from common import *
 from HarmonisationOp import HarmonisationOp
 
@@ -36,7 +36,7 @@ TOLB = 1e8      # Gauss-Newton algorithm LSMR tolerance tolB
 TOLU = 1e-8     # Gauss-Newton algorithm Minres rtol
 
 
-parsed_cmdline = parse_cmdline()
+parsed_cmdline = parse_cmdline(description="Run Full Errors-in-Variables Solver for input dataset")
 logger = configure_logging(parsed_cmdline.log, parsed_cmdline.verbose, parsed_cmdline.quiet)
 
 preamble = "\nErrors-in-Variables Sensor Harmonisation"
@@ -51,7 +51,7 @@ def main():
     logger.info("Match-up Dataset Directory: " + dataset_dir)
     logger.info("Harmonisation Result Directory: " + output_dir)
 
-    conf = {"software": _short_name_, "version": __version__, "tag": __tag__}
+    conf = {"software": __short_name__, "version": __version__, "tag": __tag__}
 
     # Initialise harmonisation operator
     harm_op = HarmonisationOp()
