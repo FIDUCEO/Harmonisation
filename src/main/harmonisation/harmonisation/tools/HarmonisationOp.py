@@ -15,7 +15,7 @@ from numpy import all as nall
 '''___harmonisation Modules___'''
 from harmonisation.version import __version__, __tag__
 from common import *
-from harmonisation import MatchUp, HarmonisationEIV, HarmonisationResult, Sample2Ind, Transform2NormInd
+from harmonisation import MatchUp, open_matchup, HarmonisationEIV, HarmonisationResult, Sample2Ind, Transform2NormInd
 from harmonisation.core.matchup.matchupToolbox.harmonisation.\
     harmonisationProcessing.harmonisation_eiv.GN_algo import GNAlgo
 from harmonisation.core.matchup.matchupToolbox.harmonisation.\
@@ -25,6 +25,7 @@ from harmonisation.core.matchup.matchupToolbox.harmonisation.\
 '''___Authorship___'''
 __author__ = ["Sam Hunt", "Peter Harris"]
 __created__ = "09/01/2017"
+__version__ = __version__
 __credits__ = ["Arta Dillo", "Jon Mittaz"]
 __maintainer__ = "Sam Hunt"
 __email__ = "sam.hunt@npl.co.uk"
@@ -90,7 +91,8 @@ class HarmonisationOp:
         ################################################################################################################
 
         print "\nOpening data..."
-        HData = MatchUp(dataset_dir, sensor_data)
+        HData = open_matchup(dataset_dir)
+        HData.setSensorData(sensor_data)
         print "Complete"
 
         print "\nData Info"
