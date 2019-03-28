@@ -10,6 +10,7 @@ from sys import argv
 from shutil import copyfile
 from os import listdir
 from os.path import join as pjoin
+from os import makedirs
 
 '''___Third Party Modules___'''
 from netCDF4 import Dataset
@@ -29,8 +30,8 @@ __maintainer__ = "Sam Hunt"
 __email__ = "sam.hunt@npl.co.uk"
 __status__ = "Development"
 
-AMSUB_sensors = ["15"]
-MHS_sensors = ["19", "A", "B"]
+AMSUB_sensors = ["15", "16", "17"]
+MHS_sensors = ["19", "ma", "mb"]
 ref_sensors = ["18"]
 
 
@@ -206,14 +207,14 @@ def return_w_matrix_variables_MW(time1, time2, scanline_time, uR1, uR2, weights,
 
     if (sensor_1_instrument == "AMSUB") and (sensor_2_instrument == "MHS"):
         w_matrix_use1 = array([1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0], dtype=int8)
-        w_matrix_use2 = array([2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0], dtype=int8)
-        u_matrix_use1 = array([1, 2, 3, 3, 3, 3, 3, 0, 0], dtype=int8)
+        w_matrix_use2 = array([2, 2, 2, 2, 2, 2, 2, 0, 0], dtype=int8)
+        u_matrix_use1 = array([1, 2, 3, 3, 3, 3, 3, 3, 3, 0, 0], dtype=int8)
         u_matrix_use2 = array([4, 5, 6, 6, 6, 6, 6, 0, 0], dtype=int8)
 
     if (sensor_1_instrument == "MHS") and (sensor_2_instrument == "AMSUB"):
         w_matrix_use1 = array([1, 1, 1, 1, 1, 1, 1, 0, 0], dtype=int8)
-        w_matrix_use2 = array([2, 2, 2, 2, 2, 2, 2, 0, 0], dtype=int8)
-        u_matrix_use1 = array([1, 2, 3, 3, 3, 3, 3, 3, 3, 0, 0], dtype=int8)
+        w_matrix_use2 = array([2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0], dtype=int8)
+        u_matrix_use1 = array([1, 2, 3, 3, 3, 3, 3, 0, 0], dtype=int8)
         u_matrix_use2 = array([4, 5, 6, 6, 6, 6, 6, 6, 6, 0, 0], dtype=int8)
 
     if (sensor_1_instrument == "AMSUB") and (sensor_2_instrument == "AMSUB"):
@@ -320,6 +321,10 @@ def run(input_file_path, output_file_path):
 
 
 def main(input_directory, output_directory):
+    try:
+        makedirs(output_directory)
+    except OSError:
+        pass
 
     for fname in listdir(input_directory):
         run(pjoin(input_directory, fname), pjoin(output_directory, fname))
@@ -328,7 +333,7 @@ def main(input_directory, output_directory):
 
 
 if __name__ == "__main__":
-    # main(argv[1], argv[2])
-    main("/home/seh2/data/FIDUCEO/matchups/MW/MW____RCh3_1_RS______",
-         "/home/seh2/data/FIDUCEO/matchups/MW/MW____RCh3_1_RSAS____")
+    main(argv[1], argv[2])
+    # main("/home/seh2/processing/fiduceo/matchups/MW_test/RS__",
+    #      "/home/seh2/processing/fiduceo/matchups/MW_test/RSWS")
 

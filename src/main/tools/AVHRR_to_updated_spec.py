@@ -32,10 +32,10 @@ __status__ = "Development"
 
 '''___Constants___'''
 updated_names = {-12: "aatsr", -11: 'atsr2', -10: 'atsr1',
-                 -1: 'm02', 19: 'n19', 18: 'n18', 17: 'n17',
-                 16: 'n16', 15: 'n15', 14: 'n14',
-		         12: 'n12', 11: 'n11', 10: 'n10', 9: 'n09',
-                 8: 'n08', 7: 'n07'}
+                  -1: 'm02',    19: 'n19',    18: 'n18', 17: 'n17',
+                  16: 'n16',    15: 'n15',    14: 'n14',
+		          12: 'n12',    11: 'n11',    10: 'n10', 9: 'n09',
+                   8: 'n08',     7: 'n07'}
 
 
 def get_new_name(old_name):
@@ -173,17 +173,19 @@ def return_valid_averages_mask(u11, u12, u21, u22, bt=None, temp_lim=None, label
 
     valid_averages = ones(u11.shape[0], dtype=bool_)
 
-    if isnan(label):
-        # If NaN provided for any scanline uncertainty match-up invalid
-        for i, (row11, row12, row21, row22) in enumerate(zip(u11, u12, u21, u22)):
-            if (where(isnan(row11))[0].size != 0) or (where(isnan(row12))[0].size != 0) or \
-                    (where(isnan(row21))[0].size != 0) or (where(isnan(row22))[0].size != 0):
+    # If NaN provided for any scanline uncertainty match-up invalid
+    for i, (row11, row12, row21, row22) in enumerate(zip(u11, u12, u21, u22)):
+        if (where(isnan(row11))[0].size != 0) or (where(isnan(row12))[0].size != 0) or \
+                (where(isnan(row21))[0].size != 0) or (where(isnan(row22))[0].size != 0):
+            valid_averages[i] = False
+        # if (where(row11 == 0)[0].size != 0) or (where(row12 == 0)[0].size != 0) or \
+        #         (where(row21 == 0)[0].size != 0) or (where(row22 == 0)[0].size != 0):
+        #     valid_averages[i] = False
+        if (temp_lim is not None) and (bt is not None):
+            if bt[i] < temp_lim:
                 valid_averages[i] = False
-            if (temp_lim is not None) and (bt is not None):
-                if bt[i] < temp_lim:
-                    valid_averages[i] = False
-                else:
-                    pass
+            else:
+                pass
 
     return valid_averages
 
@@ -192,8 +194,10 @@ def return_additional_variables(additional_variables, valid_averages):
 
     additional_variables_new = {}
 
-    old_names = ["latitude", "longitude", "satza", "solza", "BT", "ref_latitude", "ref_longitude", "ref_satza", "ref_solza", "ref_BT", "nominal_measurand1", "nominal_measurand2"]
-    new_names = ["lat2", "lon2", "vza2", "sza2", "nominal_BT2", "lat1", "lon1", "vza1", "sza1", "nominal_BT1", "nominal_measurand1", "nominal_measurand2"]
+    old_names = ["original_indices", "latitude", "longitude", "satza", "solza", "BT",
+                 "ref_latitude", "ref_longitude", "ref_satza", "ref_solza", "ref_BT"]
+    new_names = ["original_indices", "lat2", "lon2", "vza2", "sza2", "nominal_measurand2",
+                 "lat1", "lon1", "vza1", "sza1", "nominal_measurand1"]
 
     for old_name, new_name in zip(old_names, new_names):
         if old_name in additional_variables.keys():
@@ -435,13 +439,23 @@ def write_input_file(file_path, X1, X2, Ur1, Ur2, Us1, Us2, uncertainty_type1, u
     return 0
 
 
-def prepare_directories(directory, input_file_path):
-    directory_3_RSA = pjoin(directory, "AVHRR_REAL_3_RSA")
-    directory_4_RSA = pjoin(directory, "AVHRR_REAL_4_RSA")
-    directory_3_R_A = pjoin(directory, "AVHRR_REAL_3_R_A")
-    directory_4_R_A = pjoin(directory, "AVHRR_REAL_4_R_A")
-    directory_3_R__ = pjoin(directory, "AVHRR_REAL_3_R__")
-    directory_4_R__ = pjoin(directory, "AVHRR_REAL_4_R__")
+def prepare_directories(directory, input_file_path, band):
+
+    if band == "37":
+        directory_3_RSA = pjoin(directory, "AVHRR_REAL_105_RSW_")
+        directory_4_RSA = pjoin(directory, "AVHRR_REAL_106_RSW_")
+        directory_3_R_A = pjoin(directory, "AVHRR_REAL_105_R_W_")
+        directory_4_R_A = pjoin(directory, "AVHRR_REAL_106_R_W_")
+        directory_3_R__ = pjoin(directory, "AVHRR_REAL_105_R___")
+        directory_4_R__ = pjoin(directory, "AVHRR_REAL_106_R___")
+
+    else:
+        directory_3_RSA = pjoin(directory, "AVHRR_REAL_101_RSW_")
+        directory_4_RSA = pjoin(directory, "AVHRR_REAL_102_RSW_")
+        directory_3_R_A = pjoin(directory, "AVHRR_REAL_101_R_W_")
+        directory_4_R_A = pjoin(directory, "AVHRR_REAL_102_R_W_")
+        directory_3_R__ = pjoin(directory, "AVHRR_REAL_101_R___")
+        directory_4_R__ = pjoin(directory, "AVHRR_REAL_102_R___")
 
     try:
         makedirs(directory_3_RSA)
@@ -648,7 +662,6 @@ def main(input_file_path, output_directory, temp_lim=None):
 
     :type input_file_path: str
     :param input_file_path: path of input harmonisation input file
-
     :type output_file_path: str
     :param output_file_path: path of output harmonisation input file
     """
@@ -670,15 +683,23 @@ def main(input_file_path, output_directory, temp_lim=None):
     sensor_1_name = get_new_name(sensor_1_name)
     sensor_2_name = get_new_name(sensor_2_name)
 
+    additional_variables["original_indices"] = {'data': arange(len(K)),
+                                                "Description": "Indices of matches in Jon's input file",
+                                                "dim": ("M",),
+                                                "dtype": "i4"}
+
     # Convert BT to radiance
-    additional_variables['nominal_measurand1'] = {'data': convertBT2rad(sensor_1_name, additional_variables["ref_BT"]["data"]),
-                                                  "Description": "Nominal measurand for sensor 1",
-                                                  "dim": ("M",),
-                                                  "dtype": "f4"}
-    additional_variables['nominal_measurand2'] = {"data": convertBT2rad(sensor_2_name, additional_variables["BT"]["data"]),
-                                                  "Description": "Nominal measurand for sensor 2",
-                                                  "dim": ("M",),
-                                                  "dtype": "f4"}
+    if "ref_BT" in additional_variables:
+        additional_variables['nominal_measurand1'] = {'data': convertBT2rad(sensor_1_name,
+                                                                            additional_variables["ref_BT"]["data"]),
+                                                      "Description": "Nominal measurand for sensor 1",
+                                                      "dim": ("M",),
+                                                      "dtype": "f4"}
+        additional_variables['nominal_measurand2'] = {"data": convertBT2rad(sensor_2_name,
+                                                                            additional_variables["BT"]["data"]),
+                                                      "Description": "Nominal measurand for sensor 2",
+                                                      "dim": ("M",),
+                                                      "dtype": "f4"}
 
     # Find bad data to remove:
     # > Determine valid scanlines (i.e. full averaging kernal available)
@@ -753,7 +774,7 @@ def main(input_file_path, output_directory, temp_lim=None):
     # 3. Write
     print "Writing to new files:"
     path_3_RSA, path_4_RSA, path_3_R_A,\
-    path_4_R_A, path_3_R__, path_4_R__ = prepare_directories(output_directory, input_file_path)
+    path_4_R_A, path_3_R__, path_4_R__ = prepare_directories(output_directory, input_file_path, band)
 
     if m1 == 1:
         m1s = [1, 1]
@@ -877,13 +898,11 @@ def main(input_file_path, output_directory, temp_lim=None):
     return 0
 
 if __name__ == "__main__":
-    # if len(argv) == 3:
-    #     main(argv[1], argv[2])
-    #
-    # if len(argv) == 4:
-    #     main(argv[1], argv[2], float(argv[3]))
+    if len(argv) == 3:
+        main(argv[1], argv[2])
 
-    main("/home/seh2/atsr2_n15.nc", "/home/seh2/test")
+    if len(argv) == 4:
+        main(argv[1], argv[2], float(argv[3]))
 
 
 
