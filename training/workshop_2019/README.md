@@ -25,6 +25,11 @@ or Jupyter installed, install it. The most simple way may be to install [Anacond
 Either download the [Anaconda installer](https://www.anaconda.com/download/#macos) and follow the instructions on the Anaconda web
 site or use your system's package manager to install Jupyter and Python 3.
 
+In addition to python modules that come with Anaconda, cartopy and xarray must installed. To do this run the following in the command line:
+
+    conda install -c conda-forge cartopy
+    conda install xarray
+
 ### Opening the interactive lecture
 
 Now you are ready to start the interactive lecture. Open a Terminal window, `cd` into the directory where the lecture files reside and type
@@ -42,36 +47,16 @@ as well.
 
 ### Installing prerequisites
 
-To use the interactive lecture you need to have Python 3 and [Jupyter](https://jupyter.org) installed. If you do not have Python 3
-or Jupyter installed, install it. The most simple way is to install [Anaconda](https://www.anaconda.com).
-
-For more experienced users the more convenient way to install Python 3 and Jupyter may be the [Homebrew](https://brew.sh)
-package manager, which allows you to install everything you need, and get rid of it when you do not need it anymore,
-including itself.
+To use the interactive lecture you need to have Python 3 and [Jupyter](https://jupyter.org) installed. If you do not have Python 3 or Jupyter installed, install it. The most simple way is to install [Anaconda](https://www.anaconda.com).
 
 #### Anaconda
 
 Download the [Anaconda installer](https://www.anaconda.com/download/#macos) and follow the instructions on the Anaconda web site.
 
-#### Homebrew
+In addition to python modules that come with Anaconda, cartopy and xarray must installed. To do this run the following in the command line:
 
-To install Homebrew open a Terminal window and type
-
-    /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-
-To install Python 3 type
-
-    brew install python
-
-To bring Python's Pip package manager up to date type
-
-    pip3 install --upgrade pip setuptools wheel
-
-To install Jupyter (and Python modules required by the interactive lecture) type
-
-    pip3 install jupyter matplotlib numpy scipy
-
-You have completed the installation of prerequisites.
+    conda install -c conda-forge cartopy
+    conda install xarray
 
 ### Opening the interactive lecture
 
@@ -99,28 +84,18 @@ to execute the uninstaller. Then remove all Anaconda directories from your home 
     rm -rf ~/.anaconda_backup/
 
 and edit your `~/.profile` to remove the Anaconda directory from your `PATH` environment variable.
-    
-#### Homebrew
-
-To uninstall Jupyter (and Python modules required by the interactive lecture) open a Terminal window and type
-
-    pip3 uninstall jupyter matplotlib numpy scipy
-
-To uninstall Python 3 type
-
-    brew uninstall python
-
-To uninstall homebrew itself type
-
-    ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/uninstall)"
 
 ## How to get started on Windows
 
 ### Installing prerequisites
 
-To use the interactive lecture you need to have Python 3 and [Jupyter](https://jupyter.org) installed. If you do not have Python 3
-or Jupyter installed, install it. The most simple way is to install [Anaconda](https://www.anaconda.com). Download the
+To use the interactive lecture you need to have Python 3 and [Jupyter](https://jupyter.org) installed. If you do not have Python 3 or Jupyter installed, install it. The most simple way is to install [Anaconda](https://www.anaconda.com). Download the
 Anaconda installer and follow the instructions on the Anaconda web site.
+
+In addition to python modules that come with Anaconda, cartopy and xarray must installed. To do this run the following in the command line:
+
+    conda install -c conda-forge cartopy
+    conda install xarray
 
 ### Opening the interactive lecture
 
