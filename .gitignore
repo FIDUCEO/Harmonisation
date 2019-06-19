@@ -7,3 +7,5 @@
 *.pyd
 *.c
 build/
+
+.ipynb_checkpoints
