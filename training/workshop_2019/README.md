@@ -1,17 +1,19 @@
 # Lisbon Workshop, 25-27 June 2019
 
-## How to fetch the interactive lecture from GitHub
+## How to fetch the interactive lecture files
 
-Open a web browser and visit the [Lisbon Workshop on GitHub](https://github.com/FIDUCEO/Harmonisation/tree/master/training/workshop_2019).
-Right click and download the following files to your computer:
- 
-*
-*
-*
-*
+### Getting the interactive lecture files from Dropbox
 
-Users familiar with git may instead find it easier to clone the FIDUCEO [Harmonisation repository](https://github.com/FIDUCEO/Harmonisation). The workshop files are located in `Harmonisation/training/workshop_2019`.
+The interactive lecture files are available on Dropbox for download. Do this in the following way:
 
+1.	Follow this [link](https://www.dropbox.com/sh/zowwp25rsj713on/AABYbsVKhu2yJpTkMjAaw5Qba?dl=0) to the interactive lecture folder on Dropbox.
+2.	Download the contents of this folder to your computer, by clicking download then direct download.
+3.	Unzip the files to a folder wherever you like on your computer.
+
+
+### Getting the interactive lecture files from GitHub
+
+Users familiar with git may prefer to access the files by cloning the FIDUCEO [Harmonisation repository](https://github.com/FIDUCEO/Harmonisation). The workshop files are located in `Harmonisation/training/workshop_2019`.
 
 ## How to get started on Linux
 
@@ -29,7 +31,7 @@ Now you are ready to start the interactive lecture. Open a Terminal window, `cd`
 
     jupyter notebook
 
-A browser window opens and shows the directory contents. Click on the interactive lecture and play with it!
+A browser window opens and shows the directory contents.  Click on an interactive lecture iPython notebook file and play with it!
 
 ### Uninstalling prerequisites
 
@@ -77,7 +79,7 @@ Now you are ready to start the interactive lecture. Open a Terminal window, `cd`
 
     jupyter notebook
 
-A browser window opens and shows the directory contents. Click on the interactive lecture and play with it!
+A browser window opens and shows the directory contents.  Click on an interactive lecture iPython notebook file and play with it!
 
 ### Uninstalling prerequisites
 
@@ -127,7 +129,7 @@ click “Open command window here”. Then get started with the following comman
 
     jupyter notebook
 
-A browser window opens and shows the directory contents. Click on the interactive lecture and play with it!
+A browser window opens and shows the directory contents.  Click on an interactive lecture iPython notebook file and play with it!
 
 ### Uninstalling prerequisites
 
