@@ -34,7 +34,7 @@ Typing `make test` shall yield console output like
 
     Total Test time (real) =   0.11 sec
 
-and produce a file name like
+and produce a file named like
 
     harm_FO_3.0_ggggggg_EIV_101_01_R_W__PH______TEST_01_RSW___.nc
 
