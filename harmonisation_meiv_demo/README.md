@@ -1,17 +1,17 @@
 # Harmonisation of satellite data series (demonstration only)
 
-The code included with this project is an excerpt from the full harmonisation software, which is described in detail by
+The code included with this project is an excerpt from the marginalised errors-in-variables (MEIV) harmonisation software, which is described in detail by
 
 Giering, R.; Quast, R.; Mittaz, J.P.D.; Hunt, S.E.; Harris, P.M.; Woolliams, E.R.; Merchant, C.J.
 A Novel Framework to Harmonise Satellite Data Series for Climate Applications. Remote Sens. 2019, 11, 1002.  
 doi:[10.3390/rs11091002](https://doi.org/10.3390/rs11091002)
 
 The code included with this project is for demonstration only and does not include essential computational parts.
-Please contact [FastOpt GmbH](www.fastopt.de) for further information on the full harmonisation software.
+Please contact [FastOpt GmbH](www.fastopt.de) for further information on the full MEIV harmonisation software.
 
 ## Building and installing
  
-Building this software requires [CMake](https://cmake.org) and a compiler that implements the Fortran 2008 standard and [netCDF](https://www.unidata.ucar.edu/software/netcdf/). To use a specific Fortran compiler set the `FC` and `CC` environment variables before you build this software. For example:
+Building this software requires [CMake](https://cmake.org), a compiler that implements the Fortran 2008 standard and a recent installation of [netCDF](https://www.unidata.ucar.edu/software/netcdf/). To use a specific Fortran compiler set the `FC` and `CC` environment variables before you build this software. For example:
 
     export FC=gfortran
     export CC=gcc
