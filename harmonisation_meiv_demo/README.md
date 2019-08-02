@@ -1,10 +1,10 @@
-# Harmonisation of satellite data series (for demonstration only)
+# Harmonisation of satellite data series (demonstration only)
 
 The code included with this project is an excerpt from the full harmonisation software, which is described in detail by
 
 Giering, R.; Quast, R.; Mittaz, J.P.D.; Hunt, S.E.; Harris, P.M.; Woolliams, E.R.; Merchant, C.J.
 A Novel Framework to Harmonise Satellite Data Series for Climate Applications. Remote Sens. 2019, 11, 1002.
-<https://doi.org/10.3390/rs11091002>
+doi:[10.3390/rs11091002](https://doi.org/10.3390/rs11091002)
 
 The code included with this project is for demonstration only and does not include essential computational parts.
 Please contact [FastOpt GmbH](www.fastopt.de) for further information on the full harmonisation software.
