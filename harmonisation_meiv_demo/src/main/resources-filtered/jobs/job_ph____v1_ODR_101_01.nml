@@ -1,0 +1,26 @@
+$job
+   config_job_id                        = "ODR_101_01_R___"
+   config_job_enable_covariance_matrix  = F   
+   config_job_enable_covariance_update  = T
+   config_job_sensor_count              = 4
+   config_job_sensors(1)                = 0
+   config_job_sensors(2)                = 101
+   config_job_sensors(3)                = 101
+   config_job_sensors(4)                = 101
+   config_job_sensor_configurations(2,:) = 0.0, 1.0, 0.0, 1.0E-02, 0.0, 1.0E-06
+   config_job_sensor_configurations(3,:) = 0.0, 1.0, 0.0, 1.0E-02, 0.0, 1.0E-06
+   config_job_sensor_configurations(4,:) = 0.0, 1.0, 0.0, 1.0E-02, 0.0, 1.0E-06
+   config_job_sensor_names(1)           = "0"
+   config_job_sensor_names(2)           = "1"
+   config_job_sensor_names(3)           = "2"
+   config_job_sensor_names(4)           = "3"
+   config_job_matchup_count             = 3
+   config_job_matchup(1,:)              = 1, 2
+   config_job_matchup(2,:)              = 2, 3
+   config_job_matchup(3,:)              = 3, 4
+   config_job_matchup_datasets(1)       = "0_1.nc"
+   config_job_matchup_datasets(2)       = "1_2.nc"
+   config_job_matchup_datasets(3)       = "2_3.nc"
+   config_job_matchup_dataset_id        = "PH______TEST_01_RSW_"
+   config_job_matchup_dataset_path      = "@PROC@/source/test/ph_v1/"
+ /

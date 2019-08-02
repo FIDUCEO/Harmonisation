@@ -1,0 +1,6 @@
+$run
+   config_solver_accuracy_goal = 1.0E-05
+   config_solver_max_iteration = 400
+   config_enable_log_level     = 4
+   config_job                  = "job.nml"
+/
