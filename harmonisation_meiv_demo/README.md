@@ -42,7 +42,7 @@ which contains (dummy) calibration coefficients, calibration uncertainties, cali
 
 ### Adding a specific directory to search for a netCDF installation
        
-To search for a specific [netCDF](https://www.unidata.ucar.edu/software/netcdf/) version add the directory to be searched to the `CMAKE_PREFIX_PATH`. For example:
+To search for a specific [netCDF](https://www.unidata.ucar.edu/software/netcdf/) installation add the directory to be searched to the `CMAKE_PREFIX_PATH`. For example:
 
     cmake -DCMAKE_PREFIX_PATH=/usr/local/netcdf-4.7-gfortran ..
 
