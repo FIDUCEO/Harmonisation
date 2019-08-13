@@ -40,7 +40,7 @@ and produce a file named like
 
 which contains (dummy) calibration coefficients, calibration uncertainties, calibration error covariance and correlation matrices, and some result statistics.
 
-### Adding a specific directory to search for [netCDF](https://www.unidata.ucar.edu/software/netcdf/)
+### Adding a specific directory to search for a netCDF installation
        
 To search for a specific [netCDF](https://www.unidata.ucar.edu/software/netcdf/) version add the directory to be searched to the `CMAKE_PREFIX_PATH`. For example:
 
