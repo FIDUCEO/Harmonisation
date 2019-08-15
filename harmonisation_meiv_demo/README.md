@@ -23,7 +23,7 @@ To build and test this software `cd` into the project root directory and type:
     cmake ..
     make clean all test
 
-Typing `make test` shall yield console output like
+Typing `make test` will yield console output like
 
     Running tests...
     Test project harmonisation_meiv_demo/cmake-build
