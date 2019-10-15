@@ -6,6 +6,12 @@ Giering, R.; Quast, R.; Mittaz, J.P.D.; Hunt, S.E.; Harris, P.M.; Woolliams, E.R
 A Novel Framework to Harmonise Satellite Data Series for Climate Applications. Remote Sens. 2019, 11, 1002.  
 doi:[10.3390/rs11091002](https://doi.org/10.3390/rs11091002)
 
+The source and result datasets discussed in the above journal article as well as a presentation on the comparison of errors-in-variables and marginalised errors-in-variables methods are publicly available at Zenodo:
+
+Quast, Ralf, Mittaz, Jonathan P. D., & Hunt, Samuel E. (2019). A Novel Framework to Harmonise Satellite Data Series for Climate Applications: Matchups, Calibration Parameters and Residuals [Data set]. Zenodo. http://doi.org/10.5281/zenodo.3490298
+
+Harris, Peter M., Hunt, Samuel E., Quast, Ralf, & Giering, Ralf. (2019, October). Comparison of FIDUCEO harmonisation methods on simulated datasets. Zenodo. http://doi.org/10.5281/zenodo.3490509
+
 The code included with this project is for demonstration only and does not include essential computational parts.
 Please contact [FastOpt GmbH](www.fastopt.de) for further information on the full MEIV harmonisation software.
 
